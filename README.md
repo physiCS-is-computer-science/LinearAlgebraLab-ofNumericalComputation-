@@ -38,161 +38,56 @@ Workspace 把矩阵A存到内存，需要时保存到文件
 ### 文件结构
 
 ```
-lal/LALCore/
-│  command.md
-│  README.md
-│
-├─LALCore
-│  ├─include/
-│  │  ├─core/ # 基础数据结构层
-│  │  │      matrix.hpp # 矩阵 类
-│  │  │      vector.hpp # 向量 类
-│  │  │
-│  │  ├─decompositions/ # 矩阵分解模块
-│  │  │      cholesky_decomposition.hpp # Cholesky分解 类
-│  │  │      eigen_decomposition.hpp # 特征值分解 类
-│  │  │      LU_decomposition.hpp # LU分解 类
-│  │  │      QR_decomposition.hpp # QR分解 类
-│  │  │      schur_decomposition.hpp # Schur分解 类
-│  │  │      SVD.hpp # 奇异值分解 类
-│  │  │
-│  │  ├─eigen/ # 特征系统模块
-│  │  │      eigen_solver.hpp # 特征求解器 类
-│  │  │      generalized_eigen.hpp # 广义特征值
-│  │  │      power_method.hpp # 幂方法
-│  │  │      QR_algorithm.hpp # QR算法
-│  │  │
-│  │  ├─factory/ # 矩阵创建与工厂模块
-│  │  │      matrix_builder.hpp # 矩阵构建工具
-│  │  │      matrix_factory.hpp # 特殊矩阵生成器
-│  │  │      random_generator.hpp # 随机矩阵生成器
-│  │  │
-│  │  ├─functions/ # 矩阵函数模块
-│  │  │      matrix_exponential.hpp # 矩阵指数
-│  │  │      matrix_logarithm.hpp # 矩阵对数
-│  │  │      matrix_power.hpp # 矩阵幂
-│  │  │      matrix_square_root.hpp # 矩阵平方根
-│  │  │      matrix_trigonometric.hpp # 矩阵三角函数
-│  │  │
-│  │  ├─least_squares/ # 最小二乘与优化模块
-│  │  │      least_squares_solver.hpp # 最小二乘求解器 类
-│  │  │      regularized_least_squares.hpp # 正则化最小二乘
-│  │  │      weighted_leadt_squares.hpp # 加权最小二乘
-│  │  │
-│  │  ├─numerical/ # 数值稳定性模块
-│  │  │      condition_estimator.hpp # 条件数估计
-│  │  │      error_analysis.hpp # 数值误差分析
-│  │  │      numerical_rank.hpp # 数值秩判断
-│  │  │      preconditioner.hpp # 预处理器
-│  │  │
-│  │  ├─solvers/ # 线性系统求解模块
-│  │  │  │  linear_solver.hpp # 线性方程组求解器 基类
-│  │  │  │
-│  │  │  ├─direct/
-│  │  │  │      cholesky_solver.hpp # Cholesky求解器 子类
-│  │  │  │      gaussian_sollver.hpp # 高斯消元求解器 子类
-│  │  │  │      LU_solver.hpp # LU求解器 子类
-│  │  │  │      QR_solver.hpp # QR求解器 子类
-│  │  │  │
-│  │  │  └─iterative/
-│  │  │          conjugate_gradient_solver.hpp # 共轭梯度求解器 子类
-│  │  │          gauss_seidel_solver.hpp # Gauss-Seidel求解器 子类
-│  │  │          GMRES_solver.hpp # GMRES求解器 子类
-│  │  │          jacobi_solver.hpp # 雅可比求解器 子类
-│  │  │
-│  │  ├─subspaces/ # 子空间与投影模块
-│  │  │      fundamental_subspaces.hpp # 四个基本子空间
-│  │  │      orthogonal_projection.hpp # 正交投影
-│  │  │      projector.hpp # 投影矩阵生成
-│  │  │      subspace_angles.hpp # 子空间夹角
-│  │  │
-│  │  └─utilities/
-│  │          constants.hpp # 数学常量
-│  │          utilities.hpp # 公用工具
+.\LALCore\
+├─include
+│  ├─core
+│  │      matrix.hpp
+│  │      vector.hpp
+│  │      
+│  ├─decompositions
+│  │      advanced_decomp.hpp
+│  │      basic_decomp.hpp
+│  │      
+│  ├─solvers
+│  │      eigen_solvers.hpp
+│  │      least_squares_solver.hpp
+│  │      linear_solvers.hpp
 │  │
-│  └─src/
-│      │  main.cpp # 程序主循环
-│      │
-│      ├─core/
-│      │      matrix.cpp
-│      │      vector.cpp
-│      │
-│      ├─decompositions/
-│      │      cholesky_decomposition.cpp
-│      │      eigen_decomposition.cpp
-│      │      LU_decomposition.cpp
-│      │      QR_decomposition.cpp
-│      │      schur_decomposition.cpp
-│      │      SVD.cpp
-│      │
-│      ├─eigen/
-│      │      eigen_solver.cpp
-│      │      generalized_eigen.cpp
-│      │      power_method.cpp
-│      │      QR_algorithm.cpp
-│      │
-│      ├─factory/
-│      │      matrix_builder.cpp
-│      │      matrix_factory.cpp
-│      │      random_generator.cpp
-│      │
-│      ├─functions/
-│      │      matrix_exponential.cpp
-│      │      matrix_logarithm.cpp
-│      │      matrix_power.cpp
-│      │      matrix_square_root.cpp
-│      │      matrix_trigonometric.cpp
-│      │
-│      ├─least_squares/
-│      │      least_squares_solver.cpp
-│      │      regularized_least_squares.cpp
-│      │      weighted_leadt_squares.cpp
-│      │
-│      ├─numerical/
-│      │      condition_estimator.cpp
-│      │      error_analysis.cpp
-│      │      numerical_rank.cpp
-│      │      preconditioner.cpp
-│      │
-│      ├─solvers/
-│      │  ├─direct/
-│      │  │      cholesky_solver.cpp
-│      │  │      gaussian_sollver.cpp
-│      │  │      LU_solver.cpp
-│      │  │      QR_solver.cpp
-│      │  │
-│      │  └─iterative/
-│      │          conjugate_gradient_solver.cpp
-│      │          gauss_seidel_solver.cpp
-│      │          GMRES_solver.cpp
-│      │          jacobi_solver.cpp
-│      │
-│      ├─subspaces/
-│      │      fundamental_subspaces.cpp
-│      │      orthogonal_projection.cpp
-│      │      projector.cpp
-│      │      subspace_angles.cpp
-│      │
-│      └─utilities/
-│              utilities.cpp
-│
-├─LaxbIO/ # Laxb的IO模块
-│  ├─include/
-│  │      command_manual_lib.hpp # 命令手册库
-│  │      command_parser.hpp # 命令解析器 类
+│  ├─spaces
+│  │      projections.hpp
+│  │      subspaces.hpp
 │  │
-│  └─src/
-│          command_parser.cpp
+│  └─utils
+│          factory.hpp
+│          functions.hpp
+│          numerical.hpp
+│          output.hpp
 │
-└─Workspace/ # 工作空间模块
-    ├─include/
-    │      workspace.hpp # 工作空间 类
+└─src
+    │  main.cpp
     │
-    ├─src/
-    │      workspace.cpp
+    ├─core
+    │      matrix.cpp
+    │      vector.cpp
     │
-    └─user_files/ # 被保存的.lal文件
-            test.lal
+    ├─decompositions
+    │      advanced_decomp.cpp
+    │      basic_decomp.cpp
+    │
+    ├─solvers
+    │      eigen_solvers.cpp
+    │      least_squares_solver.cpp
+    │      linear_solvers.cpp
+    │
+    ├─spaces
+    │      projections.cpp
+    │      subspaces.cpp
+    │
+    └─utils
+            factory.cpp
+            functions.cpp
+            numerical.cpp
+            output.cpp
 ```
 
 
