@@ -208,7 +208,7 @@ Matrix cross(const Vector& vec1, const Vector& vec2) {
 }
 
 /* 接受 1 * n 或者 n * 1 的 Vector 返回对应维度方向的 Matrix */
-Matrix toMatrix(const Vector& vec) {
+Matrix tomtx(const Vector& vec) {
     Matrix output;
 
     if (vec.getOrientation() == VectorOrientation::ROW) {

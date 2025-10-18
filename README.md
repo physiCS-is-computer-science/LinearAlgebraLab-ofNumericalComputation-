@@ -250,10 +250,10 @@ lal/LALCore/
 
 - 未设置环境变量时
 ```bash
-./LAL arg_v ...
+.\LAL arg_v ...
 ```
 
-- 添加 `.\LinearAlgebraLab\x64\release` 为环境变量时
+- 添加 `.\LAL` 为环境变量时
 ```bash
 LAL arg_v ...
 ```

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-/* #### 使用initializer_list列表视图初始化矩阵
+/* 使用 initializer_list 列表视图初始化矩阵的构造函数
  * - 必须严格按照矩阵格式来初始化，{{1}, {2, 3}} 这样子初始化会得到错误的矩阵
  * - 矩阵大小以第一行的列数为矩阵列数，后续列数少于第一行则补零，多则丢弃 */
 Matrix::Matrix(std::initializer_list<std::initializer_list<double>> initList) {
@@ -28,6 +28,24 @@ Matrix::Matrix(std::initializer_list<std::initializer_list<double>> initList) {
             matrix_[i][j] = *colIt;
         }
     }
+}
+
+/* 类型转换 */
+Matrix::operator Vector() const {
+    Vector output;
+    if (col_ == 1) { // 如果为 1 * 1 的矩阵，此处直接处理为列向量（即为不执行转置）
+        output.reconstruct(row_);
+        for (Vector::vectorSizet i = 0; i < row_; ++i)
+            output(i) = matrix_[i][0];
+    }
+    else if (row_ == 1) {
+        output.reconstruct(col_);
+        for (Vector::vectorSizet i = 0; i < col_; ++i)
+            output(i) = matrix_[0][i];
+        output = ~output; // 转为行向量
+    }
+
+    return output;
 }
 
 /* ============ 运算符重载 ============ */
@@ -324,9 +342,9 @@ double Matrix::getMin() const {
 }
 
 /* 接受 1*n 或 n*1 的 Matrix，返回对应方向的 Vector */
-Vector toVector(const Matrix& matrix) {
+Vector tovec(const Matrix& matrix) {
     if (matrix.row_ != 1 && matrix.col_ != 1)
-        throw std::invalid_argument("matrix.cpp: toVector(): expected a 1*n or n*1 matrix, but passed that is not");
+        throw std::invalid_argument("matrix.cpp: tovec(): expected a 1*n or n*1 matrix, but passed that is not");
 
     Vector output;
 

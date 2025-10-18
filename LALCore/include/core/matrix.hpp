@@ -32,10 +32,10 @@
 class Vector; // 向前声明，避免 vector.hpp 和 matrix.hpp 相互循环 include 导致报错
 
 class Matrix {
-  public:
+public:
     using matrixSizet = std::vector<double>::size_type;
 
-    /* ==== friend ==== */
+    /* friend */
     friend Matrix operator+(const Matrix& matrix1, const Matrix& matrix2);
     friend Matrix operator-(const Matrix& matrix1, const Matrix& matrix2);
     friend Matrix operator*(const Matrix& matrix1, const Matrix& matrix2);
@@ -47,19 +47,29 @@ class Matrix {
     friend Matrix times(const Matrix& matrix1, const Matrix& matrix2);
     friend Matrix power(const Matrix& matrix1, const Matrix& matrix2);
     friend Matrix divide(const Matrix& matrix1, const Matrix& matrix2);
-    friend Vector toVector(const Matrix& matrix);
+    friend Vector tovec(const Matrix& matrix);
 
+    /* 默认的六大特殊函数 */
     Matrix() = default;
+    ~Matrix() = default;
+    Matrix(const Matrix&) = default;
+    Matrix(Matrix&&) = default;
+    Matrix& operator=(const Matrix&) = default;
+    Matrix& operator=(Matrix&&) = default;
+
+    /* 类型转换 */
+    operator Vector() const; // 将一行或一列的矩阵在需要时转换为 Vector
+
+    /* 初始化构造函数 */
     Matrix(matrixSizet row, matrixSizet col) : row_(row), col_(col), matrix_(row, std::vector<double>(col, 0.0)) {} // r 行 c 列的矩阵，默认初始化为 0
     Matrix(matrixSizet dimension) : row_(dimension), col_(dimension), matrix_(dimension, std::vector<double>(dimension, 0.0)) {} // dimension 维的方阵，初始化为 0
-    Matrix(const Matrix& other) : row_(other.row_), col_(other.col_), matrix_(other.matrix_) {}; // 拷贝构造，注意第一参数 非const 引用不能绑定临时对象，因此加上 const
     Matrix(std::initializer_list<std::initializer_list<double>> initList); // 初始化列表初始化，{{1, 2, 3}, {4, 5, 6};
 
-    /* ==== 运算符重载 ==== */
+    /* 运算符重载 */
     double& operator()(matrixSizet row, matrixSizet col) { return matrix_[row][col]; } // 用 M(0, 1) 访问矩阵第一行第二列元素
     const double& operator()(matrixSizet row, matrixSizet col) const { return matrix_[row][col]; } // 同上，const 版本，详细说明在 Vector 的()重载函数
 
-    /* ==== member functions ==== */
+    /* member functions */
     matrixSizet getRowSize() const { return row_; } // 获取行大小
     matrixSizet getColSize() const { return col_; } // 获取列大小
     Vector getRow(matrixSizet row) const; // 获取 row 行
@@ -77,13 +87,13 @@ class Matrix {
     bool isEmpty() const { return row_ == 0 && col_ == 0; } // 判断是否为空矩阵
     void reconstruct(matrixSizet row = 0, matrixSizet col = 0); // 重新构建矩阵大小，默认初始化元素为0，默认重构大小为 0 * 0 的空矩阵
 
-  private:
+private:
     matrixSizet col_ = 0;
     matrixSizet row_ = 0;
     std::vector<std::vector<double>> matrix_;
 };
 
-/* ==== 运算符重载 ==== */
+/* 运算符重载 */
 Matrix operator+(const Matrix& matrix1, const Matrix& matrix2); // +
 Matrix operator-(const Matrix& matrix1, const Matrix& matrix2); // -
 Matrix operator*(const Matrix& matrix1, const Matrix& matrix2); // matrix * matrix
@@ -98,4 +108,4 @@ Matrix power(const Matrix& matrix1, const Matrix& matrix2); // 逐元素幂
 Matrix divide(const Matrix& matrix1, const Matrix& matrix2); // 逐元素除
 
 // void printMatrix(const Matrix& matrix, std::string messageBegin = "", std::string messageEnd = ""); // print a matrix formatly
-Vector toVector(const Matrix& matrix); // 转换为一个 Vector
+Vector tovec(const Matrix& matrix); // 转换为一个 Vector
