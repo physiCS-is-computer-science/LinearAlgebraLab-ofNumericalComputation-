@@ -1,20 +1,26 @@
 // ============================================================================
 // 此文件为 LAL 程序主循环
-//
+// - 循环流程为：
+//   0.注册所有函数
+//   1.由 CmdParser 类的唯一对象 cmdpr 读取命令字符串并解析
+//   2.cmdpr 调用 LALCore 的接口模块计算
+//   3.LALCore 的接口模块使用 Workspace 类的唯一对象 ws 对工作空间写入计算结果
+//   4.cmdpr 检查 ws 的标记，判断是否需要输出本次计算的结果
+//   5.循环结束，重新等待新命令
 // ============================================================================
 
+#include "commandIO.hpp"
 #include "core/matrix.hpp"
 #include "core/vector.hpp"
+#include "function_manager.hpp"
 #include "utils/output.hpp"
 #include <iostream>
 
 int main() {
-    Matrix mtx1{{10, 20, 30}};
-    Matrix mtx2{{9, 10, 11, 12, 13},
-                {14, 15, 16, 17, 18}};
-    Vector vec{1, 2, 3};
+    void registerAllFunc(); // 注册所有函数
 
-    std::cout << mtx1 + ~vec;
+    for (const auto& i : cmdpr.in())
+        std::cout << i << "|";
 
     return 0;
 }
