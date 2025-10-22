@@ -167,6 +167,28 @@ Matrix operator~(const Matrix& matrix) {
     return output;
 }
 
+/* 矩阵格式化输出
+ * - 末尾追加一个 '\n' */
+std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
+    if (os.fail()) {
+        throw std::ios::failure("matrix_vector_output.cpp: operator<<(): std::cout.fail() == true");
+        return os;
+    }
+
+    if (matrix.getColSize() == 0 || matrix.getRowSize() == 0) {
+        os.setstate(std::ios::failbit); // failbit 置位
+        return os;
+    }
+
+    for (Matrix::matrixSizet row = 0; row < matrix.getRowSize(); ++row) {
+        Vector temp(matrix.getRow(row)); // 临时行
+        for (Vector::vectorSizet i = 0; i < temp.getSize(); ++i) // 逐个输出临时行的元素
+            std::cout << temp(i) << '\t';
+        std::cout << '\n'; // put a '\n' at the end of matrix
+    }
+    return os;
+}
+
 /* ============= member functions ============= */
 /* get a row of the matrix */
 Vector Matrix::getRow(matrixSizet row) const {

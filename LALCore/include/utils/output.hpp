@@ -1,27 +1,33 @@
 // ========================================
-// 重载 << 从而用 std::cout 输出矩阵与向量类型
+// 杂七杂八的输出部分
 // ========================================
 
 #pragma once
 
-#include "core/matrix.hpp"
-#include "core/vector.hpp"
 #include <iostream>
 #include <string>
 
-class MatrixVectorOutput {
+namespace oup {
+/* 标注当前使用文件路径，默认为$，使用方式为纯粹的类名调用重载的 ()，其中括号接受一个 std::string 作为路径 */
+class OutPathID {
 public:
-    friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix); // 默认矩阵末尾输出一个 '\n'
-    friend std::ostream& operator<<(std::ostream& os, const Vector& vec); // 同上
+    OutPathID() = default;
+    ~OutPathID() = default;
+    OutPathID(const OutPathID&) = delete;
+    OutPathID(OutPathID&&) = delete;
+    OutPathID& operator=(const OutPathID&) = delete;
+    OutPathID& operator=(OutPathID&&) = delete;
 
-    MatrixVectorOutput() = default;
-    ~MatrixVectorOutput() = default;
-    MatrixVectorOutput(const MatrixVectorOutput&) = default;
-    MatrixVectorOutput(MatrixVectorOutput&&) = default;
-    MatrixVectorOutput& operator=(const MatrixVectorOutput&) = default;
-    MatrixVectorOutput& operator=(MatrixVectorOutput&&) = default;
+    OutPathID(const std::string& ioid) : ioid_(ioid) {}
+
+    std::string operator()(const std::string& path = "#") { return "[LAL " + path + "]" + ioid_; } // 传递路径，无参数时默认为 $
+
+private:
+    const std::string ioid_; // 初始化后就不可改
 };
+extern oup::OutPathID ERS;
+extern oup::OutPathID SOS;
+extern oup::OutPathID SIS;
+} // namespace oup
 
-/* 借助 std::cout 的所有重载，使得矩阵输出可以直接使用 std::cout */
-std::ostream& operator<<(std::ostream& os, const Matrix& matrix); // 默认矩阵末尾输出一个 '\n'
-std::ostream& operator<<(std::ostream& os, const Vector& vec); // 同上
+void startupBanner(); // 启动信息栏

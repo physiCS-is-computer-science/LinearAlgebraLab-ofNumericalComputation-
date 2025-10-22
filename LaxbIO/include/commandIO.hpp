@@ -16,9 +16,8 @@ public:
     CmdParser& operator=(const CmdParser&) = delete;
     CmdParser& operator=(CmdParser&&) = delete;
 
-    /* 处理输入 */
-    std::vector<std::string> in();
-
-private:
+    std::vector<std::string> in(); // 处理输入，错误则返回空 vector，正确则返回语法正确的 tokens
 };
 extern CmdParser cmdpr; // 不可复制，仅作为命名解析器使用
+
+bool tksCheck(std::vector<std::string> tks); // in() 调用，检查输入参数的语法正确与否

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <iostream>
 #include <vector>
 
 class Matrix; // 向前声明，避免 vector.hpp 和 matrix.hpp 相互循环 include 导致报错
@@ -65,7 +66,7 @@ public:
 private:
     VectorOrientation orientation_ = VectorOrientation::COLUMN; // 默认为列向量
     vectorSizet dimension_ = 0;
-    std::vector<double> vec_;
+    std::vector<double> vec_{};
 };
 
 /* 运算符重载 */
@@ -76,6 +77,7 @@ inline Vector operator*(const Vector& vec, double scalar) { return scalar * vec;
 bool operator==(const Vector& vec1, const Vector& vec2); // ==
 bool operator!=(const Vector& vec1, const Vector& vec2); // !=
 Vector operator~(const Vector& vec); // 转置
+std::ostream& operator<<(std::ostream& os, const Vector& vec); // 同上
 
 Vector times(const Vector& vec1, const Vector& vec2); // 逐元素乘
 Vector power(const Vector& vec1, const Vector& vec2); // 逐元素幂

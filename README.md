@@ -158,7 +158,7 @@ LAL arg_v ...
 语法与 Linux 的 `bash` 操作相似
 
 ```
-command -opt :varn ::varn [a b c; d e f] {a b c};
+command -opt :varn ::varn {a b c} [a b c; d e f];
 ```
 
 - 命令后三种参数的 `位置、数量没有要求`

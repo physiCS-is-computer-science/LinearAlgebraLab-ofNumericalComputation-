@@ -14,12 +14,22 @@
 #include "core/vector.hpp"
 #include "function_manager.hpp"
 #include "utils/output.hpp"
+#include <Windows.h>
 #include <iostream>
+#include <string>
+#include <vector>
 
 int main() {
-    void registerAllFunc(); // 注册所有函数
+    // system("cls");
 
-    for (const auto& i : cmdpr.in())
+    registerAllFunc(); // 注册所有函数
+    startupBanner(); // 启动信息栏
+
+    std::vector<std::string> ret;
+    std::cout << oup::SIS();
+    while ((ret = cmdpr.in()).empty())
+        std::cout << oup::SIS();
+    for (const auto& i : ret)
         std::cout << i << "|";
 
     return 0;

@@ -29,6 +29,14 @@
 #include <string>
 #include <vector>
 
+/* ========= 以下为模板重构 ========= */
+// template <typename T>
+// class  {
+
+// }
+
+/* ========= 以下为旧类 ========= */
+
 class Vector; // 向前声明，避免 vector.hpp 和 matrix.hpp 相互循环 include 导致报错
 
 class Matrix {
@@ -102,6 +110,7 @@ inline Matrix operator*(double scalar, const Matrix& matrix) { return matrix * s
 bool operator==(const Matrix& matrix1, const Matrix& matrix2); // ==
 bool operator!=(const Matrix& matrix1, const Matrix& matrix2); // !=
 Matrix operator~(const Matrix& matrix); // 转置
+std::ostream& operator<<(std::ostream& os, const Matrix& matrix); // 默认矩阵末尾输出一个 '\n'
 
 Matrix times(const Matrix& matrix1, const Matrix& matrix2); // 逐元素乘
 Matrix power(const Matrix& matrix1, const Matrix& matrix2); // 逐元素幂
