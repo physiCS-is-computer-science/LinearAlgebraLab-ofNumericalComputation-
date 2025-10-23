@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace laxb {
+
 FuncManager fnMgr;
 
 void registerAllFunc() {
@@ -21,3 +23,5 @@ bool FuncManager::fnFind(const std::string& fnName) const {
         return true;
     return false;
 }
+
+} // namespace laxb

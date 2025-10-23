@@ -13,6 +13,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace laxb {
+
 class FuncManager {
 public:
     /* 全部使用默认合成版本 */
@@ -33,3 +35,5 @@ private:
 extern FuncManager fnMgr; // 唯一对象，管理函数们
 
 void registerAllFunc(); // 注册所有函数
+
+} // namespace laxb

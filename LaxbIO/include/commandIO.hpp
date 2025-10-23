@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+namespace laxb {
+
 class CmdParser {
 public:
     CmdParser() = default;
@@ -21,3 +23,5 @@ public:
 extern CmdParser cmdpr; // 不可复制，仅作为命名解析器使用
 
 bool tksCheck(std::vector<std::string> tks); // in() 调用，检查输入参数的语法正确与否
+
+} // namespace laxb

@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string>
 
+namespace util {
+
 namespace oup {
 /* 三个常量，分别为错误字符串、标准输入字符串、标准输出字符串 */
 oup::OutPathID ERS = oup::OutPathID(">! ");
@@ -18,6 +20,8 @@ void startupBanner() {
 
     std::cout << "+---------- " << name << " ----------+\n";
     std::cout << " > Support: Matrix/Vector Calculation\n";
-    std::cout << " >                                   \n";
+    std::cout << " > Real number version               \n";
     std::cout << "+-------------------------------------+\n\n";
 }
+
+} // namespace util

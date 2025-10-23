@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+namespace laxb {
+
 CmdParser cmdpr;
 
 /* 唯一命令输入函数，内部调用 getline()
@@ -59,12 +61,12 @@ std::vector<std::string> CmdParser::in() {
                 ++endPos; // 不为最后一个字符则递增
 
                 if (cmdLine[endPos] != ' ') { // 递增之后，当前位置应该为空格（最后一个为括号例外）
-                    std::cout << oup::ERS() + "CmdParser::in(): Missing spaces after brackests\n";
+                    std::cout << util::oup::ERS() + "CmdParser::in(): Missing spaces after brackests\n";
                     return {};
                 }
             }
             else if (endPos == std::string::npos) { // 未找到反括号时，处理找不到反括号的情况
-                std::cout << oup::ERS() + "CmdParser::in(): Missing a backbrackets\n";
+                std::cout << util::oup::ERS() + "CmdParser::in(): Missing a backbrackets\n";
                 return {};
             }
         }
@@ -101,14 +103,14 @@ bool tksCheck(std::vector<std::string> tks) {
 
     for (auto& tk : tks) {
         if (tk.size() < 2) { // 所有命令的参数（包括命令）都至少有两位或以上（分号除外）
-            std::cout << oup::ERS() + "CmdParser::in(): Argument(s) error\n";
+            std::cout << util::oup::ERS() + "CmdParser::in(): Argument(s) error\n";
             return false;
         }
 
         /* 命令检查 */
         if (allow) {
             if (fnMgr.fnFind(tk) == false) {
-                std::cout << oup::ERS() + "CmdParser::in(): Command '" + tk + "' not found\n";
+                std::cout << util::oup::ERS() + "CmdParser::in(): Command '" + tk + "' not found\n";
                 return false;
             }
             allow = false;
@@ -123,27 +125,27 @@ bool tksCheck(std::vector<std::string> tks) {
             inx = 1;
         else if (tk[0] == ':' && tk[1] == ':') { // ::varn
             if (tk.size() < 3) {
-                std::cout << oup::ERS() + "tksCheck(): Argument error after identifier \"::\"\n";
+                std::cout << util::oup::ERS() + "tksCheck(): Argument error after identifier \"::\"\n";
                 return false;
             }
             inx = 2;
         }
         else if (tk[0] == '{') { // {a b ...}
             if (tk[tk.size() - 1] != '}') {
-                std::cout << oup::ERS() + "tksCheck(): Missing a backbrackets '}'\n";
+                std::cout << util::oup::ERS() + "tksCheck(): Missing a backbrackets '}'\n";
                 return false;
             }
             inx = 1;
         }
         else if (tk[0] == '[') { // [a b; c d; ...]
             if (tk[tk.size() - 1] != ']') {
-                std::cout << oup::ERS() + "tksCheck(): Missing a backbrackets ']'\n";
+                std::cout << util::oup::ERS() + "tksCheck(): Missing a backbrackets ']'\n";
                 return false;
             }
             inx = 1;
         }
         else {
-            std::cout << oup::ERS() + "tksCheck(): Unknown argument(s)\n";
+            std::cout << util::oup::ERS() + "tksCheck(): Unknown argument(s)\n";
             return false;
         }
         tksNoid.push_back(tk.substr(inx));
@@ -152,10 +154,12 @@ bool tksCheck(std::vector<std::string> tks) {
     const std::string legalCh{"1234567890abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
     for (const auto& tkNoid : tksNoid) {
         if (tkNoid.find_first_not_of(legalCh) != std::string::npos) { // 找到非法字符时
-            std::cout << oup::ERS() + "tksCheck(): Illegal argument(s) in \"" + tkNoid + "\"\n";
+            std::cout << util::oup::ERS() + "tksCheck(): Illegal argument(s) in \"" + tkNoid + "\"\n";
             return false;
         }
     }
 
     return true; // 都通过时
 }
+
+} // namespace laxb

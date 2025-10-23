@@ -7,7 +7,10 @@
 #include <iostream>
 #include <string>
 
+namespace util {
+
 namespace oup {
+
 /* 标注当前使用文件路径，默认为$，使用方式为纯粹的类名调用重载的 ()，其中括号接受一个 std::string 作为路径 */
 class OutPathID {
 public:
@@ -28,6 +31,9 @@ private:
 extern oup::OutPathID ERS;
 extern oup::OutPathID SOS;
 extern oup::OutPathID SIS;
+
 } // namespace oup
 
 void startupBanner(); // 启动信息栏
+
+} // namespace util
