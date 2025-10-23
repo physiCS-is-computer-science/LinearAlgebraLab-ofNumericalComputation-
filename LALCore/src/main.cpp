@@ -26,7 +26,7 @@ int main() {
     util::startupBanner(); // 启动信息栏
 
     core::dvec vec1{0, 1, 2, 3}, vec2{1, 2, 5, 7};
-    std::cout << vec1 - vec2;
+    std::cout << core::dot(vec1, ~vec2);
 
     /* LaxbIO 模块测试 */
     // std::vector<std::string> ret;
