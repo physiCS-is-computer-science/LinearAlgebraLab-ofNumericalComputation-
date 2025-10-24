@@ -1,19 +1,16 @@
 // =========================================================================
-// # Vector类，单个vector<T>存储向量对象，包含向量基本运算，与Matrix密切相关
+// # Vector<T> 模板类，存储向量对象，包含向量基本运算，与Matrix密切相关
 // - 向量基本信息：尺寸、元素数量等
 // - 向量状态判断：是否为标量、空向量
 // - 向量基本运算：加、减、乘、逐元素乘、逐元素除、逐元素幂、元素求和、最值、转置等
 // -------------------------------------------------------------------------
 // - 复数类型仅仅支持 complex<double>，故传入其他类型的复数时，产生的行为我也没细看（事实上后果很严重！）
 // - 通过枚举类型区分行列向量
-// - 运算符重载只重载了向量数乘，向量之间的“乘法运算”用 dot() cross() 函数来进行
+// - 运算符重载只重载了向量数乘，向量之间的“乘法运算”用 dot()、cross() 函数来进行
 // =========================================================================
 
 #pragma once
 
-#include "core/matrix.hpp"
-#include "core/vector.hpp"
-// #include "utils/output.hpp"
 #include <algorithm>
 #include <cmath>
 #include <complex>
@@ -22,12 +19,9 @@
 #include <iterator>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 namespace core {
-
-// class Matrix; // 向前声明，避免 vector.hpp 和 matrix.hpp 相互循环 include 导致报错
 
 enum class VecOrientation {
     ROW,
