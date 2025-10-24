@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "core/vector.hpp"
 #include <algorithm>
 #include <cmath>
 #include <complex>

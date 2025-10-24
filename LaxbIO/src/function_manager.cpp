@@ -1,20 +1,20 @@
 #include "function_manager.hpp"
+#include "session_manager.hpp"
 #include "utils/interface.hpp"
-#include "workspace.hpp"
 #include <string>
 #include <unordered_map>
 
 namespace laxb {
 
-FuncManager fnMgr;
+FuncManager fnmgr;
 
 void registerAllFunc() {
-    fnMgr.fnReg("eye", eye);
-    fnMgr.fnReg("zeros", zeros);
-    fnMgr.fnReg("ones", ones);
-    fnMgr.fnReg("random", random);
-    fnMgr.fnReg("randn", randn);
-    fnMgr.fnReg("diag", diag);
+    fnmgr.fnReg("eye", eye);
+    fnmgr.fnReg("zeros", zeros);
+    fnmgr.fnReg("ones", ones);
+    fnmgr.fnReg("random", random);
+    fnmgr.fnReg("randn", randn);
+    fnmgr.fnReg("diag", diag);
 }
 
 /* 仅仅查找函数是否存在 */

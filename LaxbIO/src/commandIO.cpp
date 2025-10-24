@@ -109,7 +109,7 @@ bool tksCheck(std::vector<std::string> tks) {
 
         /* 命令检查 */
         if (allow) {
-            if (fnMgr.fnFind(tk) == false) {
+            if (fnmgr.fnFind(tk) == false) {
                 std::cout << util::oup::ERS() + "CmdParser::in(): Command '" + tk + "' not found\n";
                 return false;
             }

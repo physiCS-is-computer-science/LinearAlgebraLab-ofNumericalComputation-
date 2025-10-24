@@ -6,9 +6,7 @@
 // ===========================================================================
 #pragma once
 
-#include "core/matrix.hpp"
-#include "core/vector.hpp"
-#include "workspace.hpp"
+#include "session_manager.hpp"
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -32,7 +30,7 @@ public:
 private:
     std::unordered_map<std::string, std::function<bool(std::vector<std::string>)>> funcMap_; // 函数映射
 };
-extern FuncManager fnMgr; // 唯一对象，管理函数们
+extern FuncManager fnmgr; // 唯一对象，管理函数们
 
 void registerAllFunc(); // 注册所有函数
 
