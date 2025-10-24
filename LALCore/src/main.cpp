@@ -26,7 +26,14 @@ int main() {
     util::startupBanner(); // 启动信息栏
 
     core::dvec vec1{0, 1, 2, 3}, vec2{1, 2, 5, 7};
-    std::cout << core::dot(vec1, ~(vec2 + vec1 * 4));
+    core::dmtx
+        mtx1{{1, 2, 3},
+             {1, 2, 3}},
+        mtx2{{1, 2},
+             {1, 2},
+             {1, 2}};
+
+    std::cout << mtx1 * mtx2;
 
     /* LaxbIO 模块测试 */
     // std::vector<std::string> ret;
