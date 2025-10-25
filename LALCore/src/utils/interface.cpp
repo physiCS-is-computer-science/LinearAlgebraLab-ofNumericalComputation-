@@ -3,20 +3,22 @@
 #include <string>
 #include <vector>
 
-void eye(std::vector<std::string> args) {
+bool eye(std::vector<std::string> args) {
+    smr::semgr << "\n\n---\neye() test text\n---\n";
+    return true;
 }
 
-void zeros(std::vector<std::string> args) {
-}
+// bool zeros(std::vector<std::string> args) {
+// }
 
-void ones(std::vector<std::string> args) {
-}
+// bool ones(std::vector<std::string> args) {
+// }
 
-void random(std::vector<std::string> args) {
-}
+// bool random(std::vector<std::string> args) {
+// }
 
-void randn(std::vector<std::string> args) {
-}
+// bool randn(std::vector<std::string> args) {
+// }
 
-void diag(std::vector<std::string> args) {
-}
+// bool diag(std::vector<std::string> args) {
+// }

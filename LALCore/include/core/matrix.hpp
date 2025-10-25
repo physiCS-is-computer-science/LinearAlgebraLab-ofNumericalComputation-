@@ -321,8 +321,8 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     for (typename Matrix<T>::mtxSizet row = 0; row < matrix.getRowSize(); ++row) {
         Vector<T> temp(matrix.getRow(row)); // 临时行
         for (typename Vector<T>::vecSizet i = 0; i < temp.getSize(); ++i) // 逐个输出临时行的元素
-            std::cout << temp(i) << '\t';
-        std::cout << '\n'; // put a '\n' at the end of matrix
+            os << temp(i) << '\t';
+        os << '\n'; // put a '\n' at the end of matrix
     }
 
     return os;

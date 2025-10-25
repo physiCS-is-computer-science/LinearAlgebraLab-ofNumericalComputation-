@@ -7,19 +7,19 @@
 //    3.LALCore 的接口模块使用 SessionMgr 类的唯一对象 semgr 对工作空间写入计算结果、额外信息
 //    4.cmdpr 访问 semgr，判断输出内容、是否向 LaxbIO 发出命令
 //    5.循环结束，重新等待新命令
-// - 三大模块（LALCore 单向接收 LaxbIO 的消息，二者通过 SessionMgr 间接联系）：
+// - 三大模块（LALCore 单向接收 LaxbIO 的消息（只返回执行是否成功的布尔值），二者通过 SessionMgr 间接联系）：
 //    ================================================
-//    LALCore <---> SessionMgr <---> LaxbIO <---> user
-//      ^-------------------------------|
+//    LALCore ---> SessionMgr ---> LaxbIO <---> user
+//      ^-----------------------------^
 //    ================================================
 //    - LALCore 作为计算核心，只负责计算，并附带接受命令、输出数据与状态功能
-//    - SessionMgr 作为会话管理器，储存所有数据于工作空间，并于其他两个模块沟通
+//    - SessionMgr 作为会话管理器，储存所有数据、状态于工作空间，并与其他两个模块沟通
 //    - LaxbIO 处理输入、输出，与用户交互
 // ============================================================================
 
 #include "commandIO.hpp"
-#include "core/matrix.hpp"
-#include "core/vector.hpp"
+#include "core/matrix.hpp" // test
+#include "core/vector.hpp" // test
 #include "function_manager.hpp"
 #include "utils/output.hpp"
 #include <Windows.h>
@@ -28,29 +28,38 @@
 #include <vector>
 
 int main() {
-    system("cls");
-
+    // system("cls");
     laxb::registerAllFunc(); // 注册所有函数
     util::startupBanner(); // 启动信息栏
 
-    core::dvec vec1{0, 1, 2, 3}, vec2{1, 2, 5, 7};
-    core::dmtx
-        mtx1{{1, 2, 3},
-             {1, 2, 3}},
-        mtx2{{1, 2},
-             {1, 2},
-             {1, 2}},
-        mtx3{{1, 2, 3, 4}};
+    core::dmtx mtx{{1, 2, 3}};
 
-    std::cout << core::tovec(mtx3) + ~vec1;
+    /* LaxbIO module test */
+    while (true) {
+        smr::semgr.clear();
 
-    /* LaxbIO 模块测试 */
-    // std::vector<std::string> ret;
-    // std::cout << oup::SIS();
-    // while ((ret = cmdpr.in()).empty())
-    //     std::cout << oup::SIS();
-    // for (const auto& i : ret)
-    //     std::cout << i << "|";
+        /* input */
+        std::vector<std::string> cmdStr; // 原始命令字符串
+        std::cout << util::SIS(smr::semgr.getpath()); // default path identifier
+        while ((cmdStr = laxb::cmdpr.in()).empty())
+            std::cout << util::SIS(smr::semgr.getpath());
+
+        /* check current tokens */
+        std::cout << "==== TEST ====\ntokens:\n";
+        for (const auto& i : cmdStr)
+            std::cout << i << "|";
+        std::cout << std::endl
+                  << "==== TEST ====\n";
+
+        /* 尝试调用 LALCore */
+        std::string cmdName = cmdStr[0];
+        cmdStr.erase(cmdStr.begin()); // 分离参数们
+        bool state = laxb::fnmgr.call(cmdName)(cmdStr);
+        if (state == true && !smr::semgr.getoup().empty()) // 执行成功并且存在输出时（不存在时 cptoup_ 为空串
+            std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
+        else if (state == false)
+            std::cout << util::ERS(smr::semgr.getpath()) + smr::semgr.geterr() + "\n";
+    }
 
     return 0;
 }

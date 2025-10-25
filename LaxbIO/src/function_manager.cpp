@@ -10,11 +10,11 @@ FuncManager fnmgr;
 
 void registerAllFunc() {
     fnmgr.fnReg("eye", eye);
-    fnmgr.fnReg("zeros", zeros);
-    fnmgr.fnReg("ones", ones);
-    fnmgr.fnReg("random", random);
-    fnmgr.fnReg("randn", randn);
-    fnmgr.fnReg("diag", diag);
+    // fnmgr.fnReg("zeros", zeros);
+    // fnmgr.fnReg("ones", ones);
+    // fnmgr.fnReg("random", random);
+    // fnmgr.fnReg("randn", randn);
+    // fnmgr.fnReg("diag", diag);
 }
 
 /* 仅仅查找函数是否存在 */

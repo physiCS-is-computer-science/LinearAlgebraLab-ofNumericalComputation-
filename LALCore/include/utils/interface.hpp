@@ -18,8 +18,8 @@ public:
 };
 
 bool eye(std::vector<std::string> args);
-bool zeros(std::vector<std::string> args);
-bool ones(std::vector<std::string> args);
-bool random(std::vector<std::string> args);
-bool randn(std::vector<std::string> args);
-bool diag(std::vector<std::string> args);
+// bool zeros(std::vector<std::string> args);
+// bool ones(std::vector<std::string> args);
+// bool random(std::vector<std::string> args);
+// bool randn(std::vector<std::string> args);
+// bool diag(std::vector<std::string> args);

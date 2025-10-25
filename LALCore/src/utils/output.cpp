@@ -8,12 +8,10 @@
 
 namespace util {
 
-namespace oup {
 /* 三个常量，分别为错误字符串、标准输入字符串、标准输出字符串 */
-oup::OutPathID ERS = oup::OutPathID(">! ");
-oup::OutPathID SOS = oup::OutPathID(">> ");
-oup::OutPathID SIS = oup::OutPathID("<< ");
-} // namespace oup
+OutPathID ERS = OutPathID(">! ");
+OutPathID SOS = OutPathID(">> ");
+OutPathID SIS = OutPathID("<< ");
 
 void startupBanner() {
     std::string name{"LAL v0.1 (Beta)"};
