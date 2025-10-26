@@ -32,7 +32,7 @@ int main() {
     laxb::registerAllFunc(); // 注册所有函数
     util::startupBanner(); // 启动信息栏
 
-    core::dmtx mtx{{1, 2, 3}};
+    // core::dmtx mtx{{1, 2, 3}};
 
     /* LaxbIO module test */
     while (true) {
@@ -44,12 +44,12 @@ int main() {
         while ((cmdStr = laxb::cmdpr.in()).empty())
             std::cout << util::SIS(smr::semgr.getpath());
 
-        /* check current tokens */
-        std::cout << "==== TEST ====\ntokens:\n";
-        for (const auto& i : cmdStr)
-            std::cout << i << "|";
-        std::cout << std::endl
-                  << "==== TEST ====\n";
+        // /* check current tokens */
+        // std::cout << "==== TEST ====\ntokens:\n";
+        // for (const auto& i : cmdStr)
+        //     std::cout << i << "|";
+        // std::cout << std::endl
+        //           << "==== TEST ====\n";
 
         /* 尝试调用 LALCore */
         std::string cmdName = cmdStr[0];

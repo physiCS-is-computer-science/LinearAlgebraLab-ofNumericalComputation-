@@ -5,6 +5,7 @@
 #include "commandIO.hpp"
 #include "function_manager.hpp"
 #include "utils/output.hpp"
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -159,8 +160,8 @@ bool tksCheck(std::vector<std::string> tks) {
     }
 
     const std::string legalCh{"1234567890abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
-    const std::string legalCurlyBraCh{"1234567890"}; // 花括号合法字符
-    const std::string legalSquareBraCh{"1234567890;"}; // 方括号合法字符
+    const std::string legalCurlyBraCh{"1234567890 "}; // 花括号合法字符
+    const std::string legalSquareBraCh{"1234567890; "}; // 方括号合法字符
     for (const auto& tkNoid : tksNoid) {
         if (tkNoid.find_first_not_of(legalCh) != std::string::npos) { // 找到非法字符时
             std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + tkNoid + "\"\n";
@@ -176,6 +177,12 @@ bool tksCheck(std::vector<std::string> tks) {
             std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + bTk + "\"\n";
             return false;
         }
+
+        /* 到达此处说明所有字符均合法，若没有数字则括号参数有问题 */
+        if (bTk.find_first_of("1234567890") == std::string::npos) {
+            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Number(s) not found in \"" + bTk + "\"\n";
+            return false;
+        }
     }
     for (const auto& bTk : squareBracketTks) { // 方括号内容检查
         if (bTk.empty()) {
@@ -186,9 +193,69 @@ bool tksCheck(std::vector<std::string> tks) {
             std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + bTk + "\"\n";
             return false;
         }
+
+        /* 到达此处说明所有字符均合法，若没有数字则括号参数有问题 */
+        if (bTk.find_first_of("1234567890") == std::string::npos) {
+            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Number(s) not found in \"" + bTk + "\"\n";
+            return false;
+        }
     }
 
     return true; // 都通过时
+}
+
+/* 返回单个 str 参数类型 */
+Cmdt argtype(std::string str) {
+    if (str[0] == '-')
+        return Cmdt::OPT;
+    else if (str[0] == ':' && str[1] != ':')
+        return Cmdt::IN;
+    else if (str[0] == ':' && str[1] == ':')
+        return Cmdt::OUT;
+    else if (str[0] == '[')
+        return Cmdt::SB;
+    else if (str[0] == '{')
+        return Cmdt::CB;
+    else
+        return Cmdt::NOTF;
+}
+
+/* 按照 tplate 模板的顺序与数量检查、排序参数集，二者任意一个不一致则返回 false */
+bool CmdParser::sortArgs(std::vector<Cmdt> tplate, std::vector<std::string>& args) {
+    if (tplate.size() != args.size())
+        return false;
+
+    std::vector<std::string> aim{}, temp(args);
+    for (const auto i : tplate) {
+        auto it = std::find_if(temp.cbegin(), temp.cend(), [i](std::string s) {if (argtype(s) == i) return true; return false; }); // 找到第一个满足当前类型 i 的迭代器
+        if (it == temp.cend()) // 没找到
+            return false;
+        aim.push_back(*it);
+        temp.erase(it); // 找到的删掉
+    }
+    args = aim;
+
+    return true;
+}
+
+/* 解析花括号里的数值，确保传递的是花括号 */
+std::vector<double> CmdParser::curlyArgs(std::string arg) {
+    arg = (arg.substr(1, arg.size() - 2)); // 去掉花括号的子串
+    std::vector<double> nums;
+    double temp{0};
+    for (std::size_t pos{0}; pos < arg.size();) {
+        temp = std::stod(arg, &pos);
+        if (pos == 0) { // 没找到数字时
+            ++pos;
+            continue;
+        }
+        nums.push_back(temp);
+        if (pos < arg.size()) { // 找到末尾则不拆解子串
+            arg = arg.substr(++pos); // 此处 pos 自增前为非数字字符
+            pos = 0;
+        }
+    }
+    return nums;
 }
 
 } // namespace laxb

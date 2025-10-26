@@ -50,14 +50,16 @@ public:
         return *this;
     }
 
-    /* ==== 操控 VarStorage<> 的函数 ==== */
-    /* get 系列函数返回迭代器，add 系列函数直接存储，不检查 */
-    typename std::unordered_map<std::string, core::dmtx>::const_iterator getdmtx(std::string varn) const { return dmSpace_.find(varn); }; // 如果没有该函数返回空 map
-    // typename std::unordered_map<std::string, core::dmtx>::const_iterator getcmtx(std::string varn) const { return cmSpace_.find(varn); }; // 复数版本，同上
-    std::unordered_map<std::string, double>::const_iterator getreal(std::string varn) const { return realSpace_.find(varn); };
-    void adddmtx(std::string varn, core::dmtx& mtx) { dmSpace_[varn] = mtx; }; // 无检查
-    // void addcmtx(std::string varn, core::cmtx& mtx) { cmSpace_[varn] = mtx; }; // 复数重载版本
+    /* add 系列函数返回迭代器，add 系列函数直接存储，不检查 */
+    typename std::unordered_map<std::string, core::dmtx>::const_iterator finddmtx(const std::string& varn) const { return dmSpace_.find(varn); }; // 如果没有该函数返回空 map
+    // typename std::unordered_map<std::string, core::dmtx>::const_iterator findcmtx(std::string varn) const { return cmSpace_.find(varn); }; // 复数版本，同上
+    std::unordered_map<std::string, double>::const_iterator findreal(const std::string& varn) const { return realSpace_.find(varn); };
+    void adddmtx(std::string varn, core::dmtx mtx) { dmSpace_[varn] = mtx; }; // 无检查
+    // void addcmtx(std::string varn, core::cmtx mtx) { cmSpace_[varn] = mtx; }; // 复数重载版本
     void addreal(std::string varn, double val) { realSpace_[varn] = val; }; // 无检查
+    std::unordered_map<std::string, core::dmtx>::const_iterator getdmtxEnd() { return dmSpace_.end(); } // 变量空间尾后迭代器
+    // std::unordered_map<std::string, core::cmtx>::const_iterator getcmtxEnd() { return cmSpace_.end(); } // 复数版本
+    std::unordered_map<std::string, double>::const_iterator getrealEnd() { return realSpace_.end(); }
 
     void clear() { // 只清除错误信息、计算结果、字符流对象的内容
         err_ = "";

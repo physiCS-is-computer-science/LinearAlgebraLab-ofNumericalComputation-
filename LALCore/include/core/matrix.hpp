@@ -305,8 +305,7 @@ Matrix<T> operator~(const Matrix<T>& matrix) {
     return output;
 }
 
-/* 矩阵格式化输出
- * - 末尾追加一个 '\n' */
+/* 矩阵格式化输出 */
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     if (os.fail()) {
@@ -318,6 +317,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
         return os;
     }
 
+    os << '\n';
     for (typename Matrix<T>::mtxSizet row = 0; row < matrix.getRowSize(); ++row) {
         Vector<T> temp(matrix.getRow(row)); // 临时行
         for (typename Vector<T>::vecSizet i = 0; i < temp.getSize(); ++i) // 逐个输出临时行的元素

@@ -233,6 +233,14 @@ symmlq  ilu ichol gmres lsqr minres bicgstab
 
 ## 基本命令
 
+- 关键词预览：
+```
+show 
+```
+
+```
+1.show -opt   ==>   show -a
+```
 
 
 ## 常量宏

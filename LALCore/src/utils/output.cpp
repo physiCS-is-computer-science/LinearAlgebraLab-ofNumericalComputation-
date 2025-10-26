@@ -10,7 +10,7 @@ namespace util {
 
 /* 三个常量，分别为错误字符串、标准输入字符串、标准输出字符串 */
 OutPathID ERS = OutPathID(">! ");
-OutPathID SOS = OutPathID(">> ");
+OutPathID SOS = OutPathID(">: ");
 OutPathID SIS = OutPathID("<< ");
 
 void startupBanner() {

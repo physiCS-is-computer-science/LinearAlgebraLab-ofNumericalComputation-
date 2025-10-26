@@ -186,6 +186,7 @@ std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
         return os;
     }
 
+    os << '\n';
     if (vec.getOrientation() == VecOrientation::ROW) { // 行向量
         for (typename Vector<T>::vecSizet i = 0; i < vec.getSize(); ++i)
             os << vec(i) << '\t';

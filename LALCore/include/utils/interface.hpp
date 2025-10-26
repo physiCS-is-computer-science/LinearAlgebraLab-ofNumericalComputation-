@@ -17,6 +17,10 @@ class CoreIntf {
 public:
 };
 
+/* ==== 交互 ==== */
+bool show(std::vector<std::string> args);
+
+/* ==== 数学 ==== */
 bool eye(std::vector<std::string> args);
 // bool zeros(std::vector<std::string> args);
 // bool ones(std::vector<std::string> args);
