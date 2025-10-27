@@ -28,7 +28,7 @@
 #include <vector>
 
 int main() {
-    // system("cls");
+    system("cls");
     laxb::registerAllFunc(); // 注册所有函数
     util::startupBanner(); // 启动信息栏
 
@@ -55,7 +55,11 @@ int main() {
         std::string cmdName = cmdStr[0];
         cmdStr.erase(cmdStr.begin()); // 分离参数们
         bool state = laxb::fnmgr.call(cmdName)(cmdStr);
-        if (state == true && !smr::semgr.getoup().empty()) // 执行成功并且存在输出时（不存在时 cptoup_ 为空串
+
+        if (smr::semgr.poweroff())
+            return 0;
+
+        if (state == true && !smr::semgr.getoup().empty()) // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
             std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
         else if (state == false)
             std::cout << util::ERS(smr::semgr.getpath()) + smr::semgr.geterr() + "\n";

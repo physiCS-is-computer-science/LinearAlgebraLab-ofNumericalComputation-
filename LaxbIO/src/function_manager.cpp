@@ -9,6 +9,18 @@ namespace laxb {
 FuncManager fnmgr;
 
 void registerAllFunc() {
+    /* ==== 交互 ==== */
+    fnmgr.fnReg("quit", quit);
+    fnmgr.fnReg("show", show);
+    fnmgr.fnReg("var", var);
+    // fnmgr.fnReg("modify", modify);
+    // fnmgr.fnReg("del", del);
+    // fnmgr.fnReg("save", save);
+    // fnmgr.fnReg("load", load);
+    fnmgr.fnReg("cls", cls);
+    // fnmgr.fnReg("help", help);
+
+    /* ==== 数学 ==== */
     fnmgr.fnReg("eye", eye);
     // fnmgr.fnReg("zeros", zeros);
     // fnmgr.fnReg("ones", ones);

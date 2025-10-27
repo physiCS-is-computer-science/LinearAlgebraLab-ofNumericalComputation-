@@ -5,6 +5,7 @@
 #pragma once
 
 #include "core/matrix.hpp"
+#include "utils/interface.hpp"
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -15,6 +16,9 @@ namespace smr {
 /* ==== 会话管理器 ==== */
 class SessionMgr {
 public:
+    /* friends */
+    friend bool ::show(std::vector<std::string> args);
+
     SessionMgr() : path_("#") {};
     ~SessionMgr() = default;
     SessionMgr(const SessionMgr&) = delete;
@@ -55,7 +59,7 @@ public:
     // typename std::unordered_map<std::string, core::dmtx>::const_iterator findcmtx(std::string varn) const { return cmSpace_.find(varn); }; // 复数版本，同上
     std::unordered_map<std::string, double>::const_iterator findreal(const std::string& varn) const { return realSpace_.find(varn); };
     void adddmtx(std::string varn, core::dmtx mtx) { dmSpace_[varn] = mtx; }; // 无检查
-    // void addcmtx(std::string varn, core::cmtx mtx) { cmSpace_[varn] = mtx; }; // 复数重载版本
+    // void addcmtx(std::string varn, core::cmtx mtx) { cmSpace_[varn] = mtx; }; // 复数版本
     void addreal(std::string varn, double val) { realSpace_[varn] = val; }; // 无检查
     std::unordered_map<std::string, core::dmtx>::const_iterator getdmtxEnd() { return dmSpace_.end(); } // 变量空间尾后迭代器
     // std::unordered_map<std::string, core::cmtx>::const_iterator getcmtxEnd() { return cmSpace_.end(); } // 复数版本
@@ -67,7 +71,12 @@ public:
         os_.str("");
     }
 
+    void swich() { quit_ = true; } // 关闭程序（swich 是错误拼写，因为 switch 是关键字用不了...）
+    bool poweroff() { return quit_; } // 返回状态判断是否结束
+
 private:
+    bool quit_{0};
+
     std::string path_;
     std::string err_;
     std::string cptoup_; // 所有计算结果输出转化为字符串存储

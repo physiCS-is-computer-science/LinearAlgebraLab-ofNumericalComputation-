@@ -121,8 +121,13 @@ bool tksCheck(std::vector<std::string> tks) {
 
         /* 参数检查，已经保证 [0][1] 可以访问 */
         std::size_t inx{1}, len{std::string::npos}; // 子串写入位置
-        if (tk[0] == '-') // -p
+        if (tk[0] == '-') { // -p
+            if (tk.size() != 2) {
+                std::cout << util::ERS() + "tksCheck(): Too many arguments in \"" + tk + "\"\n";
+                return false;
+            }
             inx = 1;
+        }
         else if (tk[0] == ':' && tk[1] != ':') // :varn
             inx = 1;
         else if (tk[0] == ':' && tk[1] == ':') { // ::varn

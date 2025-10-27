@@ -7,18 +7,25 @@
 
 #pragma once
 
-#include "session_manager.hpp"
 #include <string>
 #include <vector>
 
 /* 此类负责处理核心与其他模块的数据沟通
  * - 如每个函数拥有的第二参数为一个 vector，存储着数量不同含义不一致的字符串，因而通过此类解析 */
-class CoreIntf {
-public:
-};
+// class CoreIntf {
+// public:
+// };
 
 /* ==== 交互 ==== */
+bool quit(std::vector<std::string> args);
 bool show(std::vector<std::string> args);
+bool var(std::vector<std::string> args);
+// bool modify(std::vector<std::string> args);
+// bool del(std::vector<std::string> args);
+// bool save(std::vector<std::string> args);
+// bool load(std::vector<std::string> args);
+bool cls(std::vector<std::string> args);
+// bool help(std::vector<std::string> args);
 
 /* ==== 数学 ==== */
 bool eye(std::vector<std::string> args);

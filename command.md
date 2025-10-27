@@ -11,7 +11,7 @@ reshape cat horzcat vertcat blkdiag tril triu flip rot90 compan
 ```
 
 ```
-1.eye ::varn {}              ==> eye ::A {3}         % 单位矩阵 **
+1.eye ::varn {}              --> eye ::A {3}         % 单位矩阵 **
 2.zeros ::varn {}            ==> zeros ::A {3}       % 零矩阵 **
 3.ones ::varn {}             ==> ones ::A {3}        % 全1矩阵 **
 4.random ::varn {}           ==> random ::A {3}      % 均匀分布随机矩阵 *
@@ -235,12 +235,34 @@ symmlq  ilu ichol gmres lsqr minres bicgstab
 
 - 关键词预览：
 ```
-show 
+show var modify del save load cls help quit
 ```
 
 ```
-1.show -opt   ==>   show -a
+1.show -opt :varn                -->   show -a              % 展示某一变量或所有变量
+2.var ::varn [a b; c d] {varn}   ==>   var ::A [1 2; 3 4;]  % 创建变量（矩阵或常量）
+3.modify :varn {a} [a; b]        ==>   modify :A [1; 3]     % 修改变量值
+4.del -opt :varn                 ==>   del :A               % 删除该变量
+5.save ::varn                    ==>   save ::new.lal       % 保存当前工作空间到文件 path
+6.load :varn                     ==>   load :test.lal       % 从 path 读取工作空间
+7.cls                            -->   cls                  % 清屏
+8.help :varn                     ==>   help :eye            % 查找该命令的信息
+9.quit                           -->   quit                 % 退出
 ```
 
 
-## 常量宏
+## -opt
+
+### 通用
+
+```
+1.a 所有
+```
+
+### 特殊
+
+```
+1.show
+- m 只输出矩阵（向量也存为矩阵）
+- l 变量名列表
+```
