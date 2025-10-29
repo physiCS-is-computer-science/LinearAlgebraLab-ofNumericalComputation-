@@ -12,17 +12,17 @@
 
 namespace laxb {
 
-CmdParser cmdpr;
+CmdHandler cmdhr;
 
 /* 唯一命令输入函数，内部调用 getline()
  * - 仅简单检查命令语法正确与否，命令是否存在等
  * - 若成功则返回分解完毕的命令 tokens，若失败则返回空 vector */
-std::vector<std::string> CmdParser::in() {
+bool CmdHandler::in() {
     /* input command string */
     std::string cmdLine{""};
     getline(std::cin, cmdLine);
     if (cmdLine.empty()) // 确保不为空
-        return {};
+        return false;
 
     /* 简单检查正确性，并转换为 tokens */
     std::vector<std::string> tokens;
@@ -35,7 +35,7 @@ std::vector<std::string> CmdParser::in() {
         cmdLine.erase(begIt);
     }
     if (cmdLine.empty()) // 什么都不做，等待重新输入
-        return {};
+        return false;
 
     /* 最后一个字符为 ';' 时，在它之前插入一个空格，以分出 token */
     auto tmpIt = cmdLine.end();
@@ -62,13 +62,13 @@ std::vector<std::string> CmdParser::in() {
                 ++endPos; // 不为最后一个字符则递增
 
                 if (cmdLine[endPos] != ' ') { // 递增之后，当前位置应该为空格（最后一个为括号例外）
-                    std::cout << util::ERS() + "CmdParser::in(): Missing spaces after brackests\n";
-                    return {};
+                    std::cout << util::ERS(smr::semgr.getpath()) + "CmdParser::in(): Missing spaces after brackests\n";
+                    return false;
                 }
             }
             else if (endPos == std::string::npos) { // 未找到反括号时，处理找不到反括号的情况
-                std::cout << util::ERS() + "CmdParser::in(): Missing a backbrackets\n";
-                return {};
+                std::cout << util::ERS(smr::semgr.getpath()) + "CmdParser::in(): Missing a backbrackets\n";
+                return false;
             }
         }
 
@@ -88,9 +88,10 @@ std::vector<std::string> CmdParser::in() {
 
     /* 逐项 tokens 检查 */
     if (tksCheck(tokens) == false)
-        return {};
+        return false;
 
-    return tokens;
+    laxb::cmdhr.setCmdtoken(tokens);
+    return true;
 }
 
 /* 检查 tokens，返回布尔值 */
@@ -226,25 +227,25 @@ Cmdt argtype(std::string str) {
 }
 
 /* 按照 tplate 模板的顺序与数量检查、排序参数集，二者任意一个不一致则返回 false */
-bool CmdParser::sortArgs(std::vector<Cmdt> tplate, std::vector<std::string>& args) {
-    if (tplate.size() != args.size())
+bool CmdHandler::sortArgs(std::vector<Cmdt> tplate) {
+    if (tplate.size() != cmdToken_.size())
         return false;
 
-    std::vector<std::string> aim{}, temp(args);
+    std::vector<std::string> aim{}, temp(cmdToken_);
     for (const auto i : tplate) {
         auto it = std::find_if(temp.cbegin(), temp.cend(), [i](std::string s) {if (argtype(s) == i) return true; return false; }); // 找到第一个满足当前类型 i 的迭代器
         if (it == temp.cend()) // 没找到
             return false;
         aim.push_back(*it);
-        temp.erase(it); // 找到的删掉
+        temp.erase(it); // 找到在副本中的删掉
     }
-    args = aim;
+    cmdToken_ = aim;
 
     return true;
 }
 
 /* 解析花括号里的数值，确保传递的是花括号 */
-std::vector<double> CmdParser::curlyArgs(std::string arg) {
+std::vector<double> CmdHandler::curlyArgs(std::string arg) {
     arg = (arg.substr(1, arg.size() - 2)); // 去掉花括号的子串
     std::vector<double> nums;
     double temp{0};
@@ -261,6 +262,31 @@ std::vector<double> CmdParser::curlyArgs(std::string arg) {
         }
     }
     return nums;
+}
+
+/* 检查 cmdToken_ 是否为空
+ * - 空返回 true，否则 false
+ * - 只有需要参数的函数能调用此检查函数（不需要参数的函调用了此检查函数后，数即使执行成功了也会输出 err_） */
+bool CmdHandler::isempty(std::string outStr) {
+    if (cmdToken_.empty()) {
+        smr::semgr.seterr(outStr + "(): Argument(s) is empty");
+        return true;
+    }
+    return false;
+}
+
+/* 有分号删除并返回 false，无分号返回 true */
+bool CmdHandler::semicolonDel() {
+    if (cmdToken_.empty()) // 空参数一定没分号
+        return true;
+
+    auto it = cmdToken_.end() - 1;
+    if (*it == ";")
+        it = cmdToken_.erase(it); // 删掉末尾分号
+    if (it == cmdToken_.end()) // 存在分号并且被删除时
+        return false;
+        
+    return true; // 无分号时
 }
 
 } // namespace laxb

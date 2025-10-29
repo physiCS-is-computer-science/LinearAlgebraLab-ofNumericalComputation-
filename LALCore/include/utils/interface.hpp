@@ -17,20 +17,20 @@
 // };
 
 /* ==== 交互 ==== */
-bool quit(std::vector<std::string> args);
-bool show(std::vector<std::string> args);
-bool var(std::vector<std::string> args);
-// bool modify(std::vector<std::string> args);
-// bool del(std::vector<std::string> args);
-// bool save(std::vector<std::string> args);
-// bool load(std::vector<std::string> args);
-bool cls(std::vector<std::string> args);
-// bool help(std::vector<std::string> args);
+bool quit();
+bool show();
+bool var();
+// bool modify();
+// bool del();
+// bool save();
+// bool load();
+bool cls();
+// bool help();
 
 /* ==== 数学 ==== */
-bool eye(std::vector<std::string> args);
-// bool zeros(std::vector<std::string> args);
-// bool ones(std::vector<std::string> args);
-// bool random(std::vector<std::string> args);
-// bool randn(std::vector<std::string> args);
-// bool diag(std::vector<std::string> args);
+bool eye();
+// bool zeros();
+// bool ones();
+// bool random();
+// bool randn();
+// bool diag();

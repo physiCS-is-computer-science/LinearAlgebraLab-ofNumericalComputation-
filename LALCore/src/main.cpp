@@ -39,9 +39,8 @@ int main() {
         smr::semgr.clear();
 
         /* input */
-        std::vector<std::string> cmdStr; // 原始命令字符串
         std::cout << util::SIS(smr::semgr.getpath()); // default path identifier
-        while ((cmdStr = laxb::cmdpr.in()).empty())
+        while (!laxb::cmdhr.in())
             std::cout << util::SIS(smr::semgr.getpath());
 
         // /* check current tokens */
@@ -52,9 +51,9 @@ int main() {
         //           << "==== TEST ====\n";
 
         /* 尝试调用 LALCore */
-        std::string cmdName = cmdStr[0];
-        cmdStr.erase(cmdStr.begin()); // 分离参数们
-        bool state = laxb::fnmgr.call(cmdName)(cmdStr);
+        laxb::cmdhr.setName(laxb::cmdhr.getCmdtoken()[0]);
+        laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
+        bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
 
         if (smr::semgr.poweroff())
             return 0;

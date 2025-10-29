@@ -1,8 +1,8 @@
 // =====================================================================
 // 所有命令都有相似的流程，调用史上最伟大的 LaxbIO、SessionManager 模块解析传递数据
 // - 每个命令的流程：
-//    1.判断 args 数量，不符合则返回 false
-//    2.去除末尾分号，防止参数排序分析函数 sortArgs() 返回错误消息
+//    1.去除末尾分号（记录输出标志），防止参数排序分析函数 sortArgs() 返回错误消息（分号处理之后再 cmdhr.isempty("") 检查）
+//    2.判断 cmdToken_ 数量，不符合则返回 false
 //    3.显示指定参数顺序和种类，调用 sortArgs() 函数分析排序 args
 //    4.逐项分析返回的有序 args，使用
 //    5.根据 ';' 判断是否写入 smr::semgr::cptoup_
@@ -18,8 +18,10 @@
 
 /* ==== 交互 ==== */
 /* 关闭 */
-bool quit(std::vector<std::string> args) {
-    if (!args.empty()) {
+bool quit() {
+    laxb::cmdhr.semicolonDel(); // 有分号就删掉
+
+    if (!laxb::cmdhr.getCmdtoken().empty()) {
         smr::semgr.seterr("quit(): This command has no arguments");
         return false;
     }
@@ -27,25 +29,20 @@ bool quit(std::vector<std::string> args) {
     return true;
 }
 
-/* 显示变量
+/* 显示变量，无论有无分号都输出
  * - show -a/l
  * - show :varn */
-bool show(std::vector<std::string> args) {
-    if (args.empty()) {
-        smr::semgr.seterr("show(): Arguments is empty");
-        return false;
-    }
+bool show() {
+    laxb::cmdhr.semicolonDel(); // 有分号就删掉
 
-    /* 末尾分号 */
-    auto endIt = args.end() - 1;
-    if (*endIt == ";")
-        args.erase(endIt);
+    if (laxb::cmdhr.isempty("show"))
+        return false;
 
     /* sortArgs() */
     std::size_t type{0};
-    if (laxb::cmdpr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}, args) == true)
+    if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true)
         type = 1;
-    else if (laxb::cmdpr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}, args) == true)
+    else if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true)
         type = 2;
     else {
         smr::semgr.seterr("show(): Argument(s) error");
@@ -59,7 +56,7 @@ bool show(std::vector<std::string> args) {
             return true;
         }
 
-        if (args[0] == "-a") { // 所有变量
+        if (laxb::cmdhr.getCmdtoken()[0] == "-a") { // 所有变量
             smr::semgr << "\n\n";
             for (const auto& i : smr::semgr.dmSpace_) // 矩阵/向量
                 smr::semgr << i.first << ": " << i.second;
@@ -74,7 +71,7 @@ bool show(std::vector<std::string> args) {
                     smr::semgr << "\n";
             }
         }
-        else if (args[0] == "-l") { // 所有变量名列表
+        else if (laxb::cmdhr.getCmdtoken()[0] == "-l") { // 所有变量名列表
             cnt = 0;
             smr::semgr << "\n\nMatrix:\n";
             for (const auto& i : smr::semgr.dmSpace_) { // 向量和矩阵名列表
@@ -98,12 +95,12 @@ bool show(std::vector<std::string> args) {
                 smr::semgr << "\n";
         }
         else {
-            smr::semgr.seterr("show(): Argument(s) error in \"" + args[0] + "\"");
+            smr::semgr.seterr("show(): Argument(s) error in \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
             return false;
         }
     }
     else if (type == 2) { // 查看特定变量
-        std::string name{args[0].substr(1)};
+        std::string name{laxb::cmdhr.getCmdtoken()[0].substr(1)};
         auto itdm = smr::semgr.dmSpace_.find(name);
         auto itreal = smr::semgr.realSpace_.find(name);
         if (itdm == smr::semgr.dmSpace_.end() && itreal == smr::semgr.realSpace_.end()) {
@@ -126,14 +123,19 @@ bool show(std::vector<std::string> args) {
 /* 创建变脸
  * var ::varn {a}
  * var ::varn [a b; c b] */
-bool var(std::vector<std::string> args) {
-    
+bool var() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+
+    if (laxb::cmdhr.isempty("var"))
+        return false;
 }
 
 /* 清屏 */
-bool cls(std::vector<std::string> args) {
-    if (!args.empty()) {
-        smr::semgr.seterr("quit(): This command has no arguments");
+bool cls() {
+    laxb::cmdhr.semicolonDel();
+
+    if (!laxb::cmdhr.getCmdtoken().empty()) {
+        smr::semgr.seterr("cls(): This command has no arguments");
         return false;
     }
     system("cls");
@@ -143,33 +145,28 @@ bool cls(std::vector<std::string> args) {
 /* ==== 数学 ==== */
 /* - eye {num}
  * - eye ::A {num} */
-bool eye(std::vector<std::string> args) {
-    if (args.empty()) {
-        smr::semgr.seterr("eye(): Args is empty");
-        return false;
-    }
+bool eye() {
+    bool shouldOut = laxb::cmdhr.semicolonDel(); // 末尾分号
 
-    /* 末尾分号 */
-    auto endIt = args.end() - 1;
-    if (*endIt == ";") // 去除末尾分号防止 sortArgs() 函数排序出错
-        args.erase(endIt);
+    if (laxb::cmdhr.isempty("eye"))
+        return false;
 
     /* 排序 args */
     std::size_t type{0};
-    if (laxb::cmdpr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::CB}, args) == true) // eye {num}
+    if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::CB}) == true) // eye {num}
         type = 1;
-    else if (laxb::cmdpr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::CB, laxb::Cmdt::OUT}, args) == true) // eye ::A {num}
+    else if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::CB, laxb::Cmdt::OUT}) == true) // eye ::A {num}
         type = 2;
     else {
-        smr::semgr.seterr("eye(): Argument(s) error");
+        smr::semgr.seterr("eye(): Argument(s) error000");
         return false;
     }
 
     /* 分析、使用 */
     core::dmtx output{};
-    std::vector<double> dimens = laxb::cmdpr.curlyArgs(args[0]);
+    std::vector<double> dimens = laxb::cmdhr.curlyArgs(laxb::cmdhr.getCmdtoken()[0]);
     if (dimens.size() != 1) {
-        smr::semgr.seterr("eye(): Number of arguments error in \"{" + args[0].substr(1, args[0].size() - 2) + "}\"");
+        smr::semgr.seterr("eye(): Number of arguments error in \"{" + laxb::cmdhr.getCmdtoken()[0].substr(1, laxb::cmdhr.getCmdtoken()[0].size() - 2) + "}\"");
         return false;
     }
     if (dimens[0] == 0) {
@@ -181,7 +178,7 @@ bool eye(std::vector<std::string> args) {
         output(i, i) = 1;
 
     if (type == 2) {
-        std::string varn{args[1].substr(2)}; // ::A
+        std::string varn{laxb::cmdhr.getCmdtoken()[1].substr(2)}; // ::A
         auto it = smr::semgr.finddmtx(varn); // 查找去掉标识符的子串
         if (it != smr::semgr.getdmtxEnd()) {
             smr::semgr.seterr("eye(): Variable \"" + varn + "\" exist");
@@ -191,7 +188,7 @@ bool eye(std::vector<std::string> args) {
     }
 
     /* 判断是否写入 smr::semgr::cptoup_ */
-    if (*endIt != ";")
+    if (shouldOut)
         smr::semgr << "\n"
                    << output;
 

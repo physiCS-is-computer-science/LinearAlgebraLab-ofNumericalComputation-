@@ -23,12 +23,12 @@ public:
     FuncManager& operator=(const FuncManager&) = delete;
     FuncManager& operator=(FuncManager&&) = delete;
 
-    void fnReg(std::string cmd, std::function<bool(std::vector<std::string>)> f) { funcMap_[cmd] = f; } // 注册函数
+    void fnReg(std::string cmd, std::function<bool()> f) { funcMap_[cmd] = f; } // 注册函数
     bool fnFind(const std::string& fnName) const; // 函数查找
-    std::function<bool(std::vector<std::string>)> call(const std::string& cmd) { return funcMap_[cmd]; } // 函数调用，没有查找检查，意味着没有对应命令则创建一个新的，需要检查有没有该命令再使用
+    std::function<bool()> call(const std::string& cmd) { return funcMap_[cmd]; } // 函数调用，没有查找检查，意味着没有对应命令则创建一个新的，需要检查有没有该命令再使用
 
 private:
-    std::unordered_map<std::string, std::function<bool(std::vector<std::string>)>> funcMap_; // 函数映射
+    std::unordered_map<std::string, std::function<bool()>> funcMap_; // 函数映射
 };
 extern FuncManager fnmgr; // 唯一对象，管理函数们
 

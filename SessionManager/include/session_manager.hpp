@@ -17,7 +17,7 @@ namespace smr {
 class SessionMgr {
 public:
     /* friends */
-    friend bool ::show(std::vector<std::string> args);
+    friend bool ::show();
 
     SessionMgr() : path_("#") {};
     ~SessionMgr() = default;
@@ -86,7 +86,6 @@ private:
     // std::unordered_map<std::string, core::cmtx> cmSpace_; // 复矩阵变量，向量也用矩阵存储
     std::unordered_map<std::string, double> realSpace_; // 普通变量
 };
-
 extern SessionMgr semgr; // 不可复制，仅仅作为接口
 
 } // namespace smr
