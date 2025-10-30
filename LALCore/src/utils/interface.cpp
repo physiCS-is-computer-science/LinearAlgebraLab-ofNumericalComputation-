@@ -36,7 +36,7 @@ bool quit() {
 bool show() {
     laxb::cmdhr.semicolonDel(); // 有分号就删掉
 
-    if (laxb::cmdhr.isempty("show"))
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
         return false;
 
     /* sortToken() */
@@ -63,14 +63,15 @@ bool show() {
                 smr::semgr << i.first << ": " << i.second;
 
             cnt = 0;
+            smr::semgr << "\n";
             for (const auto& i : smr::semgr.realSpace_) { // 实数
-                if (cnt == 1)
-                    smr::semgr << "\n";
                 smr::semgr << i.first + ": " << i.second << "\t";
                 ++cnt;
                 if (cnt % 5 == 0)
                     smr::semgr << "\n";
             }
+            if (cnt % 5 != 0) // 满一行的话已经放过 '\n' 了
+                smr::semgr << "\n";
         }
         else if (laxb::cmdhr.getCmdtoken()[0] == "-l") { // 所有变量名列表
             cnt = 0;
@@ -87,7 +88,7 @@ bool show() {
             cnt = 0;
             smr::semgr << "\nReal:\n";
             for (const auto& i : smr::semgr.realSpace_) { // 实数名列表
-                smr::semgr << i.first + " ";
+                smr::semgr << i.first + "\t";
                 ++cnt;
                 if (cnt % 5 == 0) // 五个一行
                     smr::semgr << "\n";
@@ -127,7 +128,7 @@ bool show() {
 bool var() {
     bool shouldOut = laxb::cmdhr.semicolonDel();
 
-    if (laxb::cmdhr.isempty("var"))
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
         return false;
 
     std::size_t type{0};
@@ -184,7 +185,7 @@ bool var() {
 bool del() {
     bool shouldOut = laxb::cmdhr.semicolonDel();
 
-    if (laxb::cmdhr.isempty("del()"))
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
         return false;
 
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == false) { // :varn
@@ -236,7 +237,7 @@ bool cls() {
 bool plus() {
     bool shouldOut = laxb::cmdhr.semicolonDel();
 
-    if (laxb::cmdhr.isempty("plus()"))
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
         return false;
 
     std::size_t type{0};
@@ -259,7 +260,7 @@ bool plus() {
     for (const auto& i : varns) // 实数查找
         realIts.push_back(smr::semgr.findreal(i));
 
-    /* 变量存在性查找 */
+    /* 变量存在性检查 */
     if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varnIn1 + "\" is not exist");
         return false;
@@ -304,13 +305,87 @@ bool plus() {
     return true;
 }
 
+/* 被减数取决于输入（:）变量的左右，和输出（::）变量位置无关
+ * - minus :varn :varn ::varn
+ * - minus :varn :varn */
+bool minus() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
+        return false;
+
+    std::size_t type{0};
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true)
+        type = 1;
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true)
+        type = 2;
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string varnIn1(laxb::cmdhr.getCmdtoken()[0].substr(1)), varnIn2(laxb::cmdhr.getCmdtoken()[1].substr(1)); // :varn :varn
+    std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
+    std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
+    std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
+
+    for (const auto& i : varns) // 矩阵查找
+        dmtxIts.push_back(smr::semgr.finddmtx(i));
+    for (const auto& i : varns) // 实数查找
+        realIts.push_back(smr::semgr.findreal(i));
+
+    /* 变量存在性检查 */
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varnIn1 + "\" is not exist");
+        return false;
+    }
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varnIn2 + "\" is not exist");
+        return false;
+    }
+
+    /* 类型一致性检查 */
+    if (dmtxIts[0] != smr::semgr.getdmtxEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd()) {
+        try { // 防止矩阵维度不匹配
+            dmtxIts[0]->second - dmtxIts[1]->second;
+        } catch (std::invalid_argument& e) {
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": " + e.what());
+            return false;
+        }
+
+        core::dmtx output = dmtxIts[0]->second - dmtxIts[1]->second; // 再执行一次
+
+        if (type == 1) // plus :varn :varn ::varn
+            smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[2].substr(2), output); // ::varn
+
+        if (shouldOut)
+            smr::semgr << "\n"
+                       << output;
+    }
+    else if (realIts[0] != smr::semgr.getrealEnd() && realIts[1] != smr::semgr.getrealEnd()) {
+        double output = realIts[0]->second - realIts[1]->second;
+
+        if (type == 1) // plus :varn :varn ::varn
+            smr::semgr.addreal(laxb::cmdhr.getCmdtoken()[2].substr(2), output); // ::varn
+
+        if (shouldOut)
+            smr::semgr << output;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variables \"" + varnIn1 + "\" and \"" + varnIn2 + "\" are of different types");
+        return false;
+    }
+
+    return true;
+}
+
 /* ==== 矩阵创建与操作 ==== */
 /* - eye {num}
  * - eye ::A {num} */
 bool eye() {
     bool shouldOut = laxb::cmdhr.semicolonDel(); // 末尾分号
 
-    if (laxb::cmdhr.isempty("eye()"))
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
         return false;
 
     /* 排序 args */

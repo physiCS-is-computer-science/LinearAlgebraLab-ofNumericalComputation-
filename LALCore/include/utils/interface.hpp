@@ -29,7 +29,7 @@ bool cls();
 
 /* ==== 运算 ==== */
 bool plus();
-// bool minus();
+bool minus();
 // bool mtimes();
 // bool times();
 // bool divide();
