@@ -100,17 +100,17 @@ bool show() {
         }
     }
     else if (type == 2) { // 查看特定变量
-        std::string name{laxb::cmdhr.getCmdtoken()[0].substr(1)};
-        auto itdm = smr::semgr.dmSpace_.find(name);
+        std::string name(laxb::cmdhr.getCmdtoken()[0].substr(1));
+        auto itdmtx = smr::semgr.dmSpace_.find(name);
         auto itreal = smr::semgr.realSpace_.find(name);
-        if (itdm == smr::semgr.dmSpace_.end() && itreal == smr::semgr.realSpace_.end()) {
+        if (itdmtx == smr::semgr.dmSpace_.end() && itreal == smr::semgr.realSpace_.end()) {
             smr::semgr << "Variable \"" + name + "\" not exist";
             return true;
         }
         else {
-            if (itdm != smr::semgr.dmSpace_.end())
+            if (itdmtx != smr::semgr.dmSpace_.end())
                 smr::semgr << "\n"
-                           << itdm->second;
+                           << itdmtx->second;
             if (itreal != smr::semgr.realSpace_.end())
                 smr::semgr << "\n"
                            << itreal->second << "\n";
@@ -141,13 +141,15 @@ bool var() {
 
     std::string varn(laxb::cmdhr.getCmdtoken()[0].substr(2)); // 去除标识符的变量/矩阵名
 
-    if (type == 1) {
-        /* 查找是否存在该变量 */
-        if (smr::semgr.findreal(varn) != smr::semgr.getrealEnd()) { // ::varn
-            smr::semgr.seterr("var(): Real variable \"" + varn + "\" exist");
-            return false;
-        }
+    /* 查找是否存在该变量 */
+    auto dmtxIt = smr::semgr.finddmtx(varn);
+    auto realIt = smr::semgr.findreal(varn);
+    if (dmtxIt != smr::semgr.getdmtxEnd() || realIt != smr::semgr.getrealEnd()) { // 找到任何一个都不行
+        smr::semgr.seterr("var(): Variable \"" + varn + "\" exist");
+        return false;
+    }
 
+    if (type == 1) { // ::varn {a}
         std::vector<double> temp = laxb::cmdhr.curlyToken(laxb::cmdhr.getCmdtoken()[1]); // {a}
         if (temp.size() != 1) { // 参数太多了
             smr::semgr.seterr("var(): Too many arguments in \"" + laxb::cmdhr.getCmdtoken()[1] + "\"");
@@ -158,12 +160,7 @@ bool var() {
         if (shouldOut)
             smr::semgr << temp[0];
     }
-    else if (type == 2) {
-        if (smr::semgr.finddmtx(varn) != smr::semgr.getdmtxEnd()) { // ::varn
-            smr::semgr.seterr("var(): Matrix variable \"" + varn + "\" exist");
-            return false;
-        }
-
+    else if (type == 2) { // ::varn [a b; c d]
         core::dmtx mtx(laxb::cmdhr.squareToken(laxb::cmdhr.getCmdtoken()[1])); // 矩阵输入错误返回的是空矩阵
         if (mtx.isEmpty()) {
             smr::semgr.seterr("var(): Error in matrix \"" + laxb::cmdhr.getCmdtoken()[1] + "\"");
@@ -177,6 +174,45 @@ bool var() {
     }
 
     // 此处本应为 shouldOut 检查，不过移到以上两个 if 选择之内了
+
+    return true;
+}
+
+/* 删除变量（laxb::cmdhr 的友元）
+ * del :varn */
+bool del() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+
+    if (laxb::cmdhr.isempty("del()"))
+        return false;
+
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == false) { // :varn
+        smr::semgr.seterr("del(): Argument(s) error");
+        return false;
+    }
+
+    std::string varn(laxb::cmdhr.getCmdtoken()[0].substr(1)); // :varn
+
+    /* 查找变量是否存在 */
+    auto dmtxIt = smr::semgr.dmSpace_.find(varn);
+    auto realIt = smr::semgr.realSpace_.find(varn);
+    if (dmtxIt == smr::semgr.dmSpace_.end() && realIt == smr::semgr.realSpace_.end()) {
+        smr::semgr.seterr("del(): Variable \"" + varn + "\" not exist");
+        return false;
+    }
+
+    /* 删除对应变量 */
+    if (dmtxIt != smr::semgr.dmSpace_.end()) {
+        if (shouldOut)
+            smr::semgr << "\n"
+                       << dmtxIt->second;
+        smr::semgr.dmSpace_.erase(dmtxIt);
+    }
+    else {
+        if (shouldOut)
+            smr::semgr << realIt->second;
+        smr::semgr.realSpace_.erase(realIt);
+    }
 
     return true;
 }
@@ -229,12 +265,16 @@ bool eye() {
         output(i, i) = 1;
 
     if (type == 2) {
-        std::string varn{laxb::cmdhr.getCmdtoken()[1].substr(2)}; // ::A
-        auto it = smr::semgr.finddmtx(varn); // 查找去掉标识符的子串
-        if (it != smr::semgr.getdmtxEnd()) {
+        std::string varn(laxb::cmdhr.getCmdtoken()[1].substr(2)); // ::A
+
+        /* 查找去掉标识符的子串 */
+        auto dmtxIt = smr::semgr.finddmtx(varn);
+        auto realIt = smr::semgr.findreal(varn);
+        if (dmtxIt != smr::semgr.getdmtxEnd() || realIt != smr::semgr.getrealEnd()) { // 只要找到一个就返回 false
             smr::semgr.seterr("eye(): Variable \"" + varn + "\" exist");
             return false;
         }
+
         smr::semgr.adddmtx(varn, output);
     }
 

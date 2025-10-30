@@ -18,6 +18,7 @@ class SessionMgr {
 public:
     /* friends */
     friend bool ::show();
+    friend bool ::del();
 
     SessionMgr() : path_("#") {};
     ~SessionMgr() = default;

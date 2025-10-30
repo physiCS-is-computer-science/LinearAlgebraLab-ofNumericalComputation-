@@ -37,10 +37,10 @@ reshape cat horzcat vertcat blkdiag tril triu flip rot90 compan
 
 - 关键词预览：
 ```
-
-```
 size length ndims numel isscalar isvector ismatrix isempty isequal 
 isnan isinf isfinite find nnz nonzeros issymmetric ishermitian isdefinite 
+```
+
 ```
 1.size :varn ::varn      ==> size :A ::s         % 矩阵维度 **
 2.length :varn ::varn    ==> length :A ::len     % 最大维度长度 **
