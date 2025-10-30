@@ -4,15 +4,15 @@
 
 #include "core/matrix.hpp"
 
-class Decomposer {
+class BaseDecomposer {
 public:
-    Decomposer() = default;
-    ~Decomposer() = default;
-    Decomposer(const Decomposer&) = default;
-    Decomposer(Decomposer&&) = default;
-    Decomposer& operator=(const Decomposer&) = default;
-    Decomposer& operator=(Decomposer&&) = default;
-    Decomposer(core::dmtx mtx) : originalDmtx_(mtx) {}
+    BaseDecomposer() = default;
+    ~BaseDecomposer() = default;
+    BaseDecomposer(const BaseDecomposer&) = default;
+    BaseDecomposer(BaseDecomposer&&) = default;
+    BaseDecomposer& operator=(const BaseDecomposer&) = default;
+    BaseDecomposer& operator=(BaseDecomposer&&) = default;
+    BaseDecomposer(core::dmtx mtx) : originalDmtx_(mtx) {}
 
     core::dmtx gaussianElimination(); // 高斯消元法，化为行阶梯矩阵（非最简 R）
 

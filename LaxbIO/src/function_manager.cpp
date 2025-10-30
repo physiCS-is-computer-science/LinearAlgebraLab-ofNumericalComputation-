@@ -9,7 +9,7 @@ namespace laxb {
 FuncManager fnmgr;
 
 void registerAllFunc() {
-    /* ==== 交互 ==== */
+    /* ==== 基本命令 ==== */
     fnmgr.fnReg("quit", quit);
     fnmgr.fnReg("show", show);
     fnmgr.fnReg("var", var);
@@ -20,7 +20,16 @@ void registerAllFunc() {
     fnmgr.fnReg("cls", cls);
     // fnmgr.fnReg("help", help);
 
-    /* ==== 数学 ==== */
+    /* ==== 运算 ==== */
+    fnmgr.fnReg("plus", plus);
+    // fnmgr.fnReg("minus", minus);
+    // fnmgr.fnReg("mtimes", mtimes);
+    // fnmgr.fnReg("times", times);
+    // fnmgr.fnReg("divide", divide);
+    // fnmgr.fnReg("mpower", mpower);
+    // fnmgr.fnReg("power", power);
+
+    /* ==== 矩阵创建与操作 ==== */
     fnmgr.fnReg("eye", eye);
     // fnmgr.fnReg("zeros", zeros);
     // fnmgr.fnReg("ones", ones);

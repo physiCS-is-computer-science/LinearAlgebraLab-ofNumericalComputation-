@@ -16,7 +16,7 @@
 // public:
 // };
 
-/* ==== 交互 ==== */
+/* ==== 基本命令 ==== */
 bool quit();
 bool show();
 bool var();
@@ -27,7 +27,7 @@ bool del();
 bool cls();
 // bool help();
 
-/* ==== 数学 ==== */
+/* ==== 运算 ==== */
 bool plus();
 // bool minus();
 // bool mtimes();
@@ -35,6 +35,8 @@ bool plus();
 // bool divide();
 // bool mpower();
 // bool power();
+
+/* ==== 矩阵创建与操作 ==== */
 bool eye();
 // bool zeros();
 // bool ones();
