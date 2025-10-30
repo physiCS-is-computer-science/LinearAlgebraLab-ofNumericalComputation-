@@ -28,12 +28,7 @@ bool CmdHandler::in() {
     std::vector<std::string> tokens;
     std::size_t endPos{0}, begPos{0}; // 结束位置下标
 
-    while (!cmdLine.empty() && *(cmdLine.end() - 1) == ' ') // 删掉末尾所有空格
-        cmdLine.pop_back();
-    while (!cmdLine.empty() && *cmdLine.begin() == ' ') { // 删掉开头所有空格
-        auto begIt = cmdLine.begin();
-        cmdLine.erase(begIt);
-    }
+    delSpace(cmdLine); // 去除首尾空格
     if (cmdLine.empty()) // 什么都不做，等待重新输入
         return false;
 
@@ -166,8 +161,8 @@ bool tksCheck(std::vector<std::string> tks) {
     }
 
     const std::string legalCh{"1234567890abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
-    const std::string legalCurlyBraCh{"1234567890 "}; // 花括号合法字符
-    const std::string legalSquareBraCh{"1234567890; "}; // 方括号合法字符
+    const std::string legalCurlyBraCh{"1234567890. "}; // 花括号合法字符
+    const std::string legalSquareBraCh{"1234567890;. "}; // 方括号合法字符
     for (const auto& tkNoid : tksNoid) {
         if (tkNoid.find_first_not_of(legalCh) != std::string::npos) { // 找到非法字符时
             std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + tkNoid + "\"\n";
@@ -226,8 +221,16 @@ Cmdt argtype(std::string str) {
         return Cmdt::NOTF;
 }
 
+/* 去除首尾空格，无空格则不操作 */
+void delSpace(std::string& str) {
+    while (!str.empty() && *(str.end() - 1) == ' ') // 删掉末尾所有空格
+        str.pop_back();
+    while (!str.empty() && *str.begin() == ' ') // 删掉开头所有空格
+        str.erase(str.begin());
+}
+
 /* 按照 tplate 模板的顺序与数量检查、排序参数集，二者任意一个不一致则返回 false */
-bool CmdHandler::sortArgs(std::vector<Cmdt> tplate) {
+bool CmdHandler::sortToken(std::vector<Cmdt> tplate) {
     if (tplate.size() != cmdToken_.size())
         return false;
 
@@ -244,24 +247,64 @@ bool CmdHandler::sortArgs(std::vector<Cmdt> tplate) {
     return true;
 }
 
-/* 解析花括号里的数值，确保传递的是花括号 */
-std::vector<double> CmdHandler::curlyArgs(std::string arg) {
-    arg = (arg.substr(1, arg.size() - 2)); // 去掉花括号的子串
-    std::vector<double> nums;
+/* 解析花括号里的数值，确保传递的是花括号（没有错误检查） */
+std::vector<double> CmdHandler::curlyToken(std::string token) {
+    token = (token.substr(1, token.size() - 2)); // 去掉花括号的子串
+    std::vector<double> nums{};
     double temp{0};
-    for (std::size_t pos{0}; pos < arg.size();) {
-        temp = std::stod(arg, &pos);
+    for (std::size_t pos{0}; pos < token.size();) {
+        temp = std::stod(token, &pos);
         if (pos == 0) { // 没找到数字时
             ++pos;
             continue;
         }
         nums.push_back(temp);
-        if (pos < arg.size()) { // 找到末尾则不拆解子串
-            arg = arg.substr(++pos); // 此处 pos 自增前为非数字字符
+        if (pos < token.size()) { // 找到末尾则不拆解子串
+            token = token.substr(++pos); // 此处 pos 自增前为非数字字符
             pos = 0;
         }
     }
     return nums;
+}
+
+/* 解析方括号里的矩阵，返回一个实数矩阵（无错误检查） */
+core::dmtx CmdHandler::squareToken(std::string token) {
+    token = (token.substr(1, token.size() - 2)); // 去掉方括号的子串
+
+    delSpace(token); // 去除首尾空格
+
+    /* 分解出每一行 */
+    std::vector<std::string> rows{}; // 以分号为单位，一行一个分号
+    for (std::size_t begPos{0}, endPos{0}; endPos < token.size();) {
+        endPos = token.find(';', begPos);
+        rows.push_back(token.substr(begPos, endPos - begPos)); // 从 begPos 开始，endPos 前一个结束的子串
+        if (endPos != std::string::npos) { // 找到时
+            if (endPos < token.size() - 1) // 不是最后一个字符
+                begPos = endPos + 1;
+            else if (endPos >= token.size() - 1) // 是最后一个字符，即最后一个字符是 ';'
+                break;
+        }
+    }
+
+    /* 解析数字 */
+    std::vector<std::vector<double>> numRows{};
+    for (auto row : rows) {
+        delSpace(row);
+        std::vector<double> temp = curlyToken("{" + row + "}");
+        numRows.push_back(temp);
+    }
+
+    /* 构造矩阵 */
+    std::size_t colSize = numRows.begin()->size(), rowSize = rows.size();
+    core::dmtx output(rowSize, colSize); // 第一行元素个数确定列数
+    for (std::size_t i{0}; i < rowSize; ++i) {
+        if (numRows[i].size() != colSize) // 与第一行个数不等时
+            return {};
+        for (std::size_t j{0}; j < colSize; ++j)
+            output(i, j) = numRows[i][j];
+    }
+
+    return output;
 }
 
 /* 检查 cmdToken_ 是否为空
@@ -285,7 +328,7 @@ bool CmdHandler::semicolonDel() {
         it = cmdToken_.erase(it); // 删掉末尾分号
     if (it == cmdToken_.end()) // 存在分号并且被删除时
         return false;
-        
+
     return true; // 无分号时
 }
 

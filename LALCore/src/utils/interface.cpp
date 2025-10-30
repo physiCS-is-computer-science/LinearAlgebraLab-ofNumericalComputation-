@@ -1,9 +1,9 @@
 // =====================================================================
 // 所有命令都有相似的流程，调用史上最伟大的 LaxbIO、SessionManager 模块解析传递数据
 // - 每个命令的流程：
-//    1.去除末尾分号（记录输出标志），防止参数排序分析函数 sortArgs() 返回错误消息（分号处理之后再 cmdhr.isempty("") 检查）
+//    1.去除末尾分号（记录输出标志），防止参数排序分析函数 sortToken() 返回错误消息（分号处理之后再 cmdhr.isempty("") 检查）
 //    2.判断 cmdToken_ 数量，不符合则返回 false
-//    3.显示指定参数顺序和种类，调用 sortArgs() 函数分析排序 args
+//    3.显示指定参数顺序和种类，调用 sortToken() 函数分析排序 args
 //    4.逐项分析返回的有序 args，使用
 //    5.根据 ';' 判断是否写入 smr::semgr::cptoup_
 // =====================================================================
@@ -38,11 +38,11 @@ bool show() {
     if (laxb::cmdhr.isempty("show"))
         return false;
 
-    /* sortArgs() */
+    /* sortToken() */
     std::size_t type{0};
-    if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true)
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true)
         type = 1;
-    else if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true)
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true)
         type = 2;
     else {
         smr::semgr.seterr("show(): Argument(s) error");
@@ -120,7 +120,7 @@ bool show() {
     return true;
 }
 
-/* 创建变脸
+/* 创建变量
  * var ::varn {a}
  * var ::varn [a b; c b] */
 bool var() {
@@ -128,6 +128,57 @@ bool var() {
 
     if (laxb::cmdhr.isempty("var"))
         return false;
+
+    std::size_t type{0};
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUT, laxb::Cmdt::CB}) == true) // ::varn {a}
+        type = 1;
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUT, laxb::Cmdt::SB}) == true) // ::varn [a b; c b]
+        type = 2;
+    else {
+        smr::semgr.seterr("var(): Argument(s) error");
+        return false;
+    }
+
+    std::string varn(laxb::cmdhr.getCmdtoken()[0].substr(2)); // 去除标识符的变量/矩阵名
+
+    if (type == 1) {
+        /* 查找是否存在该变量 */
+        if (smr::semgr.findreal(varn) != smr::semgr.getrealEnd()) { // ::varn
+            smr::semgr.seterr("var(): Real variable \"" + varn + "\" exist");
+            return false;
+        }
+
+        std::vector<double> temp = laxb::cmdhr.curlyToken(laxb::cmdhr.getCmdtoken()[1]); // {a}
+        if (temp.size() != 1) { // 参数太多了
+            smr::semgr.seterr("var(): Too many arguments in \"" + laxb::cmdhr.getCmdtoken()[1] + "\"");
+            return false;
+        }
+
+        smr::semgr.addreal(varn, temp[0]);
+        if (shouldOut)
+            smr::semgr << temp[0];
+    }
+    else if (type == 2) {
+        if (smr::semgr.finddmtx(varn) != smr::semgr.getdmtxEnd()) { // ::varn
+            smr::semgr.seterr("var(): Matrix variable \"" + varn + "\" exist");
+            return false;
+        }
+
+        core::dmtx mtx(laxb::cmdhr.squareToken(laxb::cmdhr.getCmdtoken()[1])); // 矩阵输入错误返回的是空矩阵
+        if (mtx.isEmpty()) {
+            smr::semgr.seterr("var(): Error in matrix \"" + laxb::cmdhr.getCmdtoken()[1] + "\"");
+            return false;
+        }
+
+        smr::semgr.adddmtx(varn, mtx); // 添加矩阵
+        if (shouldOut)
+            smr::semgr << "\n"
+                       << mtx;
+    }
+
+    // 此处本应为 shouldOut 检查，不过移到以上两个 if 选择之内了
+
+    return true;
 }
 
 /* 清屏 */
@@ -153,24 +204,24 @@ bool eye() {
 
     /* 排序 args */
     std::size_t type{0};
-    if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::CB}) == true) // eye {num}
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB}) == true) // eye {num}
         type = 1;
-    else if (laxb::cmdhr.sortArgs(std::vector<laxb::Cmdt>{laxb::Cmdt::CB, laxb::Cmdt::OUT}) == true) // eye ::A {num}
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB, laxb::Cmdt::OUT}) == true) // eye ::A {num}
         type = 2;
     else {
-        smr::semgr.seterr("eye(): Argument(s) error000");
+        smr::semgr.seterr("eye(): Argument(s) error");
         return false;
     }
 
     /* 分析、使用 */
     core::dmtx output{};
-    std::vector<double> dimens = laxb::cmdhr.curlyArgs(laxb::cmdhr.getCmdtoken()[0]);
+    std::vector<double> dimens = laxb::cmdhr.curlyToken(laxb::cmdhr.getCmdtoken()[0]);
     if (dimens.size() != 1) {
-        smr::semgr.seterr("eye(): Number of arguments error in \"{" + laxb::cmdhr.getCmdtoken()[0].substr(1, laxb::cmdhr.getCmdtoken()[0].size() - 2) + "}\"");
+        smr::semgr.seterr("eye(): Number of arguments error in \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
         return false;
     }
     if (dimens[0] == 0) {
-        smr::semgr.seterr("eye(): Invalid argument \"{0}\"");
+        smr::semgr.seterr("eye(): Invalid argument \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
         return false;
     }
     output = core::dmtx(dimens[0]); // 制造矩阵

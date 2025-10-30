@@ -4,6 +4,7 @@
 // - 需要输出时调用 Workspace，查找输出的东西放在哪
 // ======================================================
 
+#include "core/matrix.hpp"
 #include <string>
 #include <vector>
 
@@ -42,9 +43,9 @@ public:
     void setCmdtoken(std::vector<std::string> cmdToken) { cmdToken_ = cmdToken; } // 设置命令字符串的值
     void setName(std::string name) { name_ = name; } // 命令名
 
-    bool sortArgs(std::vector<Cmdt> tplate); // 根据 tplate 的模板排序出相同顺序、数量的 cmdToken_
-    std::vector<double> curlyArgs(std::string arg); // 分离出花括号字符串 arg 中的数字
-    std::vector<std::vector<double>> squareArgs(std::string arg); // 分离出方括号字符串 arg 中存储的矩阵
+    bool sortToken(std::vector<Cmdt> tplate); // 根据 tplate 的模板排序出相同顺序、数量的 cmdToken_
+    std::vector<double> curlyToken(std::string token); // 分离出花括号字符串 arg 中的数字
+    core::dmtx squareToken(std::string token); // 分离出方括号字符串 arg 中存储的矩阵
 
     bool isempty(std::string outStr); // 检查 args 是否为空
     bool semicolonDel(); // 处理末尾分号，返回是否输出标识
@@ -57,5 +58,6 @@ extern CmdHandler cmdhr; // 不可复制，仅作为命名解析器使用
 
 bool tksCheck(std::vector<std::string> tks); // in() 调用，检查输入参数的语法正确与否
 Cmdt argtype(std::string str); // 返回 str 属于哪种参数
+void delSpace(std::string& str); // 去除首尾空格
 
 } // namespace laxb
