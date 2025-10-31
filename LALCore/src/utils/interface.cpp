@@ -419,6 +419,8 @@ bool mtimes() {
     }
 
     core::dmtx output{};
+
+    /* 计算 */
     if (dmtxIts[0] != smr::semgr.getdmtxEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd()) { // matrix * matrix
         if (dmtxIts[0]->second.getColSize() != dmtxIts[1]->second.getRowSize()) {
             smr::semgr.seterr(laxb::cmdhr.getName() + ": Dimension dismatch between matrix \"" + varnIn1 + "\" and \"" + varnIn2 + "\"");
@@ -441,12 +443,71 @@ bool mtimes() {
     return true;
 }
 
+/* 逐元素乘
+ * - times :varn :varn ::varn
+ * - times :varn :varn */
+bool times() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
+        return false;
+
+    std::size_t type{0};
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) // :A :B ::C
+        type = 1;
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) // :A :B
+        type = 2;
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string varnIn1(laxb::cmdhr.getCmdtoken()[0].substr(1)), varnIn2(laxb::cmdhr.getCmdtoken()[1].substr(1)); // :varn :varn
+    std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
+    std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
+    std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
+
+    for (const auto& i : varns) // 矩阵查找
+        dmtxIts.push_back(smr::semgr.finddmtx(i));
+    for (const auto& i : varns) // 实数查找
+        realIts.push_back(smr::semgr.findreal(i));
+
+    /* 变量存在性检查 */
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varnIn1 + "\" is not exist");
+        return false;
+    }
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varnIn2 + "\" is not exist");
+        return false;
+    }
+
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() || dmtxIts[1] == smr::semgr.getdmtxEnd()) { // 必须为两个矩阵
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Need 2 matrix variable, but not");
+        return false;
+    }
+
+    /* 维度检查 */
+    if (core::dimeq(dmtxIts[0]->second, dmtxIts[1]->second) == false) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Dimension mismatch between \"" + varnIn1 + "\" and \"" + varnIn2 + "\"");
+        return false;
+    }
+
+    /* 计算 */
+    core::dmtx output = core::times(dmtxIts[0]->second, dmtxIts[1]->second);
+    if (type == 1)
+        smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[2].substr(2), output); // :varn :varn ::varn
+    if (shouldOut)
+        smr::semgr << "\n"
+                   << output;
+
+    return true;
+}
+
 /* ==== 矩阵创建与操作 ==== */
 /* - eye {num}
  * - eye ::A {num} */
 bool eye() {
     bool shouldOut = laxb::cmdhr.semicolonDel(); // 末尾分号
-
     if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
         return false;
 
@@ -477,7 +538,7 @@ bool eye() {
         output(i, i) = 1;
 
     if (type == 2)
-    smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[1].substr(2), output); // ::A
+        smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[1].substr(2), output); // ::A
 
     /* 判断是否写入 smr::semgr::cptoup_ */
     if (shouldOut)

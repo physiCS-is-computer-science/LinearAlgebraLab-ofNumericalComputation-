@@ -31,7 +31,7 @@ bool cls();
 bool plus();
 bool minus();
 bool mtimes();
-// bool times();
+bool times();
 // bool divide();
 // bool mpower();
 // bool power();

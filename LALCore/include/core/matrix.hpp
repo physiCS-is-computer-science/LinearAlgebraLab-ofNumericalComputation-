@@ -52,6 +52,8 @@ template <typename T>
 Matrix<T> divide(const Matrix<T>& matrix1, const Matrix<T>& matrix2);
 template <typename T>
 Vector<T> tovec(const Matrix<T>& matrix);
+template <typename T>
+bool dimeq(const Matrix<T>& mtx1, const Matrix<T>& mtx2);
 
 template <typename T>
 class Matrix {
@@ -72,6 +74,7 @@ public:
     friend Matrix<T> power<T>(const Matrix<T>& matrix1, const Matrix<T>& matrix2);
     friend Matrix<T> divide<T>(const Matrix<T>& matrix1, const Matrix<T>& matrix2);
     friend Vector<T> tovec<T>(const Matrix<T>& matrix);
+    friend bool dimeq<T>(const Matrix<T>& mtx1, const Matrix<T>& mtx2);
 
     Matrix() = default;
     ~Matrix() = default;
@@ -328,6 +331,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     return os;
 }
 
+/* ==== 普通函数 ==== */
 /* 矩阵逐元素相乘 */
 template <typename T>
 Matrix<T> times(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
@@ -396,6 +400,12 @@ Vector<T> tovec(const Matrix<T>& matrix) {
     }
 
     return output;
+}
+
+/* 判断两个矩阵的维度是否相等，仅仅判断维度 */
+template <typename T>
+bool dimeq(const Matrix<T>& mtx1, const Matrix<T>& mtx2) {
+    return mtx1.row_ == mtx2.row_ && mtx1.col_ == mtx2.col_;
 }
 
 /* ==== member functions ==== */
@@ -515,7 +525,5 @@ void Matrix<T>::reconstruct(mtxSizet row, mtxSizet col) {
     col_ = col;
     initMtx(row, col);
 }
-
-/* ==== 普通函数 ==== */
 
 } // namespace core
