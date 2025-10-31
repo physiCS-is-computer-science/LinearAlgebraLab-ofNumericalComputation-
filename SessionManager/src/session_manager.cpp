@@ -31,8 +31,9 @@ SessionMgr& SessionMgr::operator<<(core::dvec vec) { // 实数向量
  * - 存在同名 实数 变量则直接删除同名实数变量 */
 void SessionMgr::adddmtx(std::string varn, core::dmtx mtx) {
     dmSpace_[varn] = mtx;
-    if (realSpace_.find(varn) != realSpace_.end())
+    if (realSpace_.find(varn) != realSpace_.end()) {
         realSpace_.erase(varn);
+    }
 }
 
 /* 添加一个实数变量
@@ -40,8 +41,9 @@ void SessionMgr::adddmtx(std::string varn, core::dmtx mtx) {
  * - 存在同名 矩阵 变量则直接删除同名矩阵变量 */
 void SessionMgr::addreal(std::string varn, double val) {
     realSpace_[varn] = val;
-    if (dmSpace_.find(varn) != dmSpace_.end())
+    if (dmSpace_.find(varn) != dmSpace_.end()) {
         dmSpace_.erase(varn);
+    }
 }
 
 } // namespace smr

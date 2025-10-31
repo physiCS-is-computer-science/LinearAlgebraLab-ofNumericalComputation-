@@ -141,8 +141,9 @@ Vector<T>::Vector(std::initializer_list<T> il) {
 template <typename T>
 T Vector<T>::getElemSum() const {
     T output{}; // 初始化为 0
-    for (auto& i : vec_)
+    for (auto& i : vec_) {
         output += i;
+    }
     return output;
 }
 
@@ -150,15 +151,18 @@ T Vector<T>::getElemSum() const {
 template <typename T>
 T Vector<T>::getMax() const {
     if (this->getSize() == 1) // 一维
+    {
         return vec_[0];
+    }
     return *std::max_element(vec_.begin(), vec_.end());
 }
 
 /* 向量获取最小值 */
 template <typename T>
 T Vector<T>::getMin() const {
-    if (this->getSize() == 1)
+    if (this->getSize() == 1) {
         return vec_[0];
+    }
     return *std::min_element(vec_.begin(), vec_.end());
 }
 
@@ -188,13 +192,15 @@ std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
 
     os << '\n';
     if (vec.getOrientation() == VecOrientation::ROW) { // 行向量
-        for (typename Vector<T>::vecSizet i = 0; i < vec.getSize(); ++i)
+        for (typename Vector<T>::vecSizet i = 0; i < vec.getSize(); ++i) {
             os << vec(i) << '\t';
+        }
         os << '\n'; // put a '\n' at the end of vector
     }
     else { // 列向量
-        for (typename Vector<T>::vecSizet i = 0; i < vec.getSize(); ++i)
+        for (typename Vector<T>::vecSizet i = 0; i < vec.getSize(); ++i) {
             os << vec(i) << '\n';
+        }
     }
     return os;
 }
@@ -202,10 +208,12 @@ std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
 /* 相同类型向量之间相加 */
 template <typename T>
 Vector<T> operator+(const Vector<T>& vec1, const Vector<T>& vec2) { // +
-    if (vec1.getSize() != vec2.getSize())
+    if (vec1.getSize() != vec2.getSize()) {
         throw std::invalid_argument("vector.hpp: operator+(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
-    if (vec1.getOrientation() != vec2.getOrientation())
+    }
+    if (vec1.getOrientation() != vec2.getOrientation()) {
         throw std::invalid_argument("vector.hpp: operator+(): orientation of the two vectors do not match");
+    }
 
     Vector<T> output(vec1); // 初始化为与 vec1 一致的向量
     std::transform(vec1.vec_.begin(), vec1.vec_.end(), vec2.vec_.begin(), output.vec_.begin(), [](const T v1, const T v2) { return v1 + v2; });
@@ -215,10 +223,12 @@ Vector<T> operator+(const Vector<T>& vec1, const Vector<T>& vec2) { // +
 /* 相同类型向量之间相减 */
 template <typename T>
 Vector<T> operator-(const Vector<T>& vec1, const Vector<T>& vec2) { // -
-    if (vec1.getSize() != vec2.getSize())
+    if (vec1.getSize() != vec2.getSize()) {
         throw std::invalid_argument("vector.cpp: operator-(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
-    if (vec1.getOrientation() != vec2.getOrientation())
+    }
+    if (vec1.getOrientation() != vec2.getOrientation()) {
         throw std::invalid_argument("vector.cpp: operator-(): orientation of the two vectors do not match");
+    }
 
     Vector<T> output(vec1); // 初始化为与 vec1 一致的向量
     std::transform(vec1.vec_.begin(), vec1.vec_.end(), vec2.vec_.begin(), output.vec_.begin(), [](const T v1, const T v2) { return v1 - v2; });
@@ -229,8 +239,9 @@ Vector<T> operator-(const Vector<T>& vec1, const Vector<T>& vec2) { // -
 template <typename T>
 Vector<T> operator*(double scalar, const Vector<T>& vec) {
     Vector output(vec);
-    for (typename Vector<T>::vecSizet i = 0; i < output.dimension_; ++i)
+    for (typename Vector<T>::vecSizet i = 0; i < output.dimension_; ++i) {
         output.vec_[i] *= scalar;
+    }
     return output;
 }
 
@@ -245,24 +256,28 @@ template <typename T>
 bool operator==(const Vector<T>& vec1, const Vector<T>& vec2) {
     if (vec1.dimension_ == vec2.dimension_ && vec1.orientation_ == vec2.orientation_) {
         for (typename Vector<T>::vecSizet i = 0; i < vec1.dimension_; ++i) {
-            if (vec1.vec_[i] != vec2.vec_[i])
+            if (vec1.vec_[i] != vec2.vec_[i]) {
                 return false;
+            }
         }
         return true;
     }
-    else
+    else {
         return false;
+    }
 }
 
 /* 判断两个向量是否为“非完全相等” */
 template <typename T>
 bool operator!=(const Vector<T>& vec1, const Vector<T>& vec2) {
-    if (vec1.dimension_ != vec2.dimension_ || vec1.orientation_ != vec2.orientation_)
+    if (vec1.dimension_ != vec2.dimension_ || vec1.orientation_ != vec2.orientation_) {
         return true;
+    }
     else {
         for (typename Vector<T>::vecSizet i = 0; i < vec1.dimension_; ++i) {
-            if (vec1.vec_[i] != vec2.vec_[i])
+            if (vec1.vec_[i] != vec2.vec_[i]) {
                 return true;
+            }
         }
         return false;
     }
@@ -273,10 +288,12 @@ bool operator!=(const Vector<T>& vec1, const Vector<T>& vec2) {
 template <typename T>
 Vector<T> operator~(const Vector<T>& vec) {
     Vector<T> output(vec);
-    if (output.orientation_ == VecOrientation::COLUMN)
+    if (output.orientation_ == VecOrientation::COLUMN) {
         output.orientation_ = VecOrientation::ROW;
-    else
+    }
+    else {
         output.orientation_ = VecOrientation::COLUMN;
+    }
 
     return output;
 }
@@ -285,10 +302,12 @@ Vector<T> operator~(const Vector<T>& vec) {
 /* 向量逐元素乘 */
 template <typename T>
 Vector<T> times(const Vector<T>& vec1, const Vector<T>& vec2) {
-    if (vec1.getSize() != vec2.getSize())
+    if (vec1.getSize() != vec2.getSize()) {
         throw std::invalid_argument("vector.hpp: times(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
-    if (vec1.getOrientation() != vec2.getOrientation())
+    }
+    if (vec1.getOrientation() != vec2.getOrientation()) {
         throw std::invalid_argument("vector.hpp: times(): orientation of the two vectors do not match");
+    }
 
     Vector output(vec1);
     std::transform(vec1.vec_.begin(), vec1.vec_.end(), vec2.vec_.begin(), output.vec_.begin(), [](T v1, T v2) { return v1 * v2; });
@@ -298,10 +317,12 @@ Vector<T> times(const Vector<T>& vec1, const Vector<T>& vec2) {
 /* 向量逐元素幂 */
 template <typename T>
 Vector<T> power(const Vector<T>& vec1, const Vector<T>& vec2) {
-    if (vec1.getSize() != vec2.getSize())
+    if (vec1.getSize() != vec2.getSize()) {
         throw std::invalid_argument("vector.hpp: power(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
-    if (vec1.getOrientation() != vec2.getOrientation())
+    }
+    if (vec1.getOrientation() != vec2.getOrientation()) {
         throw std::invalid_argument("vector.hpp: power(): orientation of the two vectors do not match");
+    }
 
     Vector output(vec1);
     std::transform(vec1.vec_.begin(), vec1.vec_.end(), vec2.vec_.begin(), output.vec_.begin(), [](T v1, T v2) { return pow(v1, v2); });
@@ -312,15 +333,18 @@ Vector<T> power(const Vector<T>& vec1, const Vector<T>& vec2) {
  * - 注意除零错误，有一个 invalid_argument() 抛出 */
 template <typename T>
 Vector<T> divide(const Vector<T>& vec1, const Vector<T>& vec2) {
-    if (vec1.getSize() != vec2.getSize())
+    if (vec1.getSize() != vec2.getSize()) {
         throw std::invalid_argument("vector.hpp: power(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
-    if (vec1.getOrientation() != vec2.getOrientation())
+    }
+    if (vec1.getOrientation() != vec2.getOrientation()) {
         throw std::invalid_argument("vector.hpp: power(): orientation of the two vectors do not match");
+    }
 
     Vector output(vec1);
     for (typename Vector<T>::vecSizet i = 0; i < output.dimension_; ++i) {
-        if (vec2.vec_[i] == 0)
+        if (vec2.vec_[i] == 0) {
             throw std::invalid_argument("vector.hpp: divide(): Divide by zero error");
+        }
         output.vec_[i] /= vec2.vec_[i];
     }
     return output;
@@ -331,10 +355,12 @@ Vector<T> divide(const Vector<T>& vec1, const Vector<T>& vec2) {
  * - 矩阵间乘法的实现方式 */
 template <typename T>
 T dot(const Vector<T>& vec1, const Vector<T>& vec2) {
-    if (vec1.getSize() != vec2.getSize())
+    if (vec1.getSize() != vec2.getSize()) {
         throw std::invalid_argument("vector.hpp: dot(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
-    if (vec1.getOrientation() == vec2.getOrientation()) // 点积要求行和列
+    }
+    if (vec1.getOrientation() == vec2.getOrientation()) { // 点积要求行和列
         throw std::invalid_argument("vector.hpp: dot(): orientation of the two vectors do not match");
+    }
 
     Vector temp(~vec1); // 用转置初始化为与 vec2 相同方向的向量
     return times(temp, vec2).getElemSum(); // 逐元素积求和
@@ -344,24 +370,28 @@ T dot(const Vector<T>& vec1, const Vector<T>& vec2) {
  * - 两个向量参数无需确认顺序，只要保证一个为行向量，一个为列向量即可 */
 template <typename T>
 Matrix<T> cross(const Vector<T>& vec1, const Vector<T>& vec2) {
-    if (vec1.getSize() != vec2.getSize())
+    if (vec1.getSize() != vec2.getSize()) {
         throw std::invalid_argument("vector.hpp: cross(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
-    if (vec1.getOrientation() == vec2.getOrientation()) // 叉积要求行和列
+    }
+    if (vec1.getOrientation() == vec2.getOrientation()) { // 叉积要求行和列
         throw std::invalid_argument("vector.hpp: cross(): orientation of the two vectors do not match");
+    }
 
     Matrix<T> output(vec1.getSize()); // 方阵
     if (vec1.getOrientation() == VecOrientation::ROW) { // 此时 vec2(col) 左乘 vec1(row)
         for (typename Vector<T>::vecSizet i = 0; i < vec1.getSize(); ++i) { // vec1 的每列都为一个标量，分别乘 vec2 构成一个矩阵，即为叉积
             Vector<T> temp(vec2 * vec1.vec_[i]);
-            for (typename Vector<T>::vecSizet j = 0; j < vec1.getSize(); ++j)
+            for (typename Vector<T>::vecSizet j = 0; j < vec1.getSize(); ++j) {
                 output(j, i) = temp(j); // temp 为列向量
+            }
         }
     }
     else { // 此时 vec1(col) 左乘 vec2(row)
         for (typename Vector<T>::vecSizet i = 0; i < vec2.getSize(); ++i) {
             Vector<T> temp(vec1 * vec2.vec_[i]);
-            for (typename Vector<T>::vecSizet j = 0; j < vec2.getSize(); ++j)
+            for (typename Vector<T>::vecSizet j = 0; j < vec2.getSize(); ++j) {
                 output(j, i) = temp(j);
+            }
         }
     }
 
@@ -374,13 +404,15 @@ Matrix<T> tomtx(const Vector<T>& vec) {
     Matrix<T> output{};
     if (vec.getOrientation() == VecOrientation::ROW) {
         output.reconstruct(1, vec.getSize()); // 行向量
-        for (typename Matrix<T>::mtxSizet i = 0; i < vec.getSize(); ++i)
+        for (typename Matrix<T>::mtxSizet i = 0; i < vec.getSize(); ++i) {
             output(0, i) = vec(i);
+        }
     }
     else {
         output.reconstruct(vec.getSize(), 1); // 列向量
-        for (typename Matrix<T>::mtxSizet i = 0; i < vec.getSize(); ++i)
+        for (typename Matrix<T>::mtxSizet i = 0; i < vec.getSize(); ++i) {
             output(i, 0) = vec(i);
+        }
     }
 
     return output;

@@ -40,9 +40,10 @@ int main() {
 
         /* input */
         std::cout << util::SIS(smr::semgr.getpath()); // default path identifier
-        while (!laxb::cmdhr.in())
+        while (!laxb::cmdhr.in()) {
             std::cout << util::SIS(smr::semgr.getpath());
-
+        }
+        
         // /* check current tokens */
         // std::cout << "==== TEST ====\ntokens:\n";
         // for (const auto& i : cmdStr)
@@ -55,13 +56,16 @@ int main() {
         laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
         bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
 
-        if (smr::semgr.poweroff())
+        if (smr::semgr.poweroff()) {
             return 0;
+        }
 
-        if (state == true && !smr::semgr.getoup().empty()) // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
+        if (state == true && !smr::semgr.getoup().empty()) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
             std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
-        else if (state == false)
+        }
+        else if (state == false) {
             std::cout << util::ERS(smr::semgr.getpath()) + smr::semgr.geterr() + "\n";
+        }
     }
 
     return 0;

@@ -25,7 +25,7 @@ void registerAllFunc() {
     fnmgr.fnReg("minus", minus);
     fnmgr.fnReg("mtimes", mtimes);
     fnmgr.fnReg("times", times);
-    // fnmgr.fnReg("divide", divide);
+    fnmgr.fnReg("divide", divide);
     // fnmgr.fnReg("mpower", mpower);
     // fnmgr.fnReg("power", power);
 
@@ -40,8 +40,9 @@ void registerAllFunc() {
 
 /* 仅仅查找函数是否存在 */
 bool FuncManager::fnFind(const std::string& fnName) const {
-    if (funcMap_.find(fnName) != funcMap_.end())
+    if (funcMap_.find(fnName) != funcMap_.end()) {
         return true;
+    }
     return false;
 }
 

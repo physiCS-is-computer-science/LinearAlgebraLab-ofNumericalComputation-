@@ -21,39 +21,44 @@ bool CmdHandler::in() {
     /* input command string */
     std::string cmdLine{""};
     getline(std::cin, cmdLine);
-    if (cmdLine.empty()) // 确保不为空
+    if (cmdLine.empty()) { // 确保不为空
         return false;
+    }
 
     /* 简单检查正确性，并转换为 tokens */
     std::vector<std::string> tokens;
     std::size_t endPos{0}, begPos{0}; // 结束位置下标
 
     delSpace(cmdLine); // 去除首尾空格
-    if (cmdLine.empty()) // 什么都不做，等待重新输入
+    if (cmdLine.empty()) { // 什么都不做，等待重新输入
         return false;
+    }
 
     /* 最后一个字符为 ';' 时，在它之前插入一个空格，以分出 token */
     auto tmpIt = cmdLine.end();
-    if (*(--tmpIt) == ';')
+    if (*(--tmpIt) == ';') {
         cmdLine.insert(tmpIt, ' ');
-
+    }
     std::size_t cmdlSize = cmdLine.size();
     while (true) {
         /* 普通字符起点 */
-        if (cmdLine[begPos] != '{' && cmdLine[begPos] != '[')
+        if (cmdLine[begPos] != '{' && cmdLine[begPos] != '[') {
             endPos = cmdLine.find(" ", begPos);
+        }
 
         /* 括号起点 */
         if (cmdLine[begPos] == '{' || cmdLine[begPos] == '[') {
-            if (cmdLine[begPos] == '{')
+            if (cmdLine[begPos] == '{') {
                 endPos = cmdLine.find("}", begPos);
-            else if (cmdLine[begPos] == '[')
+            }
+            else if (cmdLine[begPos] == '[') {
                 endPos = cmdLine.find("]", begPos);
+            }
 
             if (endPos != std::string::npos) { // 找到反括号时
-                if (endPos == cmdlSize - 1) // 最后一个字符为括号时
+                if (endPos == cmdlSize - 1) { // 最后一个字符为括号时
                     break;
-
+                }
                 ++endPos; // 不为最后一个字符则递增
 
                 if (cmdLine[endPos] != ' ') { // 递增之后，当前位置应该为空格（最后一个为括号例外）
@@ -67,8 +72,9 @@ bool CmdHandler::in() {
             }
         }
 
-        if (endPos == std::string::npos) // 循环结束标志，处理找不到空格的情况
+        if (endPos == std::string::npos) { // 循环结束标志，处理找不到空格的情况
             break;
+        }
 
         /* 此时为多个空格（begPos开始查找第一个空格，而第一个空格是自身） */
         if (begPos == endPos && endPos != cmdlSize - 1) {
@@ -82,8 +88,9 @@ bool CmdHandler::in() {
     tokens.push_back(cmdLine.substr(begPos, cmdlSize - begPos)); // 最后一个字符串
 
     /* 逐项 tokens 检查 */
-    if (tksCheck(tokens) == false)
+    if (tksCheck(tokens) == false) {
         return false;
+    }
 
     laxb::cmdhr.setCmdtoken(tokens);
     return true;
@@ -95,8 +102,9 @@ bool tksCheck(std::vector<std::string> tks) {
     std::vector<std::string> tksNoid; // 去除标识符的 tokens
 
     auto it = tks.end() - 1; // 此处一定为非空，可以直接计算
-    if (*it == ";") // 删掉末尾 ;
+    if (*it == ";") { // 删掉末尾 ;
         tks.erase(it);
+    }
 
     std::vector<std::string> curlyBracketTks{}, squareBracketTks{}; // 括号内容单独存储
     for (auto& tk : tks) {
@@ -124,8 +132,9 @@ bool tksCheck(std::vector<std::string> tks) {
             }
             inx = 1;
         }
-        else if (tk[0] == ':' && tk[1] != ':') // :varn
+        else if (tk[0] == ':' && tk[1] != ':') { // :varn
             inx = 1;
+        }
         else if (tk[0] == ':' && tk[1] == ':') { // ::varn
             if (tk.size() < 3) {
                 std::cout << util::ERS() + "tksCheck(): Argument error after identifier \"::\"\n";
@@ -207,38 +216,48 @@ bool tksCheck(std::vector<std::string> tks) {
 
 /* 返回单个 str 参数类型 */
 Cmdt argtype(std::string str) {
-    if (str[0] == '-')
+    if (str[0] == '-') {
         return Cmdt::OPT;
-    else if (str[0] == ':' && str[1] != ':')
+    }
+    else if (str[0] == ':' && str[1] != ':') {
         return Cmdt::IN;
-    else if (str[0] == ':' && str[1] == ':')
+    }
+    else if (str[0] == ':' && str[1] == ':') {
         return Cmdt::OUT;
-    else if (str[0] == '[')
+    }
+    else if (str[0] == '[') {
         return Cmdt::SB;
-    else if (str[0] == '{')
+    }
+    else if (str[0] == '{') {
         return Cmdt::CB;
-    else
+    }
+    else {
         return Cmdt::NOTF;
+    }
 }
 
 /* 去除首尾空格，无空格则不操作 */
 void delSpace(std::string& str) {
-    while (!str.empty() && *(str.end() - 1) == ' ') // 删掉末尾所有空格
+    while (!str.empty() && *(str.end() - 1) == ' ') { // 删掉末尾所有空格
         str.pop_back();
-    while (!str.empty() && *str.begin() == ' ') // 删掉开头所有空格
+    }
+    while (!str.empty() && *str.begin() == ' ') { // 删掉开头所有空格
         str.erase(str.begin());
+    }
 }
 
 /* 按照 tplate 模板的顺序与数量检查、排序参数集，二者任意一个不一致则返回 false */
 bool CmdHandler::sortToken(std::vector<Cmdt> tplate) {
-    if (tplate.size() != cmdToken_.size())
+    if (tplate.size() != cmdToken_.size()) {
         return false;
+    }
 
     std::vector<std::string> aim{}, temp(cmdToken_);
     for (const auto i : tplate) {
         auto it = std::find_if(temp.cbegin(), temp.cend(), [i](std::string s) {if (argtype(s) == i) return true; return false; }); // 找到第一个满足当前类型 i 的迭代器
-        if (it == temp.cend()) // 没找到
+        if (it == temp.cend()) { // 没找到
             return false;
+        }
         aim.push_back(*it);
         temp.erase(it); // 找到在副本中的删掉
     }
@@ -279,10 +298,12 @@ core::dmtx CmdHandler::squareToken(std::string token) {
         endPos = token.find(';', begPos);
         rows.push_back(token.substr(begPos, endPos - begPos)); // 从 begPos 开始，endPos 前一个结束的子串
         if (endPos != std::string::npos) { // 找到时
-            if (endPos < token.size() - 1) // 不是最后一个字符
+            if (endPos < token.size() - 1) { // 不是最后一个字符
                 begPos = endPos + 1;
-            else if (endPos >= token.size() - 1) // 是最后一个字符，即最后一个字符是 ';'
+            }
+            else if (endPos >= token.size() - 1) { // 是最后一个字符，即最后一个字符是 ';'
                 break;
+            }
         }
     }
 
@@ -298,10 +319,12 @@ core::dmtx CmdHandler::squareToken(std::string token) {
     std::size_t colSize = numRows.begin()->size(), rowSize = rows.size();
     core::dmtx output(rowSize, colSize); // 第一行元素个数确定列数
     for (std::size_t i{0}; i < rowSize; ++i) {
-        if (numRows[i].size() != colSize) // 与第一行个数不等时
+        if (numRows[i].size() != colSize) { // 与第一行个数不等时
             return {};
-        for (std::size_t j{0}; j < colSize; ++j)
+        }
+        for (std::size_t j{0}; j < colSize; ++j) {
             output(i, j) = numRows[i][j];
+        }
     }
 
     return output;
@@ -320,14 +343,17 @@ bool CmdHandler::isempty(std::string outStr) {
 
 /* 有分号删除并返回 false，无分号返回 true */
 bool CmdHandler::semicolonDel() {
-    if (cmdToken_.empty()) // 空参数一定没分号
+    if (cmdToken_.empty()) { // 空参数一定没分号
         return true;
+    }
 
     auto it = cmdToken_.end() - 1;
-    if (*it == ";")
+    if (*it == ";") {
         it = cmdToken_.erase(it); // 删掉末尾分号
-    if (it == cmdToken_.end()) // 存在分号并且被删除时
+    }
+    if (it == cmdToken_.end()) { // 存在分号并且被删除时
         return false;
+    }
 
     return true; // 无分号时
 }

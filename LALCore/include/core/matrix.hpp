@@ -141,13 +141,15 @@ Matrix<T>::operator Vector<T>() const {
     Vector<T> output{};
     if (col_ == 1) { // 如果为 n * 1 的矩阵，此处直接处理为列向量（即为不执行转置）
         output.reconstruct(row_);
-        for (typename Vector<T>::vecSizet i = 0; i < row_; ++i)
+        for (typename Vector<T>::vecSizet i = 0; i < row_; ++i) {
             output(i) = matrix_[i][0];
+        }
     }
     else if (row_ == 1) {
         output.reconstruct(col_);
-        for (typename Vector<T>::vecSizet i = 0; i < col_; ++i)
+        for (typename Vector<T>::vecSizet i = 0; i < col_; ++i) {
             output(i) = matrix_[0][i];
+        }
         output = ~output; // 转为行向量
     }
 
@@ -168,8 +170,9 @@ Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> il) {
     for (mtxSizet i = 0; i < row_; ++i, ++rowIt) {
         auto colIt = rowIt->begin(); // 如果不按照标准矩阵形式，这里开始，以后有可能会访问到尾后迭代器之外，行为未定义。因此下面的循环加了if语句保护内存，然而仍然无法保护矩阵完整，故依赖coder自觉点检查
         for (mtxSizet j = 0; j < col_; ++j, ++colIt) {
-            if (colIt == rowIt->end()) // 简单保护内存而已
+            if (colIt == rowIt->end()) { // 简单保护内存而已
                 break;
+            }
             matrix_[i][j] = *colIt;
         }
     }
@@ -180,13 +183,15 @@ Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> il) {
  * - 只检测两个矩阵行列是否完全相等 */
 template <typename T>
 Matrix<T> operator+(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
-    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_)
+    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
         throw std::invalid_argument("matrix.hpp: operator+(): Dimensional mismatch between the two matrices");
+    }
 
     Matrix<T> output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
-        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j)
+        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
             output.matrix_[i][j] += matrix2.matrix_[i][j];
+        }
     }
     return output;
 }
@@ -195,13 +200,15 @@ Matrix<T> operator+(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
  * - 只检测两个矩阵行列是否完全相等 */
 template <typename T>
 Matrix<T> operator-(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
-    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_)
+    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
         throw std::invalid_argument("matrix.hpp: operator-(): Dimensional mismatch between the two matrices");
+    }
 
     Matrix output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
-        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j)
+        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
             output.matrix_[i][j] -= matrix2.matrix_[i][j];
+        }
     }
     return output;
 }
@@ -222,21 +229,24 @@ Matrix<T> operator-(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
  * [amb1 ...           ambn] */
 template <typename T>
 Matrix<T> operator*(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
-    if (matrix1.col_ != matrix2.row_)
+    if (matrix1.col_ != matrix2.row_) {
         throw std::invalid_argument("matrix.hpp: operator*(): Dimensional mismatch between the two matrices");
-
+    }
     Matrix<T> output(matrix1.row_, matrix2.col_);
     std::vector<Vector<T>> a(matrix1.row_); // row_ 个行向量
     std::vector<Vector<T>> b(matrix2.col_); // col_ 个列向量
 
-    for (typename Matrix<T>::mtxSizet i = 0; i < matrix1.row_; ++i)
+    for (typename Matrix<T>::mtxSizet i = 0; i < matrix1.row_; ++i) {
         a[i] = matrix1.getRow(i); // 获取每一行
-    for (typename Matrix<T>::mtxSizet i = 0; i < matrix2.col_; ++i)
+    }
+    for (typename Matrix<T>::mtxSizet i = 0; i < matrix2.col_; ++i) {
         b[i] = matrix2.getCol(i); // 获取每一列
+    }
 
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
-        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j)
+        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
             output.matrix_[i][j] = dot(a[i], b[j]);
+        }
     }
 
     return output;
@@ -248,8 +258,9 @@ template <typename T>
 Matrix<T> operator*(const Matrix<T>& matrix, double scalar) {
     Matrix<T> output(matrix);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
-        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j)
+        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
             output.matrix_[i][j] *= scalar;
+        }
     }
     return output;
 }
@@ -267,26 +278,30 @@ bool operator==(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     if (matrix1.row_ == matrix2.row_ && matrix1.col_ == matrix2.col_) {
         for (typename Matrix<T>::mtxSizet i = 0; i < matrix1.row_; ++i) {
             for (typename Matrix<T>::mtxSizet j = 0; j < matrix1.col_; ++j) {
-                if (matrix1.matrix_[i][j] != matrix2.matrix_[i][j])
+                if (matrix1.matrix_[i][j] != matrix2.matrix_[i][j]) {
                     return false;
+                }
             }
         }
         return true;
     }
-    else
+    else {
         return false;
+    }
 }
 
 /* 判断两个矩阵是否不完全相等 */
 template <typename T>
 bool operator!=(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
-    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_)
+    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
         return true;
+    }
     else {
         for (typename Matrix<T>::mtxSizet i = 0; i < matrix1.row_; ++i) {
             for (typename Matrix<T>::mtxSizet j = 0; j < matrix1.col_; ++j) {
-                if (matrix1.matrix_[i][j] != matrix2.matrix_[i][j])
+                if (matrix1.matrix_[i][j] != matrix2.matrix_[i][j]) {
                     return true;
+                }
             }
         }
         return false;
@@ -297,13 +312,15 @@ bool operator!=(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
  * - 不改变自身 */
 template <typename T>
 Matrix<T> operator~(const Matrix<T>& matrix) {
-    if (matrix.isEmpty())
+    if (matrix.isEmpty()) {
         throw std::invalid_argument("matrix.hpp: operator~(): the incomming matrix is empty");
+    }
 
     Matrix<T> output(matrix.col_, matrix.row_);
     for (typename Matrix<T>::mtxSizet i = 0; i < matrix.row_; ++i) {
-        for (typename Matrix<T>::mtxSizet j = 0; j < matrix.col_; ++j)
+        for (typename Matrix<T>::mtxSizet j = 0; j < matrix.col_; ++j) {
             output.matrix_[j][i] = matrix.matrix_[i][j];
+        }
     }
     return output;
 }
@@ -323,8 +340,9 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     os << '\n';
     for (typename Matrix<T>::mtxSizet row = 0; row < matrix.getRowSize(); ++row) {
         Vector<T> temp(matrix.getRow(row)); // 临时行
-        for (typename Vector<T>::vecSizet i = 0; i < temp.getSize(); ++i) // 逐个输出临时行的元素
+        for (typename Vector<T>::vecSizet i = 0; i < temp.getSize(); ++i) { // 逐个输出临时行的元素
             os << temp(i) << '\t';
+        }
         os << '\n'; // put a '\n' at the end of matrix
     }
 
@@ -335,13 +353,14 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
 /* 矩阵逐元素相乘 */
 template <typename T>
 Matrix<T> times(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
-    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_)
+    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
         throw std::invalid_argument("matrix.hpp: times(): Dimensional mismatch between the two matrices");
-
+    }
     Matrix<T> output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
-        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j)
+        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
             output.matrix_[i][j] *= matrix2.matrix_[i][j];
+        }
     }
     return output;
 }
@@ -349,13 +368,14 @@ Matrix<T> times(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 /* 矩阵逐元素幂 */
 template <typename T>
 Matrix<T> power(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
-    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_)
+    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
         throw std::invalid_argument("matrix.hpp: power(): Dimensional mismatch between the two matrices");
-
+    }
     Matrix<T> output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
-        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j)
+        for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
             output.matrix_[i][j] = pow(output.matrix_[i][j], matrix2.matrix_[i][j]);
+        }
     }
     return output;
 }
@@ -365,14 +385,15 @@ Matrix<T> power(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
  * - 留意除零错误，有一个 invalid_argument() 抛出 */
 template <typename T>
 Matrix<T> divide(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
-    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_)
+    if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
         throw std::invalid_argument("matrix.hpp: divide(): Dimensional mismatch between the two matrices");
-
+    }
     Matrix<T> output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
         for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
-            if (matrix2.matrix_[i][j] == 0)
+            if (matrix2.matrix_[i][j] == 0) {
                 throw std::invalid_argument("matrix.hpp: divide(): Divide by zero error");
+            }
             output.matrix_[i][j] /= matrix2.matrix_[i][j];
         }
     }
@@ -382,21 +403,24 @@ Matrix<T> divide(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 /* 接受 1*n 或 n*1 的 Matrix，返回对应方向的 Vector */
 template <typename T>
 Vector<T> tovec(const Matrix<T>& matrix) {
-    if (matrix.row_ != 1 && matrix.col_ != 1)
+    if (matrix.row_ != 1 && matrix.col_ != 1) {
         throw std::invalid_argument("matrix.hpp: tovec(): expected a 1*n or n*1 matrix, but passed that is not");
+    }
 
     Vector<T> output{};
 
     if (matrix.row_ == 1) { // 此时为行向量
         output.reconstruct(matrix.col_);
         output = ~output; // 默认为列向量，故转置
-        for (typename Vector<T>::vecSizet i = 0; i < matrix.col_; ++i)
+        for (typename Vector<T>::vecSizet i = 0; i < matrix.col_; ++i) {
             output(i) = matrix(0, i);
+        }
     }
     else {
         output.reconstruct(matrix.row_); // 此时为列向量
-        for (typename Vector<T>::vecSizet i = 0; i < matrix.row_; ++i)
+        for (typename Vector<T>::vecSizet i = 0; i < matrix.row_; ++i) {
             output(i) = matrix(i, 0);
+        }
     }
 
     return output;
@@ -412,12 +436,14 @@ bool dimeq(const Matrix<T>& mtx1, const Matrix<T>& mtx2) {
 /* get a row of the matrix */
 template <typename T>
 Vector<T> Matrix<T>::getRow(mtxSizet row) const {
-    if (row >= row_ || row < 0)
+    if (row >= row_ || row < 0) {
         throw std::out_of_range("matrix.hpp: getRow(): colume index " + std::to_string(row) + " out of range " + "[0, " + std::to_string(row_ - 1) + "]");
+    }
 
     Vector<T> output(col_);
-    for (typename Vector<T>::vecSizet i = 0; i < col_; ++i)
+    for (typename Vector<T>::vecSizet i = 0; i < col_; ++i) {
         output(i) = matrix_[row][i];
+    }
     output = ~output; // 转置为行向量
     return output;
 }
@@ -426,12 +452,14 @@ Vector<T> Matrix<T>::getRow(mtxSizet row) const {
  * - if col out of range, throw out_of_range() */
 template <typename T>
 Vector<T> Matrix<T>::getCol(mtxSizet col) const {
-    if (col >= col_ || col < 0)
+    if (col >= col_ || col < 0) {
         throw std::out_of_range("matrix.hpp: getCol(): colume index " + std::to_string(col) + " out of range " + "[0, " + std::to_string(col_ - 1) + "]");
+    }
 
     Vector<T> output(row_);
-    for (typename Vector<T>::vecSizet i = 0; i < row_; ++i)
+    for (typename Vector<T>::vecSizet i = 0; i < row_; ++i) {
         output(i) = matrix_[i][col];
+    }
     return output; // 默认列向量，无需转置
 }
 
@@ -440,36 +468,42 @@ Vector<T> Matrix<T>::getCol(mtxSizet col) const {
  * - 失败抛出 domain_erroe()*/
 template <typename T>
 Vector<T> Matrix<T>::getMainDiag() const {
-    if (!isSquare())
+    if (!isSquare()) {
         throw std::domain_error("matrix.hpp: getMainDiag(): expect a square matrix, but it is a non-square matrix"); // 域错误
+    }
 
     Vector output(row_);
-    for (typename Vector<T>::vecSizet i = 0; i < row_; ++i)
+    for (typename Vector<T>::vecSizet i = 0; i < row_; ++i) {
         output(i) = matrix_[i][i];
+    }
     return output;
 }
 
 /* 副对角线，同上 */
 template <typename T>
 Vector<T> Matrix<T>::getAntiDiag() const {
-    if (!isSquare())
+    if (!isSquare()) {
         throw std::domain_error("matrix.hpp: getAntiDiag(): expect a square matrix, but it is a non-square matrix"); // 域错误
+    }
 
     Vector output(row_);
-    for (typename Vector<T>::vecSizet i = 0; i < row_; ++i)
+    for (typename Vector<T>::vecSizet i = 0; i < row_; ++i) {
         output(i) = matrix_[i][row_ - 1 - i];
+    }
     return output;
 }
 
 /* 返回矩阵的迹 */
 template <typename T>
 double Matrix<T>::getTrace() const {
-    if (!(this->isSquare()))
+    if (!(this->isSquare())) {
         throw std::domain_error("matrix.hpp: getTrace(): expect a square matrix, but it is a non-square matrix"); // 域错误
+    }
 
     double output = 0.0;
-    for (mtxSizet i = 0; i < row_; ++i)
+    for (mtxSizet i = 0; i < row_; ++i) {
         output += matrix_[i][i];
+    }
     return output;
 }
 
@@ -478,8 +512,9 @@ template <typename T>
 double Matrix<T>::getElementSum() const {
     double output{};
     for (mtxSizet i = 0; i < row_; ++i) {
-        for (mtxSizet j = 0; j < col_; ++j)
+        for (mtxSizet j = 0; j < col_; ++j) {
             output += matrix_[i][j];
+        }
     }
     return output;
 }
@@ -496,8 +531,9 @@ double Matrix<T>::getMax() const {
     double output{matrix_[0][0]};
     for (mtxSizet i = 0; i < row_; ++i) {
         for (mtxSizet j = 0; j < col_; ++j) {
-            if (matrix_[i][j] > output)
+            if (matrix_[i][j] > output) {
                 output = matrix_[i][j];
+            }
         }
     }
     return output;
@@ -509,8 +545,9 @@ double Matrix<T>::getMin() const {
     double output{matrix_[0][0]};
     for (mtxSizet i = 0; i < row_; ++i) {
         for (mtxSizet j = 0; j < col_; ++j) {
-            if (matrix_[i][j] < output)
+            if (matrix_[i][j] < output) {
                 output = matrix_[i][j];
+            }
         }
     }
     return output;

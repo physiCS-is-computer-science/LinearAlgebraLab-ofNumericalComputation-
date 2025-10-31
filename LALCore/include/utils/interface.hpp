@@ -32,9 +32,9 @@ bool plus();
 bool minus();
 bool mtimes();
 bool times();
-// bool divide();
+bool divide();
 // bool mpower();
-// bool power();
+bool power();
 
 /* ==== 矩阵创建与操作 ==== */
 bool eye();
