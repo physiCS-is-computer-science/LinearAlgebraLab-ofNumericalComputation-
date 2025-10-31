@@ -122,7 +122,7 @@ bool show() {
     return true;
 }
 
-/* 创建变量
+/* 创建变量，此函数会检查所有变量名，如果有重名则不允许创建新变量（除此之外的所有创建、更改变量操作都会覆盖原变量）
  * var ::varn {a}
  * var ::varn [a b; c b] */
 bool var() {
@@ -158,7 +158,7 @@ bool var() {
             return false;
         }
 
-        smr::semgr.addreal(varn, temp[0]);
+        smr::semgr.addreal(varn, temp[0]); // 上方检查过，矩阵与实数都没有同名变量，因而可以直接添加
         if (shouldOut)
             smr::semgr << temp[0];
     }
@@ -169,7 +169,7 @@ bool var() {
             return false;
         }
 
-        smr::semgr.adddmtx(varn, mtx); // 添加矩阵
+        smr::semgr.adddmtx(varn, mtx); // 上方检查过，矩阵与实数都没有同名变量，因而可以直接添加
         if (shouldOut)
             smr::semgr << "\n"
                        << mtx;
@@ -379,6 +379,68 @@ bool minus() {
     return true;
 }
 
+/* 矩阵乘（times 为逐元素）
+ * mtimes :varn :varn ::varn
+ * mtimes :varn :varn */
+bool mtimes() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName()))
+        return false;
+
+    std::size_t type{0};
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) // :A :B ::C
+        type = 1;
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) // :A :B
+        type = 2;
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string varnIn1(laxb::cmdhr.getCmdtoken()[0].substr(1)), varnIn2(laxb::cmdhr.getCmdtoken()[1].substr(1)); // :varn :varn
+    std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
+    std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
+    std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
+
+    for (const auto& i : varns) // 矩阵查找
+        dmtxIts.push_back(smr::semgr.finddmtx(i));
+    for (const auto& i : varns) // 实数查找
+        realIts.push_back(smr::semgr.findreal(i));
+
+    /* 变量存在性检查 */
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varnIn1 + "\" is not exist");
+        return false;
+    }
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varnIn2 + "\" is not exist");
+        return false;
+    }
+
+    core::dmtx output{};
+    if (dmtxIts[0] != smr::semgr.getdmtxEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd()) { // matrix * matrix
+        if (dmtxIts[0]->second.getColSize() != dmtxIts[1]->second.getRowSize()) {
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": Dimension dismatch between matrix \"" + varnIn1 + "\" and \"" + varnIn2 + "\"");
+            return false;
+        }
+        output = dmtxIts[0]->second * dmtxIts[1]->second;
+    }
+    else if (dmtxIts[0] != smr::semgr.getdmtxEnd() && realIts[1] != smr::semgr.getrealEnd())
+        output = dmtxIts[0]->second * realIts[1]->second;
+    else if (realIts[0] != smr::semgr.getrealEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd())
+        output = realIts[0]->second * dmtxIts[1]->second;
+
+    if (type == 1) // mtimes :varn :varn ::varn
+        smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[2].substr(2), output); // ::varn
+
+    if (shouldOut)
+        smr::semgr << "\n"
+                   << output;
+
+    return true;
+}
+
 /* ==== 矩阵创建与操作 ==== */
 /* - eye {num}
  * - eye ::A {num} */
@@ -414,19 +476,8 @@ bool eye() {
     for (core::dmtx::mtxSizet i = 0; i < output.getRowSize(); ++i)
         output(i, i) = 1;
 
-    if (type == 2) {
-        std::string varn(laxb::cmdhr.getCmdtoken()[1].substr(2)); // ::A
-
-        /* 查找去掉标识符的子串 */
-        auto dmtxIt = smr::semgr.finddmtx(varn);
-        auto realIt = smr::semgr.findreal(varn);
-        if (dmtxIt != smr::semgr.getdmtxEnd() || realIt != smr::semgr.getrealEnd()) { // 只要找到一个就返回 false
-            smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varn + "\" exist");
-            return false;
-        }
-
-        smr::semgr.adddmtx(varn, output);
-    }
+    if (type == 2)
+    smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[1].substr(2), output); // ::A
 
     /* 判断是否写入 smr::semgr::cptoup_ */
     if (shouldOut)

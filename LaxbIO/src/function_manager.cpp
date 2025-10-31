@@ -23,7 +23,7 @@ void registerAllFunc() {
     /* ==== 运算 ==== */
     fnmgr.fnReg("plus", plus);
     fnmgr.fnReg("minus", minus);
-    // fnmgr.fnReg("mtimes", mtimes);
+    fnmgr.fnReg("mtimes", mtimes);
     // fnmgr.fnReg("times", times);
     // fnmgr.fnReg("divide", divide);
     // fnmgr.fnReg("mpower", mpower);

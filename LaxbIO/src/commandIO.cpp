@@ -312,7 +312,7 @@ core::dmtx CmdHandler::squareToken(std::string token) {
  * - 只有需要参数的函数能调用此检查函数（不需要参数的函调用了此检查函数后，数即使执行成功了也会输出 err_） */
 bool CmdHandler::isempty(std::string outStr) {
     if (cmdToken_.empty()) {
-        smr::semgr.seterr(outStr + "(): Argument(s) is empty");
+        smr::semgr.seterr(outStr + ": Argument(s) is empty");
         return true;
     }
     return false;

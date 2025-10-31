@@ -30,7 +30,7 @@ bool cls();
 /* ==== 运算 ==== */
 bool plus();
 bool minus();
-// bool mtimes();
+bool mtimes();
 // bool times();
 // bool divide();
 // bool mpower();
