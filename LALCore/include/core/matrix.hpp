@@ -13,6 +13,7 @@
 #include <cmath>
 #include <complex>
 #include <initializer_list>
+#include <iomanip>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -89,7 +90,7 @@ public:
     /* ==== 构造函数们 ==== */
     Matrix(mtxSizet row, mtxSizet col) : row_(row), col_(col) { initMtx(row, col); } // r 行 c 列的矩阵，默认初始化为 0
     Matrix(mtxSizet dimension) : row_(dimension), col_(dimension) { initMtx(dimension, dimension); } // dimension 维的方阵，初始化为 0
-    Matrix(std::initializer_list<std::initializer_list<T>> il); // 初始化列表初始化，{{1, 2, 3}, {4, 5, 6};
+    Matrix(std::initializer_list<std::initializer_list<T>> il); // 初始化列表初始化，{{1, 2, 3}, {4, 5, 6}};
 
     /* ==== 运算符重载 ==== */
     T& operator()(mtxSizet row, mtxSizet col) { return matrix_[row][col]; } // 用 M(0, 1) 访问矩阵第一行第二列元素
@@ -100,6 +101,12 @@ public:
     mtxSizet getColSize() const { return col_; } // 获取列大小
     Vector<T> getRow(mtxSizet row) const; // 获取 row 行
     Vector<T> getCol(mtxSizet col) const; // 获取 col 列
+    void exchangeRow(mtxSizet r1, mtxSizet r2); // 行交换
+    void exchangeCol(mtxSizet c1, mtxSizet c2); // 列交换
+    void replaceRow(mtxSizet pos, Vector<T> vec); // 覆盖某行
+    void replaceCol(mtxSizet pos, Vector<T> vec); // 覆盖某列
+    // void insertRow(mtxSizet pos); // pos 行之前插入一行
+    // void insertCol(mtxSizet pos); // pos 列之前插入一列
     Vector<T> getMainDiag() const; // get main diagonal elements
     Vector<T> getAntiDiag() const; // get anti-diagonal elements
     double getTrace() const; // 迹
@@ -341,7 +348,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     for (typename Matrix<T>::mtxSizet row = 0; row < matrix.getRowSize(); ++row) {
         Vector<T> temp(matrix.getRow(row)); // 临时行
         for (typename Vector<T>::vecSizet i = 0; i < temp.getSize(); ++i) { // 逐个输出临时行的元素
-            os << temp(i) << '\t';
+            os << std::setw(13) << temp(i); // 规定每个数字宽度为 14
         }
         os << '\n'; // put a '\n' at the end of matrix
     }
@@ -461,6 +468,72 @@ Vector<T> Matrix<T>::getCol(mtxSizet col) const {
         output(i) = matrix_[i][col];
     }
     return output; // 默认列向量，无需转置
+}
+
+/* 交换行 r1 和行 r2 */
+template <typename T>
+void Matrix<T>::exchangeRow(mtxSizet r1, mtxSizet r2) {
+    if (r1 >= row_ || r2 >= row_ || r1 == r2) {
+        throw std::invalid_argument("matrix.hpp: exchangeRow(): Dimension not match");
+    }
+
+    T temp;
+    for (mtxSizet i = 0; i < col_; ++i) {
+        temp = matrix_[r1][i];
+        matrix_[r1][i] = matrix_[r2][i];
+        matrix_[r2][i] = temp;
+    }
+}
+
+/* 交换列 r1 和列 r2 */
+template <typename T>
+void Matrix<T>::exchangeCol(mtxSizet c1, mtxSizet c2) {
+    if (c1 >= col_ || c2 >= col_ || c1 == c2) {
+        throw std::invalid_argument("matrix.hpp: exchangeCol(): Dimension not match");
+    }
+
+    T temp;
+    for (mtxSizet i = 0; i < row_; ++i) {
+        temp = matrix_[i][c1];
+        matrix_[i][c1] = matrix_[i][c2];
+        matrix_[i][c2] = temp;
+    }
+}
+
+/* 覆盖某一行
+ * - 接收行位置、行向量，任意一个不匹配则抛出 std::invalid_argument */
+template <typename T>
+void Matrix<T>::replaceRow(mtxSizet pos, Vector<T> vec) {
+    /* 运算匹配性检查 */
+    if (pos >= row_) {
+        throw std::invalid_argument("matrix.hpp: replaceRow(): Max dimension is:" + std::to_string(row_) + " but pass: " + std::to_string(pos));
+    }
+    if (vec.getOrientation() != VecOrientation::ROW || vec.getSize() != col_) {
+        throw std::invalid_argument("matrix.hpp: replaceRow(): Orientation or dimension error");
+    }
+
+    /* 逐项覆盖 */
+    for (mtxSizet i = 0; i < col_; ++i) {
+        matrix_[pos][i] = vec(i);
+    }
+}
+
+/* 覆盖某一列
+ * - 接收列位置、列向量，任意一个不匹配则抛出 std::invalid_argument */
+template <typename T>
+void Matrix<T>::replaceCol(mtxSizet pos, Vector<T> vec) {
+    /* 运算匹配性检查 */
+    if (pos >= col_) {
+        throw std::invalid_argument("matrix.hpp: replaceRow(): Max dimension is:" + std::to_string(col_) + " but pass: " + std::to_string(pos));
+    }
+    if (vec.getOrientation() != VecOrientation::COLUMN || vec.getSize() != row_) {
+        throw std::invalid_argument("matrix.hpp: replaceRow(): Orientation or dimension error");
+    }
+
+    /* 逐项覆盖 */
+    for (mtxSizet i = 0; i < row_; ++i) {
+        matrix_[i][pos] = vec(i);
+    }
 }
 
 /* 获取主对角线元素

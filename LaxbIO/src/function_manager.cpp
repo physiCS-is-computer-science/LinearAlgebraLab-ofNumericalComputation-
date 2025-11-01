@@ -27,7 +27,7 @@ void registerAllFunc() {
     fnmgr.fnReg("times", times);
     fnmgr.fnReg("divide", divide);
     // fnmgr.fnReg("mpower", mpower);
-    // fnmgr.fnReg("power", power);
+    fnmgr.fnReg("power", power);
 
     /* ==== 矩阵创建与操作 ==== */
     fnmgr.fnReg("eye", eye);

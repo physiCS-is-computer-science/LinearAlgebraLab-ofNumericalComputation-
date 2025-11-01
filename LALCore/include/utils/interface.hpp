@@ -33,7 +33,7 @@ bool minus();
 bool mtimes();
 bool times();
 bool divide();
-// bool mpower();
+// bool mpower(); // 设计负数次方（矩阵求逆），因此暂时不实现
 bool power();
 
 /* ==== 矩阵创建与操作 ==== */
