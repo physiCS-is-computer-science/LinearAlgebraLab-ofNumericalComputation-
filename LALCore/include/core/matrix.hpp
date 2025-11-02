@@ -348,7 +348,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     for (typename Matrix<T>::mtxSizet row = 0; row < matrix.getRowSize(); ++row) {
         Vector<T> temp(matrix.getRow(row)); // 临时行
         for (typename Vector<T>::vecSizet i = 0; i < temp.getSize(); ++i) { // 逐个输出临时行的元素
-            os << std::setw(13) << temp(i); // 规定每个数字宽度为 14
+            os << std::setw(12) << temp(i); // 规定每个数字宽度为 12
         }
         os << '\n'; // put a '\n' at the end of matrix
     }
@@ -473,7 +473,7 @@ Vector<T> Matrix<T>::getCol(mtxSizet col) const {
 /* 交换行 r1 和行 r2 */
 template <typename T>
 void Matrix<T>::exchangeRow(mtxSizet r1, mtxSizet r2) {
-    if (r1 >= row_ || r2 >= row_ || r1 == r2) {
+    if (r1 >= row_ || r2 >= row_) {
         throw std::invalid_argument("matrix.hpp: exchangeRow(): Dimension not match");
     }
 
@@ -488,7 +488,7 @@ void Matrix<T>::exchangeRow(mtxSizet r1, mtxSizet r2) {
 /* 交换列 r1 和列 r2 */
 template <typename T>
 void Matrix<T>::exchangeCol(mtxSizet c1, mtxSizet c2) {
-    if (c1 >= col_ || c2 >= col_ || c1 == c2) {
+    if (c1 >= col_ || c2 >= col_) {
         throw std::invalid_argument("matrix.hpp: exchangeCol(): Dimension not match");
     }
 

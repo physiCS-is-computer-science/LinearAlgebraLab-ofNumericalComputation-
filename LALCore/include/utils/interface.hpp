@@ -43,3 +43,6 @@ bool eye();
 // bool random();
 // bool randn();
 // bool diag();
+
+/* ==== 矩阵分解 ==== */
+bool lu();

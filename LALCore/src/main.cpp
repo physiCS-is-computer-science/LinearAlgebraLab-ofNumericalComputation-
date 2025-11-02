@@ -29,54 +29,55 @@
 #include <vector>
 
 int main() {
-    core::dmtx mtx{
-        {5, 0, 0, 0},
-        {1, 6, 0, 0},
-        {2, 3, 7, 0},
-        {4, 5, 6, 8}};
-    decomp::BaseDecomposer decomper(mtx);
-    std::pair<core::dmtx, core::dmtx> LU = decomper.gaussianElimination();
-    std::cout << "Origin matrix:" << mtx << "\n";
-    std::cout << "L:" << LU.first << "U:" << LU.second << "\n";
-    std::cout << "LU:" << LU.first * LU.second;
+    // core::dmtx mtx{
+    //     {3, -2, 5, -1, 4},
+    //     {-1, 4, -3, 2, -5},
+    //     {2, -1, 6, -3, 1},
+    //     {-4, 3, -2, 7, -1},
+    //     {1, -5, 4, -2, 6}};
+    // decomp::BaseDecomposer decomper(mtx);
+    // std::vector<core::dmtx> LUP = decomper.lu();
+    // std::cout << "Origin matrix:" << mtx << "\n";
+    // std::cout << "L:" << LUP[0] << "U:" << LUP[1] << "P:" << LUP[2] << "\n";
+    // std::cout << "LU:" << LUP[0] * LUP[1] << "PA:" << LUP[2] * mtx;
 
-    // system("cls");
-    // laxb::registerAllFunc(); // 注册所有函数
-    // util::startupBanner(); // 启动信息栏
+    system("cls");
+    laxb::registerAllFunc(); // 注册所有函数
+    util::startupBanner(); // 启动信息栏
 
-    // /* LaxbIO module test */
-    // while (true) {
-    //     smr::semgr.clear();
+    /* LaxbIO module test */
+    while (true) {
+        smr::semgr.clear();
 
-    //     /* input */
-    //     std::cout << util::SIS(smr::semgr.getpath()); // default path identifier
-    //     while (!laxb::cmdhr.in()) {
-    //         std::cout << util::SIS(smr::semgr.getpath());
-    //     }
+        /* input */
+        std::cout << util::SIS(smr::semgr.getpath()); // default path identifier
+        while (!laxb::cmdhr.in()) {
+            std::cout << util::SIS(smr::semgr.getpath());
+        }
 
-    //     // /* check current tokens */
-    //     // std::cout << "==== TEST ====\ntokens:\n";
-    //     // for (const auto& i : cmdStr)
-    //     //     std::cout << i << "|";
-    //     // std::cout << std::endl
-    //     //           << "==== TEST ====\n";
+        // /* check current tokens */
+        // std::cout << "==== TEST ====\ntokens:\n";
+        // for (const auto& i : cmdStr)
+        //     std::cout << i << "|";
+        // std::cout << std::endl
+        //           << "==== TEST ====\n";
 
-    //     /* 尝试调用 LALCore */
-    //     laxb::cmdhr.setName(laxb::cmdhr.getCmdtoken()[0]);
-    //     laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
-    //     bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
+        /* 尝试调用 LALCore */
+        laxb::cmdhr.setName(laxb::cmdhr.getCmdtoken()[0]);
+        laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
+        bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
 
-    //     if (smr::semgr.poweroff()) {
-    //         return 0;
-    //     }
+        if (smr::semgr.poweroff()) {
+            return 0;
+        }
 
-    //     if (state == true && !smr::semgr.getoup().empty()) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
-    //         std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
-    //     }
-    //     else if (state == false) {
-    //         std::cout << util::ERS(smr::semgr.getpath()) + smr::semgr.geterr() + "\n";
-    //     }
-    // }
+        if (state == true && !smr::semgr.getoup().empty()) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
+            std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
+        }
+        else if (state == false) {
+            std::cout << util::ERS(smr::semgr.getpath()) + smr::semgr.geterr() + "\n";
+        }
+    }
 
     return 0;
 }
