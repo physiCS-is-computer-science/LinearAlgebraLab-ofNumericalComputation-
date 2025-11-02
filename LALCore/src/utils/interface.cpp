@@ -10,6 +10,7 @@
 
 #include "commandIO.hpp"
 #include "core/matrix.hpp"
+#include "decompositions/basic_decomp.hpp"
 #include "session_manager.hpp"
 #include <cstdlib> // 为了 system("cls")
 #include <iostream>
@@ -684,7 +685,7 @@ bool power() {
     if (type == 1) {
         smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[2].substr(2), output); // :varn :varn ::varn
     }
-    
+
     if (shouldOut) {
         smr::semgr << "\n"
                    << output;
@@ -758,3 +759,74 @@ bool eye() {
 
 // bool diag(std::vector<std::string> args) {
 // }
+
+/* ==== 矩阵分解 ==== */
+/* - lu :A（默认输出 L、U）
+ * - lu :A ::L ::U
+ * - lu :A -a（输出 L、U、P）
+ * - lu :A ::L ::U ::P */
+bool lu() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+        return false;
+    }
+
+    std::size_t type{0};
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true) { // :A
+        type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::OUT, laxb::Cmdt::OUT}) == true) { // :A ::L ::U
+        type = 2;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::OPT}) == true) { // -a :A
+        type = 3;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::OUT, laxb::Cmdt::OUT, laxb::Cmdt::OUT}) == true) { // :A ::L ::U ::P
+        type = 4;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string varnIn(laxb::cmdhr.getCmdtoken()[0].substr(1)); // :A
+    auto it = smr::semgr.finddmtx(varnIn);
+    if (it == smr::semgr.getdmtxEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\"not found");
+        return false;
+    }
+    if (!(it->second.isSquare())) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\"is not a square matrix");
+        return false;
+    }
+
+    decomp::BaseDecomposer decomper(it->second); // 初始化分解器
+    std::vector<core::dmtx> LUP = decomper.lu(); // 分解
+
+    if (type == 3) {
+        if (laxb::cmdhr.getCmdtoken()[1] == "-a") { // "-a"
+            true; // 待拓展
+        }
+        else {
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": There is no option \"" + laxb::cmdhr.getCmdtoken()[1].substr(1) + "\"");
+            return false;
+        }
+    }
+
+    if (type == 2 || type == 4) {
+        smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[1].substr(2), LUP[0]); // L
+        smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[2].substr(2), LUP[1]); // U
+        if (type == 4) {
+            smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[3].substr(2), LUP[2]); // P
+        }
+    }
+
+    if (shouldOut) {
+        smr::semgr << LUP[0] << LUP[1]; // L U
+        if (type == 3 || type == 4) {
+            smr::semgr << LUP[2]; // P
+        }
+    }
+
+    return true;
+}

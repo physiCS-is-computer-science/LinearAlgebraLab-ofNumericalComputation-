@@ -36,6 +36,9 @@ void registerAllFunc() {
     // fnmgr.fnReg("random", random);
     // fnmgr.fnReg("randn", randn);
     // fnmgr.fnReg("diag", diag);
+
+    /* ==== 矩阵分解 ==== */
+    fnmgr.fnReg("lu", lu);
 }
 
 /* 仅仅查找函数是否存在 */
