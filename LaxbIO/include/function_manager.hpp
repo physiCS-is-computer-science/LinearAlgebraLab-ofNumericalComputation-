@@ -9,7 +9,7 @@
 #include "session_manager.hpp"
 #include <functional>
 #include <string>
-#include <unordered_map>
+#include <unordered_map> // 函数较多，map 查找速度不如 unordered_map
 
 namespace laxb {
 
