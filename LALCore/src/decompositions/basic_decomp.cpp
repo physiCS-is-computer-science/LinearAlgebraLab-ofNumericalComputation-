@@ -23,11 +23,11 @@ std::vector<core::dmtx> BaseDecomposer::lu() {
  * - 返回 pair，分别为 L、U
  * - 判断每列主元位置之下是否为 0，不是则行变换
  * - 当前位置为 0 时，寻找下方是否存在非零，存在则行交换，不存在则跳到下一列
- * - 消元逻辑并未考虑数值稳定性，遇到 0 才换行。后续改进应该考虑 MATLAB 的寻找当前列最大元素最为住院行的策略，以减小误差 */
+ * - 消元逻辑考虑数值稳定性，遇到 0、非最大主元都换行，以减小误差 */
 std::vector<core::dmtx> BaseDecomposer::gaussianElimination() {
     core::dmtx copy(origDmtx_); // 不改变原矩阵
 
-    core::dmtx::mtxSizet minDim = copy.getRowSize() < copy.getColSize() ? copy.getRowSize() : copy.getColSize();
+    int minDim = copy.getRowSize() < copy.getColSize() ? copy.getRowSize() : copy.getColSize();
     core::dmtx L(minDim), P(minDim); // 最小维度
 
     for (core::dmtx::mtxSizet i = 0; i < minDim; ++i) {
@@ -56,6 +56,26 @@ std::vector<core::dmtx> BaseDecomposer::gaussianElimination() {
 
                     break;
                 }
+            }
+        }
+
+        /* 寻找最大主元减小误差 */
+        int maxPivotRow{-1};
+        for (std::size_t r = c + 1; r < copy.getRowSize(); ++r) {
+            if (pivotCvec(r) > pivotElem) {
+                maxPivotRow = r;
+            }
+        }
+        if (maxPivotRow != -1) {
+            copy.exchangeRow(c, maxPivotRow);
+
+            /* 行交换后重新获取 */
+            pivotCvec = copy.getCol(c); // 获取当前列
+            pivotRvec = copy.getRow(c); // 当前行
+            pivotElem = pivotCvec(c); // 当前主元
+
+            if (maxPivotRow < minDim && c < minDim) { // 如果为非方阵，此处 P 不进行行变换，但是 U 进行了行变换！故 P 为错误矩阵
+                P.exchangeRow(c, maxPivotRow);
             }
         }
 

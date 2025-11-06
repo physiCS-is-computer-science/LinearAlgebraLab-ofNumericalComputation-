@@ -168,7 +168,7 @@ bool var() {
     if (type == 1) { // ::varn {a}
         std::vector<double> temp = laxb::cmdhr.curlyToken(laxb::cmdhr.getCmdtoken()[1]); // {a}
         if (temp.size() != 1) { // 参数太多了
-            smr::semgr.seterr(laxb::cmdhr.getName() + ": Too many arguments in \"" + laxb::cmdhr.getCmdtoken()[1] + "\"");
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error in \"" + laxb::cmdhr.getCmdtoken()[1] + "\"");
             return false;
         }
 
@@ -720,13 +720,14 @@ bool eye() {
     core::dmtx output{};
     std::vector<double> dimens = laxb::cmdhr.curlyToken(laxb::cmdhr.getCmdtoken()[0]);
     if (dimens.size() != 1) {
-        smr::semgr.seterr(laxb::cmdhr.getName() + ": Number of arguments error in \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error in \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
         return false;
     }
     if (dimens[0] == 0) {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Invalid argument \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
         return false;
     }
+
     output = core::dmtx(dimens[0]); // 制造矩阵
     for (core::dmtx::mtxSizet i = 0; i < output.getRowSize(); ++i) {
         output(i, i) = 1;

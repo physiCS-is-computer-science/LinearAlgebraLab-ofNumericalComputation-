@@ -6,7 +6,7 @@
 // -------------------------------------------------------------------------
 // - 复数类型仅仅支持 complex<double>，故传入其他类型的复数时，产生的行为我也没细看（事实上后果很严重！）
 // - 通过枚举类型区分行列向量
-// - 运算符重载只重载了向量数乘，向量之间的“乘法运算”用 dot()、cross() 函数来进行
+// - 运算符重载只重载了向量数乘，向量之间的“乘法运算”用 dot()、outer() 函数来进行
 // =========================================================================
 
 #pragma once
@@ -57,7 +57,7 @@ Vector<T> divide(const Vector<T>& vec1, const Vector<T>& vec2); // 逐元素除
 template <typename T>
 T dot(const Vector<T>& vec1, const Vector<T>& vec2); // 点积，动态识别列向量左乘行向量（故必须接受两个维度相等的向量，一个行一个列，参数左右无所谓）
 template <typename T>
-Matrix<T> cross(const Vector<T>& vec1, const Vector<T>& vec2); // 叉积，同上
+Matrix<T> outer(const Vector<T>& vec1, const Vector<T>& vec2); // 叉积，同上
 template <typename T>
 Matrix<T> tomtx(const Vector<T>& vec); // Vector 转 Matrix
 
@@ -78,7 +78,7 @@ public:
     friend Vector<T> power<T>(const Vector<T>& vec1, const Vector<T>& vec2); // 逐元素幂
     friend Vector<T> divide<T>(const Vector<T>& vec1, const Vector<T>& vec2); // 逐元素除
     friend T dot<T>(const Vector<T>& vec1, const Vector<T>& vec2); // 点积，动态识别列向量左乘行向量（故必须接受两个维度相等的向量，一个行一个列，参数左右无所谓）
-    friend Matrix<T> cross<T>(const Vector<T>& vec1, const Vector<T>& vec2); // 叉积，同上
+    friend Matrix<T> outer<T>(const Vector<T>& vec1, const Vector<T>& vec2); // 叉积，同上
     friend Matrix<T> tomtx<T>(const Vector<T>& vec); // Vector 转 Matrix
 
     Vector() = default;
@@ -369,12 +369,12 @@ T dot(const Vector<T>& vec1, const Vector<T>& vec2) {
 /* 叉积
  * - 两个向量参数无需确认顺序，只要保证一个为行向量，一个为列向量即可 */
 template <typename T>
-Matrix<T> cross(const Vector<T>& vec1, const Vector<T>& vec2) {
+Matrix<T> outer(const Vector<T>& vec1, const Vector<T>& vec2) {
     if (vec1.getSize() != vec2.getSize()) {
-        throw std::invalid_argument("vector.hpp: cross(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
+        throw std::invalid_argument("vector.hpp: outer(): dimensions of the two vectors do not match, vec1 is " + std::to_string(vec1.getSize()) + ", vec2 is " + std::to_string(vec2.getSize()));
     }
     if (vec1.getOrientation() == vec2.getOrientation()) { // 叉积要求行和列
-        throw std::invalid_argument("vector.hpp: cross(): orientation of the two vectors do not match");
+        throw std::invalid_argument("vector.hpp: outer(): orientation of the two vectors do not match");
     }
 
     Matrix<T> output(vec1.getSize()); // 方阵

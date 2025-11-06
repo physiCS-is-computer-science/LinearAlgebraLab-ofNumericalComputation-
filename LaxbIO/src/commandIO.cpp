@@ -29,7 +29,7 @@ bool CmdHandler::in() {
     std::vector<std::string> tokens;
     std::size_t endPos{0}, begPos{0}; // 结束位置下标
 
-    delSpace(cmdLine); // 去除首尾空格
+    delCh(cmdLine, ' '); // 去除首尾空格
     if (cmdLine.empty()) { // 什么都不做，等待重新输入
         return false;
     }
@@ -169,9 +169,9 @@ bool tksCheck(std::vector<std::string> tks) {
         tksNoid.push_back(tk.substr(inx, len));
     }
 
-    const std::string legalCh{"1234567890abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
-    const std::string legalCurlyBraCh{"1234567890. "}; // 花括号合法字符
-    const std::string legalSquareBraCh{"1234567890;. "}; // 方括号合法字符
+    const std::string legalCh{"-/1234567890abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
+    const std::string legalCurlyBraCh{"-/1234567890. "}; // 花括号合法字符
+    const std::string legalSquareBraCh{"-/1234567890;. "}; // 方括号合法字符
     for (const auto& tkNoid : tksNoid) {
         if (tkNoid.find_first_not_of(legalCh) != std::string::npos) { // 找到非法字符时
             std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + tkNoid + "\"\n";
@@ -237,11 +237,11 @@ Cmdt argtype(std::string str) {
 }
 
 /* 去除首尾空格，无空格则不操作 */
-void delSpace(std::string& str) {
-    while (!str.empty() && *(str.end() - 1) == ' ') { // 删掉末尾所有空格
+void delCh(std::string& str, char tobedel) {
+    while (!str.empty() && *(str.end() - 1) == tobedel) { // 删掉末尾所有空格
         str.pop_back();
     }
-    while (!str.empty() && *str.begin() == ' ') { // 删掉开头所有空格
+    while (!str.empty() && *str.begin() == tobedel) { // 删掉开头所有空格
         str.erase(str.begin());
     }
 }
@@ -266,63 +266,151 @@ bool CmdHandler::sortToken(std::vector<Cmdt> tplate) {
     return true;
 }
 
-/* 解析花括号里的数值，确保传递的是花括号（没有错误检查） */
+/* 解析花括号里的数值，存储进 vector 中
+ * - 调用此函数的所有地方，都必须保证传递的带花括号字符串内部为合法字符: "1234567890-/."
+ * - 必须保证传递的字符串为 "  {...}  " 形式，否则解析错误
+ * - 错误时传递空 vector */
 std::vector<double> CmdHandler::curlyToken(std::string token) {
-    token = (token.substr(1, token.size() - 2)); // 去掉花括号的子串
-    std::vector<double> nums{};
-    double temp{0};
-    for (std::size_t pos{0}; pos < token.size();) {
-        temp = std::stod(token, &pos);
-        if (pos == 0) { // 没找到数字时
-            ++pos;
+    delCh(token, ' '); // 去除首尾空格，暴露花括号
+    delCh(token, '{'); // 去掉花括号的子串 { ... }
+    delCh(token, '}');
+    delCh(token, ' '); // 去除首尾空格
+
+    if (token[0] == '/' || token[token.size() - 1] == '/' || token[token.size() - 1] == '/') { // "/a" "a/" "a-"
+        return {};
+    }
+
+    /* 分解为 tokens，得到 "a" "a/" "c"... */
+    std::vector<std::string> originTks{};
+    for (std::size_t posbeg = 0, posend = 0; posend < token.size(); ++posbeg) {
+        posend = token.find(' ', posbeg);
+        if (posbeg == posend) { // posbeg 自身为空格
             continue;
         }
-        nums.push_back(temp);
-        if (pos < token.size()) { // 找到末尾则不拆解子串
-            token = token.substr(++pos); // 此处 pos 自增前为非数字字符
-            pos = 0;
+
+        originTks.push_back(token.substr(posbeg, posend - posbeg));
+        posbeg = posend;
+    }
+
+    /* 更精细的 tokens，得到 "a" "a" "/" "b" "c"... */
+    enum class State { // 状态机
+        NORM,
+        DIV
+    } state = State::NORM;
+    std::vector<std::string> tks{};
+    for (const auto& i : originTks) {
+        std::size_t div = i.find("/");
+
+        if (div != std::string::npos && state == State::NORM) { // "/" "a/" "/a" "a/b"
+            if (std::count(i.begin(), i.end(), '/') != 1) { // 一个分式不可能两个 '/'
+                return {};
+            }
+
+            if (i.size() == 1) { // "/"
+                tks.push_back("/");
+                state = State::DIV; // 分式状态
+            }
+            else if (i[i.size() - 1] == '/') { // "a/"
+                tks.push_back(i.substr(0, div - 0));
+                tks.push_back("/");
+                state = State::DIV; // 分式状态
+            }
+            else if (i[0] == '/') { // "/a"
+                tks.push_back("/");
+                tks.push_back(i.substr(1));
+            }
+            else if (i.size() > 2 && i[0] != '/' && i[i.size() - 1] != '/') { // "a/b"
+                tks.push_back(i.substr(0, div));
+                tks.push_back("/");
+                tks.push_back(i.substr(div + 1));
+            }
+            else {
+                return {};
+            }
+        }
+        else if (div != std::string::npos && state == State::DIV) { // 分式状态下又找到 '/' 一定为错误
+            return {};
+        }
+        else {
+            tks.push_back(i);
+            if (state == State::DIV) { // 恢复普通状态
+                state = State::NORM;
+            }
         }
     }
+
+    /* 正确分数格式匹配 */
+    std::vector<double> nums{};
+    for (std::size_t i = 0; i < tks.size(); ++i) {
+        if (i < tks.size() - 1 && tks[i + 1] != "/") { // "a" "b"...
+            nums.push_back(std::stod(tks[i]));
+        }
+        else if (i < tks.size() - 1 && tks[i + 1] == "/") { // "a" "/"...
+            double a = std::stod(tks[i]), b = std::stod(tks[i + 2]);
+            if (b == 0) { // "a" "/" "0"
+                return {};
+            }
+            nums.push_back(a / b);
+            i = i + 2; // 此时 i 在 a/b 的 b，循环头处自增
+        }
+        else if (i == tks.size() - 1) { // "a" end
+            nums.push_back(std::stod(tks[i]));
+        }
+        else {
+            return {};
+        }
+    }
+
     return nums;
 }
 
-/* 解析方括号里的矩阵，返回一个实数矩阵（无错误检查） */
+/* 解析方括号里的矩阵，返回一个实数矩阵
+ * - 调用此函数的所有地方，都必须保证传递的带方括号字符串内部为合法字符: "1234567890-/.;"
+ * - 必须保证传递的字符串为 "  [...]  " 形式，否则解析错误
+ * - 错误时传递空矩阵 */
 core::dmtx CmdHandler::squareToken(std::string token) {
-    token = (token.substr(1, token.size() - 2)); // 去掉方括号的子串
+    delCh(token, ' ');
+    delCh(token, '[');
+    delCh(token, ']');
 
-    delSpace(token); // 去除首尾空格
-
-    /* 分解出每一行 */
-    std::vector<std::string> rows{}; // 以分号为单位，一行一个分号
-    for (std::size_t begPos{0}, endPos{0}; endPos < token.size();) {
-        endPos = token.find(';', begPos);
-        rows.push_back(token.substr(begPos, endPos - begPos)); // 从 begPos 开始，endPos 前一个结束的子串
-        if (endPos != std::string::npos) { // 找到时
-            if (endPos < token.size() - 1) { // 不是最后一个字符
-                begPos = endPos + 1;
-            }
-            else if (endPos >= token.size() - 1) { // 是最后一个字符，即最后一个字符是 ';'
-                break;
-            }
-        }
+    /* 清除开头末尾的 ' ' 和 ';' 混合干扰字符串 */
+    while (!token.empty() && (token[token.size() - 1] == ';' || token[token.size() - 1] == ' ')) { // 末尾的 ' ' 和 ';' 清除干净
+        token.pop_back();
+    }
+    while (!token.empty() && (token[0] == ';' || token[0] == ' ')) { // 开头的 ' ' 和 ';' 清除干净
+        token.erase(token.begin());
     }
 
-    /* 解析数字 */
+    /* 以 ';' 分解出每一行，结果不带 ';' */
+    std::vector<std::string> rows{}; // 以分号为单位，一行一个分号
+    for (std::size_t posbeg = 0, posend = 0; posend < token.size(); ++posbeg) {
+        posend = token.find(';', posbeg);
+        if (posend == posbeg) { // posbeg 自身为 ';'
+            return {};
+        }
+
+        rows.push_back(token.substr(posbeg, posend - posbeg)); // 从 begPos 开始，endPos 前一个结束的子串，即不包含 ';'
+        posbeg = posend;
+    }
+
+    /* 调用 curlyToken() 返回行，从而构造矩阵 */
     std::vector<std::vector<double>> numRows{};
     for (auto row : rows) {
-        delSpace(row);
         std::vector<double> temp = curlyToken("{" + row + "}");
+        if (temp.empty()) {
+            return {};
+        }
         numRows.push_back(temp);
     }
 
     /* 构造矩阵 */
-    std::size_t colSize = numRows.begin()->size(), rowSize = rows.size();
-    core::dmtx output(rowSize, colSize); // 第一行元素个数确定列数
-    for (std::size_t i{0}; i < rowSize; ++i) {
-        if (numRows[i].size() != colSize) { // 与第一行个数不等时
+    core::dmtx::mtxSizet rowSize = numRows.size(), colSize = numRows[0].size();
+    core::dmtx output{rowSize, colSize};
+    for (core::dmtx::mtxSizet i = 0; i < rowSize; ++i) { // 以第一行的列数确定矩阵列数
+        if (numRows[i].size() != colSize) { // 与第一行的元素个数不一致时
             return {};
         }
-        for (std::size_t j{0}; j < colSize; ++j) {
+        for (core::dmtx::mtxSizet j = 0; j < colSize; ++j) {
             output(i, j) = numRows[i][j];
         }
     }

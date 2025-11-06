@@ -64,6 +64,9 @@ public:
     // void delcmtx(decltype())
     void delreal(decltype(realSpace_.end()) realIt) { realSpace_.erase(realIt); }
 
+    // bool wfile(std::string fname);
+    // bool rfile(std::string fname);
+
     void clear() { // 只清除错误信息、计算结果、字符流对象的内容
         err_ = "";
         cptoup_ = "";

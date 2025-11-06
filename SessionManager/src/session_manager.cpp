@@ -1,4 +1,6 @@
 #include "session_manager.hpp"
+#include <fstream>
+
 namespace smr {
 
 SessionMgr semgr;
@@ -45,5 +47,17 @@ void SessionMgr::addreal(std::string varn, double val) {
         dmSpace_.erase(varn);
     }
 }
+
+// bool wfile(std::string fname) {
+// }
+
+// bool rfile(std::string fname) {
+//     std::ifstream fin(fname);
+//     if (fin.fail()) {
+//         return false;
+//     }
+
+
+// }
 
 } // namespace smr
