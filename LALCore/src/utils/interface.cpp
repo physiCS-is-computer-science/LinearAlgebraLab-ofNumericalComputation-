@@ -46,7 +46,7 @@ bool show() {
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) {
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true) {
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) {
         type = 2;
     }
     else {
@@ -144,10 +144,10 @@ bool var() {
     }
 
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUT, laxb::Cmdt::CB}) == true) { // ::varn {a}
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID, laxb::Cmdt::CB}) == true) { // ::varn {a}
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUT, laxb::Cmdt::SB}) == true) { // ::varn [a b; c b]
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID, laxb::Cmdt::SB}) == true) { // ::varn [a b; c b]
         type = 2;
     }
     else {
@@ -205,7 +205,7 @@ bool del() {
         return false;
     }
 
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == false) { // :varn
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == false) { // :varn
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
         return false;
     }
@@ -238,23 +238,67 @@ bool del() {
     return true;
 }
 
-/* load :filename */
-// bool load() {
-//     bool shouldOut = laxb::cmdhr.semicolonDel();
-//     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
-//         return false;
-//     }
-//     std::size_t type = 0;
-//     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true) {
-//         type = 1;
-//     }
-//     else {
-//         smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
-//         return false;
-//     }
+/* - save ::filename */
+bool save() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+        return false;
+    }
+    std::size_t type = 0;
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID}) == true) { // save ::filename
+        type = 1;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
 
-//     smr::semgr.rfile(smr::SEPATH + laxb::cmdhr.getCmdtoken()[0]);
-// }
+    std::string filename = laxb::cmdhr.getCmdtoken()[0].substr(2); // ::filename
+    if (smr::semgr.wfile(filename) == true) {
+        // 待扩展
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Save file \"" + filename + "\" failed");
+        return false;
+    }
+
+    if (shouldOut) {
+        smr::semgr << "\"./user_session_files/" + filename + ".lal\" saved";
+    }
+
+    return true;
+}
+
+/* - load :filename */
+bool load() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+        return false;
+    }
+    std::size_t type = 0;
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) {
+        type = 1;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string filename = laxb::cmdhr.getCmdtoken()[0].substr(1); // :filename
+    if (smr::semgr.rfile(filename) == true) { // :filename
+        smr::semgr.setpath(filename); // filename
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Read file \"" + filename + "\" failed");
+        return false;
+    }
+
+    if (shouldOut) {
+        smr::semgr << "\"./user_session_files/" + filename + ".lal\" loaded";
+    }
+
+    return true;
+}
 
 /* 清屏 */
 bool cls() {
@@ -277,10 +321,10 @@ bool plus() {
         return false;
     }
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) { // :a :b ::c
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :a :b ::c
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) { // :a :b
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :a :b
         type = 2;
     }
     else {
@@ -358,10 +402,10 @@ bool minus() {
     }
 
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) {
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) {
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) {
         type = 2;
     }
     else {
@@ -439,10 +483,10 @@ bool mtimes() {
     }
 
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) { // :A :B ::C
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) { // :A :B
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
         type = 2;
     }
     else {
@@ -510,10 +554,10 @@ bool times() {
     }
 
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) { // :A :B ::C
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) { // :A :B
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
         type = 2;
     }
     else {
@@ -577,10 +621,10 @@ bool divide() {
     }
 
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) { // :A :B ::C
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) { // :A :B
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
         type = 2;
     }
     else {
@@ -652,10 +696,10 @@ bool power() {
     }
 
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) { // :A :B ::C
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN}) == true) { // :A :B
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
         type = 2;
     }
     else {
@@ -724,7 +768,7 @@ bool eye() {
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB}) == true) { // eye {num}
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB, laxb::Cmdt::OUT}) == true) { // eye ::A {num}
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB, laxb::Cmdt::OUTID}) == true) { // eye ::A {num}
         type = 2;
     }
     else {
@@ -789,16 +833,16 @@ bool lu() {
     }
 
     std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true) { // :A
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :A
         type = 1;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::OUT, laxb::Cmdt::OUT}) == true) { // :A ::L ::U
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OUTID, laxb::Cmdt::OUTID}) == true) { // :A ::L ::U
         type = 2;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::OPT}) == true) { // -a :A
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OPT}) == true) { // -a :A
         type = 3;
     }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::OUT, laxb::Cmdt::OUT, laxb::Cmdt::OUT}) == true) { // :A ::L ::U ::P
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OUTID, laxb::Cmdt::OUTID, laxb::Cmdt::OUTID}) == true) { // :A ::L ::U ::P
         type = 4;
     }
     else {

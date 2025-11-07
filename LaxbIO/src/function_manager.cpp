@@ -15,7 +15,7 @@ void registerAllFunc() {
     fnmgr.fnReg("var", var);
     // fnmgr.fnReg("modify", modify);
     fnmgr.fnReg("del", del);
-    // fnmgr.fnReg("save", save);
+    fnmgr.fnReg("save", save);
     fnmgr.fnReg("load", load);
     fnmgr.fnReg("cls", cls);
     // fnmgr.fnReg("help", help);

@@ -22,7 +22,7 @@ bool show();
 bool var();
 // bool modify();
 bool del();
-// bool save();
+bool save();
 bool load();
 bool cls();
 // bool help();

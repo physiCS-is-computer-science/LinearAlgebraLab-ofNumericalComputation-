@@ -50,12 +50,41 @@ void SessionMgr::addreal(std::string varn, double val) {
     }
 }
 
-// bool wfile(std::string fname) {
-// }
+/* 写入当前会话至文件
+ * - 存在同名文件时清空内容，重新写入 */
+bool SessionMgr::wfile(std::string fname) {
+    std::string path{this->filePath(fname)};
+    std::ofstream fout(path);
+    if (fout.fail()) {
+        fout.close();
+        return false;
+    }
 
-/* 从文件读取某次会话 */
+    /* 格式化写入所有变量进入文件 fname */
+    for (const auto& i : dmSpace_) { // 矩阵
+        fout << "\"" + i.first + "\":[\n";
+        for (core::dmtx::mtxSizet row = 0; row < i.second.getRowSize(); ++row) {
+            core::dvec temp(i.second.getRow(row)); // 临时行
+            for (core::dvec::vecSizet i = 0; i < temp.getSize(); ++i) { // 逐个输出临时行的元素
+                fout << std::setw(10) << temp(i); // 规定每个数字宽度为 10
+            }
+            fout << ";\n";
+        }
+        fout << "],\n";
+    }
+    for (const auto& i : realSpace_) {
+        fout << "\"" + i.first + "\":"
+             << i.second << ",\n";
+    }
+
+    return true;
+}
+
+/* 从文件读取某次会话
+ * - 未找到名字为 fname 的文件则返回 false */
 bool SessionMgr::rfile(std::string fname) {
-    std::ifstream fin(fname);
+    std::string path{this->filePath(fname)};
+    std::ifstream fin(path);
     if (fin.fail()) {
         fin.close();
         return false;
@@ -81,7 +110,7 @@ bool SessionMgr::rfile(std::string fname) {
         std::vector<std::string> keyVal = laxb::splitBych(i, ':');
         laxb::delCh(keyVal[0], ' '); // 去除空格
         laxb::delCh(keyVal[0], '"'); // 去除引号
-        
+
         if (keyVal[1].find('[') != std::string::npos) { // 矩阵时
             core::dmtx input = laxb::cmdhr.squareToken(keyVal[1]);
             if (input.isEmpty()) {

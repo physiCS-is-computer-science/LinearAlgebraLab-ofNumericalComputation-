@@ -220,10 +220,10 @@ Cmdt argtype(std::string str) {
         return Cmdt::OPT;
     }
     else if (str[0] == ':' && str[1] != ':') {
-        return Cmdt::IN;
+        return Cmdt::INID;
     }
     else if (str[0] == ':' && str[1] == ':') {
-        return Cmdt::OUT;
+        return Cmdt::OUTID;
     }
     else if (str[0] == '[') {
         return Cmdt::SB;

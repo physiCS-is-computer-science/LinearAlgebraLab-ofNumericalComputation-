@@ -1,5 +1,5 @@
 .vscode/
-bin/
+file_of_linear_algebra_lab/
 build/
 workspace_user_files/
 CMakeLists.txt

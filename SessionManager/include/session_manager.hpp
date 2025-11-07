@@ -6,14 +6,13 @@
 
 #include "core/matrix.hpp"
 #include "utils/interface.hpp"
+#include <Windows.h> //
 #include <map>
 #include <sstream>
 #include <string>
 #include <vector>
 
 namespace smr {
-
-const std::string SEPATH{"../user_session_files/"};
 
 /* ==== 会话管理器 ==== */
 class SessionMgr {
@@ -28,6 +27,18 @@ private:
     std::map<std::string, core::dmtx> dmSpace_; // 实矩阵变量，向量也用矩阵存储
     // std::map<std::string, core::cmtx> cmSpace_; // 复矩阵变量，向量也用矩阵存储
     std::map<std::string, double> realSpace_; // 普通变量
+
+    std::string filePath(const std::string& filen) { // 获取文件路径
+        char exePath[MAX_PATH];
+        GetModuleFileNameA(NULL, exePath, MAX_PATH); // 获取当前 .exe 的绝对路径: .../file_of_linear_algebra_lab/LAL.exe
+
+        std::string fullPath(exePath);
+        std::size_t exepos = fullPath.find("LAL.exe"); // .../file_of_linear_algebra_lab/LAL.exe -> .../file_of_linear_algebra_lab/
+        fullPath = fullPath.substr(0, exepos) + "user_session_files\\" + filen + ".lal";
+
+        return fullPath;
+    }
+
 public:
     /* friends */
     friend bool ::show();
@@ -66,7 +77,7 @@ public:
     // void delcmtx(decltype())
     void delreal(decltype(realSpace_.end()) realIt) { realSpace_.erase(realIt); }
 
-    // bool wfile(std::string fname);
+    bool wfile(std::string fname);
     bool rfile(std::string fname);
 
     void clear() { // 只清除错误信息、计算结果、字符流对象的内容

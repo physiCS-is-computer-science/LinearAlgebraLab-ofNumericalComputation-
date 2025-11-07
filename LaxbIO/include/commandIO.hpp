@@ -13,8 +13,8 @@ namespace laxb {
 /* 五种命令标识符 */
 enum class Cmdt {
     OPT, // -
-    IN, // :
-    OUT, // ::
+    INID, // :
+    OUTID, // ::
     CB, // []
     SB, // {}
     NOTF // 未找到
