@@ -18,6 +18,11 @@ SessionMgr& SessionMgr::operator<<(std::string output) { // 字符串
     cptoup_ = os_.str();
     return *this;
 }
+SessionMgr& SessionMgr::operator<<(char ch) { // 字符
+    os_ << ch;
+    cptoup_ = os_.str();
+    return *this;
+}
 SessionMgr& SessionMgr::operator<<(core::dmtx mtx) { // 实数矩阵
     os_ << mtx;
     cptoup_ = os_.str();
@@ -66,7 +71,7 @@ bool SessionMgr::wfile(std::string fname) {
         for (core::dmtx::mtxSizet row = 0; row < i.second.getRowSize(); ++row) {
             core::dvec temp(i.second.getRow(row)); // 临时行
             for (core::dvec::vecSizet i = 0; i < temp.getSize(); ++i) { // 逐个输出临时行的元素
-                fout << std::setw(10) << temp(i); // 规定每个数字宽度为 10
+                fout << std::setw(12) << temp(i); // 规定每个数字宽度为 12
             }
             fout << ";\n";
         }
@@ -81,7 +86,8 @@ bool SessionMgr::wfile(std::string fname) {
 }
 
 /* 从文件读取某次会话
- * - 未找到名字为 fname 的文件则返回 false */
+ * - 未找到名字为 fname 的文件则返回 false
+ * - 更改临时变量空间，如覆盖变量空间的同名变量 */
 bool SessionMgr::rfile(std::string fname) {
     std::string path{this->filePath(fname)};
     std::ifstream fin(path);
@@ -114,7 +120,7 @@ bool SessionMgr::rfile(std::string fname) {
         if (keyVal[1].find('[') != std::string::npos) { // 矩阵时
             core::dmtx input = laxb::cmdhr.squareToken(keyVal[1]);
             if (input.isEmpty()) {
-                return false;
+                continue;
             }
 
             smr::semgr.adddmtx(keyVal[0], input);
@@ -122,7 +128,7 @@ bool SessionMgr::rfile(std::string fname) {
         else {
             std::vector<double> input = laxb::cmdhr.curlyToken("{" + keyVal[1] + "}");
             if (input.size() != 1) {
-                return false;
+                continue;
             }
 
             smr::semgr.addreal(keyVal[0], input[0]);

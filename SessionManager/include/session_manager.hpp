@@ -43,6 +43,8 @@ public:
     /* friends */
     friend bool ::show();
     friend bool ::del();
+    friend bool ::save();
+    friend bool ::load();
 
     SessionMgr() : path_("#") {};
     ~SessionMgr() = default;
@@ -60,6 +62,7 @@ public:
     /* ==== 一组重载函数，将本次计算结果转换为 std::string 格式并追加到 cptoup_ ==== */
     SessionMgr& operator<<(double val); // 实数
     SessionMgr& operator<<(std::string output); // 字符串
+    SessionMgr& operator<<(char ch); // 字符
     SessionMgr& operator<<(core::dmtx mtx); // 实数矩阵
     SessionMgr& operator<<(core::dvec vec); // 实数向量
 

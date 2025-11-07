@@ -62,6 +62,10 @@ int main() {
         laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
         bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
 
+        if (state == true && smr::semgr.getpath() != "#") { // 函数执行成功，并且为非临时会话状态时，刷新文件
+            smr::semgr.wfile(smr::semgr.getpath());
+        }
+
         if (smr::semgr.poweroff()) {
             return 0;
         }

@@ -8,11 +8,13 @@
 //    5.根据 ';' 判断是否写入 smr::semgr::cptoup_
 // =====================================================================
 
+#include "cmdlib.hpp"
 #include "commandIO.hpp"
 #include "core/matrix.hpp"
 #include "decompositions/basic_decomp.hpp"
 #include "session_manager.hpp"
-#include <cstdlib> // 为了 system("cls")
+#include <Windows.h> // 为了 system("cls")
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -39,7 +41,7 @@ bool quit() {
         smr::semgr.swich();
     }
     else if (laxb::cmdhr.getCmdtoken()[0] == "-f") { // 恢复到临时会话
-        smr::semgr.setpath();
+        smr::semgr.setpath(); // 默认为临时会话标识 "#"
         smr::semgr.clearSpace(); // 清除内存中所有变量
     }
     else {
@@ -273,15 +275,19 @@ bool del() {
     return true;
 }
 
-/* - save ::filename */
+/* - save ::filename（重名文件则写入失败）
+ * - save ::falename -f（强制写入） */
 bool save() {
     bool shouldOut = laxb::cmdhr.semicolonDel();
     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
         return false;
     }
     std::size_t type = 0;
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID}) == true) { // save ::filename
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID}) == true) { // save ::filename（重名文件则写入失败）
         type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID, laxb::Cmdt::OPT}) == true) { // ::filename -f（强制写入）
+        type = 2;
     }
     else {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
@@ -289,8 +295,16 @@ bool save() {
     }
 
     std::string filename = laxb::cmdhr.getCmdtoken()[0].substr(2); // ::filename
-    if (smr::semgr.wfile(filename) == true) {
-        // 待扩展
+    if (type == 1) { // ::filename
+        std::string fullPath = smr::semgr.filePath(filename); // 获取文件路径
+        std::ifstream tmpFin(fullPath); // 打开文件测试文件是否存在
+        if (!tmpFin.fail()) { // 读取成功时
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": File \"" + filename + "\" is exist, if you want to force write overwriting, add -f");
+            return false;
+        }
+    }
+    else if (type == 2 && laxb::cmdhr.getCmdtoken()[1] == "-f") {
+        smr::semgr.wfile(filename);
     }
     else {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Save file \"" + filename + "\" failed");
@@ -304,15 +318,20 @@ bool save() {
     return true;
 }
 
-/* - load :filename */
+/* 读取失败时，无论命令是绑定文件版还是不绑定版，都返回 false，并且回档变量空间（不改变变量空间）
+ * - load :filename（载入变量至当前会话，不修改文件 filename，但修改当前文件会话）
+ * - load :filename -c（改变会话文件绑定，每次操作都会修改文件 filename） */
 bool load() {
     bool shouldOut = laxb::cmdhr.semicolonDel();
     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
         return false;
     }
     std::size_t type = 0;
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) {
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :filename
         type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OPT}) == true) { // :filename -m
+        type = 2;
     }
     else {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
@@ -320,8 +339,32 @@ bool load() {
     }
 
     std::string filename = laxb::cmdhr.getCmdtoken()[0].substr(1); // :filename
-    if (smr::semgr.rfile(filename) == true) { // :filename
-        smr::semgr.setpath(filename); // filename
+
+    /* 防止意外，回档用 */
+    auto dmSpaceCp = smr::semgr.dmSpace_;
+    auto realSpaceCp = smr::semgr.realSpace_;
+
+    if (type == 1) { // :filename
+        if (smr::semgr.rfile(filename) != true) { // 失败时，回档
+            smr::semgr.dmSpace_ = dmSpaceCp;
+            smr::semgr.realSpace_ = realSpaceCp;
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": Read file \"" + filename + "\" failed");
+            return false;
+        }
+    }
+    else if (type == 2 && laxb::cmdhr.getCmdtoken()[1] == "-c") { // :filename -m
+        /* 清除当前会话 a 在内存的变量空间（没回到主函数所以不会同步更改），否则同步时会把当前会话 a 的变量同步到新文件会话 b */
+        smr::semgr.clearSpace();
+
+        if (smr::semgr.rfile(filename) == true) { // 读取文件成功时
+            smr::semgr.setpath(filename); // 绑定到文件会话 b
+        }
+        else { // 失败时，不改变文件会话 a 的绑定，恢复变量空间（回档）
+            smr::semgr.dmSpace_ = dmSpaceCp;
+            smr::semgr.realSpace_ = realSpaceCp;
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": Read file \"" + filename + "\" failed");
+            return false;
+        }
     }
     else {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Read file \"" + filename + "\" failed");
@@ -344,6 +387,63 @@ bool cls() {
         return false;
     }
     system("cls");
+    return true;
+}
+
+/* - help :cmdname
+ * - help -l/a */
+bool help() {
+    bool shouldOut = laxb::cmdhr.semicolonDel();
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+        return false;
+    }
+    std::size_t type = 0;
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :cmdname
+        type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) { // -l/a
+        type = 2;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    if (type == 1) { // :cmdname
+        auto it = laxb::manual.find(laxb::cmdhr.getCmdtoken()[0].substr(1));
+        if (it == laxb::manual.end()) {
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": Command \"" + laxb::cmdhr.getCmdtoken()[0].substr(1) + "\" not exist");
+            return false;
+        }
+        smr::semgr << "\n\n"
+                   << it->first << '\t' << it->second.first << "\n---\n"
+                   << it->second.second << '\n';
+    }
+    else if (type == 2 && laxb::cmdhr.getCmdtoken()[0] == "-a") { // -a
+        smr::semgr << "\n\n";
+        for (const auto& i : laxb::manual) {
+            smr::semgr << i.first << '\t' << i.second.first << '\n';
+        }
+    }
+    else if (type == 2 && laxb::cmdhr.getCmdtoken()[0] == "-l") { // -l
+        smr::semgr << "\n\n";
+        std::size_t cnt = 0;
+        for (const auto& i : laxb::manual) { // 五个一行
+            ++cnt;
+            smr::semgr << i.first << '\t';
+            if (cnt % 5 == 0) {
+                smr::semgr << '\n';
+            }
+        }
+        if (cnt % 5 != 0) { // 满五时上方已经输出 '\n'
+            smr::semgr << '\n';
+        }
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
     return true;
 }
 

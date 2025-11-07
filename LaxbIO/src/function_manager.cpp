@@ -18,7 +18,7 @@ void registerAllFunc() {
     fnmgr.fnReg("save", save);
     fnmgr.fnReg("load", load);
     fnmgr.fnReg("cls", cls);
-    // fnmgr.fnReg("help", help);
+    fnmgr.fnReg("help", help);
 
     /* ==== 运算 ==== */
     fnmgr.fnReg("plus", plus);

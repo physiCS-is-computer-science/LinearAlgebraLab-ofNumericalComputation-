@@ -25,7 +25,7 @@ bool del();
 bool save();
 bool load();
 bool cls();
-// bool help();
+bool help();
 
 /* ==== 运算 ==== */
 bool plus();
