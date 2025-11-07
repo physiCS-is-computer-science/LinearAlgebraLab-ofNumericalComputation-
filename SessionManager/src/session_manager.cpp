@@ -82,12 +82,15 @@ bool SessionMgr::wfile(std::string fname) {
              << i.second << ",\n";
     }
 
+    fout.close();
+
     return true;
 }
 
 /* 从文件读取某次会话
  * - 未找到名字为 fname 的文件则返回 false
- * - 更改临时变量空间，如覆盖变量空间的同名变量 */
+ * - 更改临时变量空间，如覆盖变量空间的同名变量
+ * - 空文件时直接返回 true */
 bool SessionMgr::rfile(std::string fname) {
     std::string path{this->filePath(fname)};
     std::ifstream fin(path);

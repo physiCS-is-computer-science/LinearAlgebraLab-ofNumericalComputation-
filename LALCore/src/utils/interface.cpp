@@ -298,10 +298,12 @@ bool save() {
     if (type == 1) { // ::filename
         std::string fullPath = smr::semgr.filePath(filename); // 获取文件路径
         std::ifstream tmpFin(fullPath); // 打开文件测试文件是否存在
-        if (!tmpFin.fail()) { // 读取成功时
+        if (!tmpFin.fail()) { // 读取成功，即有重名文件时
             smr::semgr.seterr(laxb::cmdhr.getName() + ": File \"" + filename + "\" is exist, if you want to force write overwriting, add -f");
             return false;
         }
+
+        smr::semgr.wfile(filename); // 无重名文件时
     }
     else if (type == 2 && laxb::cmdhr.getCmdtoken()[1] == "-f") {
         smr::semgr.wfile(filename);

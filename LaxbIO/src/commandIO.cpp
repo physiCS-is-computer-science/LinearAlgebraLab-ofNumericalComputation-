@@ -249,7 +249,8 @@ void delCh(std::string& str, char tobedel) {
 /* 以分隔符 sep 分割字符串为 tokens
  * - sep 为字符，默认值为 ' '
  * - str 中无 sep 时则返回 str 单独构成的 vector（存于 vector 的原串）
- * - 此函数会主动删除首尾 sep 字符，防止出现未定义行为 */
+ * - 此函数会主动删除首尾 sep 字符，防止出现未定义行为
+ * - str 为空串时不执行循环直接返回空 vector */
 std::vector<std::string> splitBych(std::string& str, char sep) {
     delCh(str, sep); // 删除首尾 sep 字符，防止以下循环出现 substr() 访问越界的未定义行为
 

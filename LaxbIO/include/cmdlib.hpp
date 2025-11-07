@@ -16,10 +16,10 @@ const std::string showMan{"-a: Display all variables\n-l: Display a list of all 
 const std::string varMan{"::varn: Save the output to this variable\n{}: parameter list\n[]: Matrix elements list"};
 // const std::string modifyMan{""};
 const std::string delMan{"-a: Delete all variables\n:varn: Deleting specific variables"};
-const std::string saveMan{""};
-const std::string loadMan{""};
-const std::string clsMan{""};
-const std::string helpMan{""};
+const std::string saveMan{"-f: Forcibly write a file\n::filename: Save the current session to the file"};
+const std::string loadMan{"-c: Binding file\n:filename: Variables that load this file session"};
+const std::string clsMan{"Clear screen"};
+const std::string helpMan{"-a: Display all commands\n-l: Display a list of all command names\n:cmdname: Display specific command details"};
 
 /* ==== 运算 ==== */
 //
