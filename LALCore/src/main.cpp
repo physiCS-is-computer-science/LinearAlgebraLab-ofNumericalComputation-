@@ -62,14 +62,17 @@ int main() {
         laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
         bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
 
-        if (state == true && smr::semgr.getpath() != "#") { // 函数执行成功，并且为非临时会话状态时，刷新文件
+        /* 函数执行成功，并且为非临时会话状态时，刷新文件 */
+        if (state == true && smr::semgr.getpath() != "#") {
             smr::semgr.wfile(smr::semgr.getpath());
         }
 
+        /* 关机 */
         if (smr::semgr.poweroff()) {
             return 0;
         }
 
+        /* LaxbIO */
         if (state == true && !smr::semgr.getoup().empty()) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
             std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
         }
