@@ -6,12 +6,14 @@
 
 #include "core/matrix.hpp"
 #include "utils/interface.hpp"
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
 #include <vector>
 
 namespace smr {
+
+const std::string SEPATH{"../user_session_files/"};
 
 /* ==== 会话管理器 ==== */
 class SessionMgr {
@@ -65,7 +67,7 @@ public:
     void delreal(decltype(realSpace_.end()) realIt) { realSpace_.erase(realIt); }
 
     // bool wfile(std::string fname);
-    // bool rfile(std::string fname);
+    bool rfile(std::string fname);
 
     void clear() { // 只清除错误信息、计算结果、字符流对象的内容
         err_ = "";

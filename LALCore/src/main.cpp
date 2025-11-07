@@ -24,6 +24,7 @@
 #include "function_manager.hpp"
 #include "utils/output.hpp"
 #include <Windows.h>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -31,12 +32,6 @@
 int main() {
     /* =========================================================== */
     /* ======================== TESTBEGIN ======================== */
-
-    // std::string str("1 2 3234   -343 // -353 33 1/2   ");
-    // for (const auto& i : laxb::cmdhr.curlyToken("{" + str + "}")) {
-    //     std::cout << i << std::endl;
-    // }
-    // std::cout << "==== END ====";
 
     /* ========================= TESTEND ========================= */
     /* =========================================================== */

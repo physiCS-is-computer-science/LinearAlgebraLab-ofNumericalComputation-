@@ -238,6 +238,24 @@ bool del() {
     return true;
 }
 
+/* load :filename */
+// bool load() {
+//     bool shouldOut = laxb::cmdhr.semicolonDel();
+//     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+//         return false;
+//     }
+//     std::size_t type = 0;
+//     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN}) == true) {
+//         type = 1;
+//     }
+//     else {
+//         smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+//         return false;
+//     }
+
+//     smr::semgr.rfile(smr::SEPATH + laxb::cmdhr.getCmdtoken()[0]);
+// }
+
 /* 清屏 */
 bool cls() {
     laxb::cmdhr.semicolonDel();
@@ -255,11 +273,9 @@ bool cls() {
  * - plus :varn :varn */
 bool plus() {
     bool shouldOut = laxb::cmdhr.semicolonDel();
-
     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
         return false;
     }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::IN, laxb::Cmdt::IN, laxb::Cmdt::OUT}) == true) { // :a :b ::c
         type = 1;
@@ -723,8 +739,8 @@ bool eye() {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error in \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
         return false;
     }
-    if (dimens[0] == 0) {
-        smr::semgr.seterr(laxb::cmdhr.getName() + ": Invalid argument \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
+    if (static_cast<int>(dimens[0]) == 0) { // 传递 (-1, 1) 的分数，导致此处判断为非 0，进而构造出空矩阵，在 << 处 .fail() 被置位，报错
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": 0 matrix is illegal: \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
         return false;
     }
 

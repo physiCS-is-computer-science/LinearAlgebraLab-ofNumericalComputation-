@@ -1,5 +1,7 @@
 #include "session_manager.hpp"
+#include "commandIO.hpp"
 #include <fstream>
+#include <iostream> // test
 
 namespace smr {
 
@@ -51,13 +53,54 @@ void SessionMgr::addreal(std::string varn, double val) {
 // bool wfile(std::string fname) {
 // }
 
-// bool rfile(std::string fname) {
-//     std::ifstream fin(fname);
-//     if (fin.fail()) {
-//         return false;
-//     }
+/* 从文件读取某次会话 */
+bool SessionMgr::rfile(std::string fname) {
+    std::ifstream fin(fname);
+    if (fin.fail()) {
+        fin.close();
+        return false;
+    }
 
+    /* 读取所有文本至字符串 */
+    std::string temp{""}, originTxt{""};
+    while (std::getline(fin, temp)) { // getline() 会丢弃所有换行符
+        originTxt += temp;
+    }
+    if (originTxt.empty()) {
+        fin.close();
+        return false;
+    }
+    fin.close();
 
-// }
+    laxb::delCh(originTxt, ','); // 去除首尾逗号
+
+    std::vector<std::string> tokens = laxb::splitBych(originTxt, ','); // 得到: "str":[] "str":a "str":[]...
+
+    /* 写入变量空间 */
+    for (auto& i : tokens) {
+        std::vector<std::string> keyVal = laxb::splitBych(i, ':');
+        laxb::delCh(keyVal[0], ' '); // 去除空格
+        laxb::delCh(keyVal[0], '"'); // 去除引号
+        
+        if (keyVal[1].find('[') != std::string::npos) { // 矩阵时
+            core::dmtx input = laxb::cmdhr.squareToken(keyVal[1]);
+            if (input.isEmpty()) {
+                return false;
+            }
+
+            smr::semgr.adddmtx(keyVal[0], input);
+        }
+        else {
+            std::vector<double> input = laxb::cmdhr.curlyToken("{" + keyVal[1] + "}");
+            if (input.size() != 1) {
+                return false;
+            }
+
+            smr::semgr.addreal(keyVal[0], input[0]);
+        }
+    }
+
+    return true;
+}
 
 } // namespace smr

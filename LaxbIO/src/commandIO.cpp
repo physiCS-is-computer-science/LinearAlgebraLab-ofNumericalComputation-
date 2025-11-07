@@ -236,7 +236,7 @@ Cmdt argtype(std::string str) {
     }
 }
 
-/* 去除首尾空格，无空格则不操作 */
+/* 去除首尾 tobedel 字符，无此字符则不操作 */
 void delCh(std::string& str, char tobedel) {
     while (!str.empty() && *(str.end() - 1) == tobedel) { // 删掉末尾所有空格
         str.pop_back();
@@ -244,6 +244,27 @@ void delCh(std::string& str, char tobedel) {
     while (!str.empty() && *str.begin() == tobedel) { // 删掉开头所有空格
         str.erase(str.begin());
     }
+}
+
+/* 以分隔符 sep 分割字符串为 tokens
+ * - sep 为字符，默认值为 ' '
+ * - str 中无 sep 时则返回 str 单独构成的 vector（存于 vector 的原串）
+ * - 此函数会主动删除首尾 sep 字符，防止出现未定义行为 */
+std::vector<std::string> splitBych(std::string& str, char sep) {
+    delCh(str, sep); // 删除首尾 sep 字符，防止以下循环出现 substr() 访问越界的未定义行为
+
+    std::vector<std::string> tokens{};
+    for (std::size_t posbeg = 0, posend = 0; posend < str.size(); ++posbeg) { // str 为空串时不执行循环直接返回空 vector
+        posend = str.find(sep, posbeg);
+        if (posbeg == posend) { // posbeg 自身为 sep
+            continue;
+        }
+
+        tokens.push_back(str.substr(posbeg, posend - posbeg)); // 字串范围: [posbeg, posend - 1]（未找到时将 posbeg 之后字符全部写入）
+        posbeg = posend;
+    }
+
+    return tokens;
 }
 
 /* 按照 tplate 模板的顺序与数量检查、排序参数集，二者任意一个不一致则返回 false */
@@ -276,21 +297,11 @@ std::vector<double> CmdHandler::curlyToken(std::string token) {
     delCh(token, '}');
     delCh(token, ' '); // 去除首尾空格
 
-    if (token[0] == '/' || token[token.size() - 1] == '/' || token[token.size() - 1] == '/') { // "/a" "a/" "a-"
+    if (token[0] == '/' || token[token.size() - 1] == '/' || token[token.size() - 1] == '/') { // "/a.." "..a/" "..a-"
         return {};
     }
 
-    /* 分解为 tokens，得到 "a" "a/" "c"... */
-    std::vector<std::string> originTks{};
-    for (std::size_t posbeg = 0, posend = 0; posend < token.size(); ++posbeg) {
-        posend = token.find(' ', posbeg);
-        if (posbeg == posend) { // posbeg 自身为空格
-            continue;
-        }
-
-        originTks.push_back(token.substr(posbeg, posend - posbeg));
-        posbeg = posend;
-    }
+    std::vector<std::string> originTks = splitBych(token); // 分解为 tokens，得到 "a" "a/" "c"..（splitBych() 默认以空格为 sep）
 
     /* 更精细的 tokens，得到 "a" "a" "/" "b" "c"... */
     enum class State { // 状态机
@@ -381,17 +392,7 @@ core::dmtx CmdHandler::squareToken(std::string token) {
         token.erase(token.begin());
     }
 
-    /* 以 ';' 分解出每一行，结果不带 ';' */
-    std::vector<std::string> rows{}; // 以分号为单位，一行一个分号
-    for (std::size_t posbeg = 0, posend = 0; posend < token.size(); ++posbeg) {
-        posend = token.find(';', posbeg);
-        if (posend == posbeg) { // posbeg 自身为 ';'
-            return {};
-        }
-
-        rows.push_back(token.substr(posbeg, posend - posbeg)); // 从 begPos 开始，endPos 前一个结束的子串，即不包含 ';'
-        posbeg = posend;
-    }
+    std::vector<std::string> rows = splitBych(token, ';'); // 以分号为 sep，一行一个分号，分解出每一行，结果不带 ';'
 
     /* 调用 curlyToken() 返回行，从而构造矩阵 */
     std::vector<std::vector<double>> numRows{};

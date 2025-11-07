@@ -59,5 +59,6 @@ extern CmdHandler cmdhr; // 不可复制，仅作为命名解析器使用
 bool tksCheck(std::vector<std::string> tks); // in() 调用，检查输入参数的语法正确与否
 Cmdt argtype(std::string str); // 返回 str 属于哪种参数
 void delCh(std::string& str, char tobedel); // 去除首尾空格
+std::vector<std::string> splitBych(std::string &str, char sep = ' '); // 以字符 sep 为分隔符，分割出 tokens，结果不包含 sep
 
 } // namespace laxb

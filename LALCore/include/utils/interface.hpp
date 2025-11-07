@@ -23,7 +23,7 @@ bool var();
 // bool modify();
 bool del();
 // bool save();
-// bool load();
+bool load();
 bool cls();
 // bool help();
 
