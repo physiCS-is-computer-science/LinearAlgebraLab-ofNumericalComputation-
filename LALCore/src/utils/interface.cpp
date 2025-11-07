@@ -19,15 +19,34 @@
 #include <vector>
 
 /* ==== 基本命令 ==== */
-/* 关闭 */
+/* 关闭程序或变量空间
+ * - quit -e/f */
 bool quit() {
     laxb::cmdhr.semicolonDel(); // 有分号就删掉
-
-    if (!laxb::cmdhr.getCmdtoken().empty()) {
-        smr::semgr.seterr(laxb::cmdhr.getName() + ": This command has no arguments");
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
         return false;
     }
-    smr::semgr.swich();
+    std::size_t type = 0;
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) { // -opt
+        type = 1;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    if (laxb::cmdhr.getCmdtoken()[0] == "-e") { // 退出程序
+        smr::semgr.swich();
+    }
+    else if (laxb::cmdhr.getCmdtoken()[0] == "-f") { // 恢复到临时会话
+        smr::semgr.setpath();
+        smr::semgr.clearSpace(); // 清除内存中所有变量
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error in \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
+        return false;
+    }
+
     return true;
 }
 
@@ -36,7 +55,6 @@ bool quit() {
  * - show :varn */
 bool show() {
     laxb::cmdhr.semicolonDel(); // 有分号就删掉
-
     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
         return false;
     }
@@ -197,42 +215,59 @@ bool var() {
 }
 
 /* 删除变量（laxb::cmdhr 的友元）
- * del :varn */
+ * - del :varn
+ * - del -a */
 bool del() {
     bool shouldOut = laxb::cmdhr.semicolonDel();
-
     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
         return false;
     }
-
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == false) { // :varn
+    std::size_t type = 0;
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :varn
+        type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) { // -opt
+        type = 2;
+    }
+    else {
         smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
         return false;
     }
 
-    std::string varn(laxb::cmdhr.getCmdtoken()[0].substr(1)); // :varn
+    if (type == 1) {
+        std::string varn(laxb::cmdhr.getCmdtoken()[0].substr(1)); // :varn
 
-    /* 查找变量是否存在 */
-    auto dmtxIt = smr::semgr.dmSpace_.find(varn);
-    auto realIt = smr::semgr.realSpace_.find(varn);
-    if (dmtxIt == smr::semgr.dmSpace_.end() && realIt == smr::semgr.realSpace_.end()) {
-        smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varn + "\" not exist");
-        return false;
-    }
+        /* 查找变量是否存在 */
+        auto dmtxIt = smr::semgr.dmSpace_.find(varn);
+        auto realIt = smr::semgr.realSpace_.find(varn);
+        if (dmtxIt == smr::semgr.dmSpace_.end() && realIt == smr::semgr.realSpace_.end()) {
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": Variable \"" + varn + "\" not exist");
+            return false;
+        }
 
-    /* 删除对应变量 */
-    if (dmtxIt != smr::semgr.dmSpace_.end()) {
-        if (shouldOut) {
-            smr::semgr << "\n"
-                       << dmtxIt->second;
+        /* 删除对应变量 */
+        if (dmtxIt != smr::semgr.dmSpace_.end()) {
+            if (shouldOut) {
+                smr::semgr << "\n"
+                           << dmtxIt->second;
+            }
+            smr::semgr.dmSpace_.erase(dmtxIt);
         }
-        smr::semgr.dmSpace_.erase(dmtxIt);
+        else {
+            if (shouldOut) {
+                smr::semgr << realIt->second;
+            }
+            smr::semgr.realSpace_.erase(realIt);
+        }
     }
-    else {
-        if (shouldOut) {
-            smr::semgr << realIt->second;
+    else if (type == 2) {
+        if (laxb::cmdhr.getCmdtoken()[0] == "-a") {
+            smr::semgr.clearSpace();
         }
-        smr::semgr.realSpace_.erase(realIt);
+        else {
+            smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error in \"" + laxb::cmdhr.getCmdtoken()[0] + "\"");
+            return false;
+        }
     }
 
     return true;

@@ -54,7 +54,7 @@ public:
     std::string getpath() { return path_; }
     std::string geterr() { return err_; }
     std::string getoup() { return cptoup_; }
-    void setpath(std::string path) { path_ = path; }
+    void setpath(std::string path = "#") { path_ = path; }
     void seterr(std::string errStr) { err_ = errStr; }
 
     /* ==== 一组重载函数，将本次计算结果转换为 std::string 格式并追加到 cptoup_ ==== */
@@ -80,6 +80,10 @@ public:
     bool wfile(std::string fname);
     bool rfile(std::string fname);
 
+    void clearSpace() { // 清除变量空间的所有变量
+        dmSpace_ = {};
+        realSpace_ = {};
+    }
     void clear() { // 只清除错误信息、计算结果、字符流对象的内容
         err_ = "";
         cptoup_ = "";

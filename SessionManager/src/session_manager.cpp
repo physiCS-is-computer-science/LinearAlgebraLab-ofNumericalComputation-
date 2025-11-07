@@ -95,10 +95,10 @@ bool SessionMgr::rfile(std::string fname) {
     while (std::getline(fin, temp)) { // getline() 会丢弃所有换行符
         originTxt += temp;
     }
-    if (originTxt.empty()) {
-        fin.close();
-        return false;
-    }
+    // if (originTxt.empty()) {
+    //     fin.close();
+    //     return false;
+    // }
     fin.close();
 
     laxb::delCh(originTxt, ','); // 去除首尾逗号
