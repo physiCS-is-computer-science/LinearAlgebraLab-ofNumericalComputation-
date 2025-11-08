@@ -20,7 +20,6 @@
 bool quit();
 bool show();
 bool var();
-// bool modify();
 bool del();
 bool save();
 bool load();

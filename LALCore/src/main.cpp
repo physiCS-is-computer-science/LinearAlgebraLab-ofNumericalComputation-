@@ -20,7 +20,7 @@
 #include "commandIO.hpp"
 #include "core/matrix.hpp" // test
 #include "core/vector.hpp" // test
-#include "decompositions/basic_decomp.hpp"
+#include "decompositions/basic_decomp.hpp" // test
 #include "function_manager.hpp"
 #include "utils/output.hpp"
 #include <Windows.h>
@@ -30,54 +30,69 @@
 #include <vector>
 
 int main() {
+    bool test = 0;
+
     /* =========================================================== */
-    /* ======================== TESTBEGIN ======================== */
+    if (test) {
+        /* ======================== TESTBEGIN ======================== */
 
-    /* ========================= TESTEND ========================= */
+        core::dmtx mtx{
+            {1, 2, 0, 0},
+            {0, 0, 0, 1},
+            {0, 0, 1, 1},
+            {0, 0, 0, 0},
+        };
+        decomp::BaseDecomposer decomper(mtx);
+
+        /* ========================= TESTEND ========================= */
+    }
     /* =========================================================== */
 
-    system("cls");
-    laxb::registerAllFunc(); // 注册所有函数
-    util::startupBanner(); // 启动信息栏
+    if (!test) {
 
-    /* LaxbIO module test */
-    while (true) {
-        smr::semgr.clear();
+        system("cls");
+        laxb::registerAllFunc(); // 注册所有函数
+        util::startupBanner(); // 启动信息栏
 
-        /* input */
-        std::cout << util::SIS(smr::semgr.getpath()); // default path identifier
-        while (!laxb::cmdhr.in()) {
-            std::cout << util::SIS(smr::semgr.getpath());
-        }
+        /* LaxbIO module test */
+        while (true) {
+            smr::semgr.clear();
 
-        // /* check current tokens */
-        // std::cout << "==== TEST ====\ntokens:\n";
-        // for (const auto& i : cmdStr)
-        //     std::cout << i << "|";
-        // std::cout << std::endl
-        //           << "==== TEST ====\n";
+            /* input */
+            std::cout << util::SIS(smr::semgr.getpath()); // default path identifier
+            while (!laxb::cmdhr.in()) {
+                std::cout << util::SIS(smr::semgr.getpath());
+            }
 
-        /* 尝试调用 LALCore */
-        laxb::cmdhr.setName(laxb::cmdhr.getCmdtoken()[0]);
-        laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
-        bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
+            // /* check current tokens */
+            // std::cout << "==== TEST ====\ntokens:\n";
+            // for (const auto& i : cmdStr)
+            //     std::cout << i << "|";
+            // std::cout << std::endl
+            //           << "==== TEST ====\n";
 
-        /* 函数执行成功，并且为非临时会话状态时，刷新文件 */
-        if (state == true && smr::semgr.getpath() != "#") {
-            smr::semgr.wfile(smr::semgr.getpath());
-        }
+            /* 尝试调用 LALCore */
+            laxb::cmdhr.setName(laxb::cmdhr.getCmdtoken()[0]);
+            laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
+            bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
 
-        /* 关机 */
-        if (smr::semgr.poweroff()) {
-            return 0;
-        }
+            /* 函数执行成功，并且为非临时会话状态时，刷新文件 */
+            if (state == true && smr::semgr.getpath() != "#") {
+                smr::semgr.wfile(smr::semgr.getpath());
+            }
 
-        /* LaxbIO */
-        if (state == true && !smr::semgr.getoup().empty()) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
-            std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
-        }
-        else if (state == false) {
-            std::cout << util::ERS(smr::semgr.getpath()) + smr::semgr.geterr() + "\n";
+            /* 关机 */
+            if (smr::semgr.poweroff()) {
+                return 0;
+            }
+
+            /* LaxbIO */
+            if (state == true && !smr::semgr.getoup().empty()) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
+                std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
+            }
+            else if (state == false) {
+                std::cout << util::ERS(smr::semgr.getpath()) + smr::semgr.geterr() + "\n";
+            }
         }
     }
 

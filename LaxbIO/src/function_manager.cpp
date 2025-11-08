@@ -13,7 +13,6 @@ void registerAllFunc() {
     fnmgr.fnReg("quit", quit);
     fnmgr.fnReg("show", show);
     fnmgr.fnReg("var", var);
-    // fnmgr.fnReg("modify", modify);
     fnmgr.fnReg("del", del);
     fnmgr.fnReg("save", save);
     fnmgr.fnReg("load", load);
