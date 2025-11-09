@@ -38,6 +38,7 @@ void registerAllFunc() {
 
     /* ==== 矩阵分解 ==== */
     fnmgr.fnReg("lu", lu);
+    fnmgr.fnReg("rref", rref);
 }
 
 /* 仅仅查找函数是否存在 */

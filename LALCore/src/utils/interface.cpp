@@ -968,7 +968,6 @@ bool lu() {
     if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
         return false;
     }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :A
         type = 1;
@@ -1024,6 +1023,52 @@ bool lu() {
         if (type == 3 || type == 4) {
             smr::semgr << LUP[2]; // P
         }
+    }
+
+    return true;
+}
+
+/* 化为行最简型
+ * - rref :A
+ * - rref :A ::R */
+bool rref() {
+    bool shouldOut{laxb::cmdhr.semicolonDel()};
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+        return false;
+    }
+    std::size_t type{0};
+    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) {
+        type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
+        type = 2;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string varnIn(laxb::cmdhr.getCmdtoken()[0].substr(1)); // :A
+    auto it{smr::semgr.finddmtx(varnIn)};
+    if (it == smr::semgr.getdmtxEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\"not found");
+        return false;
+    }
+
+    decomp::BaseDecomposer decomper(it->second); // 初始化分解器
+    core::dmtx output{decomper.rref()};
+
+    if (output.isEmpty()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Simplification row simplest failure");
+    }
+
+    if (type == 2) { // 写入矩阵变量空间
+        smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[1].substr(2), output); // :A ::R
+    }
+
+    if (shouldOut) {
+        smr::semgr << '\n'
+                   << output;
     }
 
     return true;

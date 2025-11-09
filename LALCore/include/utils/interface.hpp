@@ -45,3 +45,4 @@ bool eye();
 
 /* ==== 矩阵分解 ==== */
 bool lu();
+bool rref();

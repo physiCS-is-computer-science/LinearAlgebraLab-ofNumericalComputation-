@@ -21,10 +21,36 @@ std::vector<core::dmtx> BaseDecomposer::lu() {
 }
 
 /* 化为行最简型
- * - 非行阶梯矩阵调会被转换为行阶梯矩阵计算（不改变传递的矩阵） */
-// core::dmtx rref(const core::dmtx& mtx) {
+ * - 调用 gaussianElimination() 返回的 U，返回最简型
+ * - 失败返回空矩阵 */
+core::dmtx BaseDecomposer::rref() {
+    if (origDmtx_.isEmpty()) {
+        return {};
+    }
 
-// }
+    core::dmtx R = this->gaussianElimination()[1]; // 返回的 U
+    for (std::size_t row{R.getRowSize() - 1}; row > 0; --row) { // 第 0 行不需要消元
+        core::dvec pivotRow{R.getRow(row)}; // 获取当前行作为主元行
+        std::size_t col{firstNonzero(pivotRow)}; // 当前主元行第一个非 0 元素的列坐标（主元列）
+        if (col >= R.getColSize()) { // 返回大于最大列下标的索引表示全 0 行
+            continue;
+        }
+
+        /* 向上消元 */
+        R.replaceRow(row, pivotRow * (1 / R(row, col))); // 主元化为 1
+        pivotRow = R.getRow(row); // 更新主元行
+        for (int r{row - 1}; r >= 0; --r) {
+            double up{R(r, col)}, pivot{R(row, col)}, l{}; // 当前主元之上的元素、当前主元、乘数
+            core::dvec upRow{R.getRow(r)}; // 待消元行
+
+            l = up / pivot; // 此处主元一定为 1，后续可能更改
+            R.replaceRow(r, upRow - pivotRow * l); // 行加减
+        }
+    }
+    R.replaceRow(0, R.getRow(0) * (1 / R(0, firstNonzero(R.getRow(0))))); // 第 0 行主元化为 1
+
+    return R;
+}
 
 // /* 找到行阶梯矩阵的所有主元坐标对
 //  * - 非行阶梯矩阵返回空 vector */
@@ -71,7 +97,7 @@ core::dmtx exchangeRowToLadderMtx(core::dmtx& mtx) {
         firstNon0s[i] = firstNonzero(mtx.getRow(i));
     }
 
-    std::size_t minDim = minDim = mtx.getRowSize() < mtx.getColSize() ? mtx.getRowSize() : mtx.getColSize(); // 最小维度
+    std::size_t minDim = mtx.getRowSize() < mtx.getColSize() ? mtx.getRowSize() : mtx.getColSize(); // 最小维度
     core::dmtx P(util::factr.eye(minDim)); // 换行矩阵
 
     /* 插入排序，此处效率极其低下，因为只要遇到小于 slow 的则换行。如果找最大元素再换行会提升很多效率。我好累，以后再改这里，希望那时你看得到吧梦奇 */
@@ -105,14 +131,14 @@ std::size_t firstNonzero(const core::dvec& vec) {
 }
 
 /* 高斯消元法（包含 LU分解，附加换行矩阵 P）
- * - 如果 origDmtx_ 为非方阵，得到的 P 为错误的 P（详情见行变换循环）！！！
  * - 返回 vector<>，分别为 L、U、P
+ * - 如果 origDmtx_ 为非方阵，得到的 P 为错误的 P（详情见行变换循环）！！！
  * - 当前主元位置为 0 时，寻找下方是否存在非 0，存在则行交换，不存在则跳到下一列（即全 0 列、主元位置之下的全 0 列都不进行任何操作）
  * - 消元逻辑考虑数值稳定性，遇到 0、非最大主元都换行，以减小误差（MATLAB） */
 std::vector<core::dmtx> BaseDecomposer::gaussianElimination() {
     core::dmtx copy(origDmtx_); // 不改变原矩阵
 
-    std::size_t minDim = copy.getRowSize() < copy.getColSize() ? copy.getRowSize() : copy.getColSize();
+    const std::size_t minDim = copy.getRowSize() < copy.getColSize() ? copy.getRowSize() : copy.getColSize();
     core::dmtx L(minDim), P(util::factr.eye(minDim)); // 最小维度
 
     /* LU 分解，每一行开始消元时，都先执行行变换，使得矩阵为行阶梯型，再进行消元算法 */
@@ -181,7 +207,7 @@ std::vector<core::dmtx> BaseDecomposer::gaussianElimination() {
         }
     }
 
-    for (std::size_t i{0}; i < minDim; ++i) {
+    for (std::size_t i{0}; i < minDim; ++i) { // 手动构造 1 主对角线
         L(i, i) = 1;
     }
 
