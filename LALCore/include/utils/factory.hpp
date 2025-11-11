@@ -3,6 +3,7 @@
 // random generator
 
 #include "core/matrix.hpp"
+#include <utility>
 
 namespace util {
 
@@ -17,6 +18,8 @@ public:
     /* 功能 */
     core::dmtx catRow(const core::dmtx& mtx1, const core::dmtx& mtx2);
     core::dmtx catCol(const core::dmtx& mtx1, const core::dmtx& mtx2);
+    std::pair<core::dmtx, core::dmtx> splitRow(const core::dmtx& mtx, std::size_t row);
+    std::pair<core::dmtx, core::dmtx> splitCol(const core::dmtx& mtx, std::size_t col);
 };
 extern Factory factr;
 

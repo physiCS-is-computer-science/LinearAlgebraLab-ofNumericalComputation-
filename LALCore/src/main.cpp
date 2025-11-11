@@ -31,19 +31,33 @@
 #include <vector>
 
 int main() {
-    bool test = 0;
+    bool test = 1;
 
     /* =========================================================== */
     if (test) {
         /* ======================== TESTBEGIN ======================== */
 
         core::dmtx
-            mtx1{{1, 2, 0, 0},
-                 {0, 0, 0, 1}},
-            mtx2{{0, 0, 1, 1},
-                 {0, 0, 0, 0}};
+            mtx1{
+                {1, 2, 3, 5},
+                {0, 1, 4, 6},
+                {0, 0, 1, 1},
+                {0, 0, 0, 1},
+            },
+            mtx2{
+                {0, 0, 1, 1},
+                {0, 0, 0, 0},
+            };
 
-        std::cout << util::factr.catCol(mtx1, mtx2);
+        decomp::BaseDecomposer decomper(mtx1);
+        auto mtx1Inv{decomper.inv()};
+
+        if (mtx1Inv.isEmpty()) {
+            std::cout << "Singular matrix!" << std::endl;
+        }
+        else {
+            std::cout << mtx1Inv << mtx1Inv * mtx1 << mtx1 * mtx1Inv;
+        }
 
         /* ========================= TESTEND ========================= */
     }

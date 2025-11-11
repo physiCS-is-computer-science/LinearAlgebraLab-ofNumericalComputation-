@@ -43,13 +43,36 @@ core::dmtx BaseDecomposer::rref() {
             double up{R(r, col)}, pivot{R(row, col)}, l{}; // 当前主元之上的元素、当前主元、乘数
             core::dvec upRow{R.getRow(r)}; // 待消元行
 
-            l = up / pivot; // 此处主元一定为 1，后续可能更改
+            l = up / pivot; // 此处主元一定为 1。代码逻辑后续可能更改
             R.replaceRow(r, upRow - pivotRow * l); // 行加减
         }
     }
     R.replaceRow(0, R.getRow(0) * (1 / R(0, firstNonzero(R.getRow(0))))); // 第 0 行主元化为 1
 
     return R;
+}
+
+/* 方阵求逆
+ * - 方阵右侧插入同维度单位矩阵，对长方阵化为行最简型，右侧矩阵即为逆
+ * - 维度错误、矩阵奇异都返回空矩阵 */
+core::dmtx BaseDecomposer::inv() {
+    if (!origDmtx_.isSquare()) {
+        return {};
+    }
+
+    core::dmtx U{this->lu()[1]}; // 返回 U，检验是否为奇异矩阵
+    std::size_t inx{decomp::firstNonzero(U.getRow(U.getRowSize() - 1))}; // 获取矩阵最后一行
+    if (inx >= U.getColSize()) { // 返回的索引大于最大索引即为全 0 行，故矩阵奇异
+        return {};
+    }
+
+    core::dmtx AE = util::factr.catCol(origDmtx_, util::factr.eye(origDmtx_.getRowSize()));
+    decomp::BaseDecomposer temp{AE};
+    AE = temp.rref(); // 返回的矩阵右侧为逆
+
+    std::pair<core::dmtx, core::dmtx> E_A = util::factr.splitCol(AE, AE.getColSize() / 2); // 左为单位矩阵，右为逆
+
+    return E_A.second;
 }
 
 // /* 找到行阶梯矩阵的所有主元坐标对
