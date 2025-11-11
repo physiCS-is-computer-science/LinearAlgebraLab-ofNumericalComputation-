@@ -22,6 +22,7 @@
 #include "core/vector.hpp" // test
 #include "decompositions/basic_decomp.hpp" // test
 #include "function_manager.hpp"
+#include "utils/factory.hpp" // test
 #include "utils/output.hpp"
 #include <Windows.h>
 #include <fstream>
@@ -36,13 +37,13 @@ int main() {
     if (test) {
         /* ======================== TESTBEGIN ======================== */
 
-        core::dmtx mtx{
-            {1, 2, 0, 0},
-            {0, 0, 0, 1},
-            {0, 0, 1, 1},
-            {0, 0, 0, 0},
-        };
-        decomp::BaseDecomposer decomper(mtx);
+        core::dmtx
+            mtx1{{1, 2, 0, 0},
+                 {0, 0, 0, 1}},
+            mtx2{{0, 0, 1, 1},
+                 {0, 0, 0, 0}};
+
+        std::cout << util::factr.catCol(mtx1, mtx2);
 
         /* ========================= TESTEND ========================= */
     }
