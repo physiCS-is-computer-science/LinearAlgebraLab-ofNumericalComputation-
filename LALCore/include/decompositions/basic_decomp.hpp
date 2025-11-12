@@ -27,6 +27,7 @@ public:
     std::vector<core::dmtx> lu(); // 调用 gaussianElimination()，返回 L、U、P
     core::dmtx rref(); // 化为行最简型
     core::dmtx inv(); // 矩阵求逆
+    double det(); // 行列式
 
 private:
     std::vector<core::dmtx> gaussianElimination(); // 高斯消元法，化为行阶梯矩阵（非最简 R），返回 L、U、P

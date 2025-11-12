@@ -39,6 +39,12 @@ void registerAllFunc() {
     /* ==== 矩阵分解 ==== */
     fnmgr.fnReg("lu", lu);
     fnmgr.fnReg("rref", rref);
+
+    /* ==== 线性方程组求解 ==== */
+    fnmgr.fnReg("inv", inv);
+
+    /* ==== 矩阵分析与条件数 ==== */
+    fnmgr.fnReg("det", det);
 }
 
 /* 仅仅查找函数是否存在 */

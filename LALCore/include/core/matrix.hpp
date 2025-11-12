@@ -545,7 +545,7 @@ Vector<T> Matrix<T>::getMainDiag() const {
         throw std::domain_error("matrix.hpp: getMainDiag(): expect a square matrix, but it is a non-square matrix"); // 域错误
     }
 
-    Vector output(row_);
+    Vector<T> output(row_);
     for (typename Vector<T>::vecSizet i = 0; i < row_; ++i) {
         output(i) = matrix_[i][i];
     }

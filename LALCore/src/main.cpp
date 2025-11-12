@@ -31,7 +31,7 @@
 #include <vector>
 
 int main() {
-    bool test = 1;
+    bool test = 0;
 
     /* =========================================================== */
     if (test) {
@@ -42,7 +42,7 @@ int main() {
                 {1, 2, 3, 5},
                 {0, 1, 4, 6},
                 {0, 0, 1, 1},
-                {0, 0, 0, 1},
+                {0, 0, 0, 4},
             },
             mtx2{
                 {0, 0, 1, 1},
@@ -50,14 +50,8 @@ int main() {
             };
 
         decomp::BaseDecomposer decomper(mtx1);
-        auto mtx1Inv{decomper.inv()};
 
-        if (mtx1Inv.isEmpty()) {
-            std::cout << "Singular matrix!" << std::endl;
-        }
-        else {
-            std::cout << mtx1Inv << mtx1Inv * mtx1 << mtx1 * mtx1Inv;
-        }
+        std::cout << decomper.det();
 
         /* ========================= TESTEND ========================= */
     }

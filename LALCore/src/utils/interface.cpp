@@ -1073,3 +1073,99 @@ bool rref() {
 
     return true;
 }
+
+/* ==== 线性方程组求解 ==== */
+/* - inv :A
+ * - inv :A ::_A */
+bool inv() {
+    bool shouldOut{laxb::cmdhr.semicolonDel()};
+    std::size_t type{0};
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+        return false;
+    }
+    if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID}) == true) {
+        type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
+        type = 2;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string varnIn(laxb::cmdhr.getCmdtoken()[0].substr(1)); // :A
+    auto it{smr::semgr.finddmtx(varnIn)};
+    if (it == smr::semgr.getdmtxEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\"not found");
+        return false;
+    }
+    if (!(it->second.isSquare())) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\" is not a square matrix");
+        return false;
+    }
+
+    decomp::BaseDecomposer decomper{it->second};
+    core::dmtx output{decomper.inv()};
+
+    if (output.isEmpty()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\" is singular matrix");
+        return false;
+    }
+
+    if (type == 2) { // :A ::_A
+        smr::semgr.adddmtx(laxb::cmdhr.getCmdtoken()[1].substr(2), output);
+    }
+
+    if (shouldOut) {
+        smr::semgr << '\n'
+                   << output;
+    }
+
+    return true;
+}
+
+/* ==== 矩阵分析与条件数 ==== */
+/* - det :A
+ * - det :A ::val */
+bool det() {
+    bool shouldOut{laxb::cmdhr.semicolonDel()};
+    std::size_t type{0};
+    if (laxb::cmdhr.isempty(laxb::cmdhr.getName())) {
+        return false;
+    }
+    if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID}) == true) {
+        type = 1;
+    }
+    else if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
+        type = 2;
+    }
+    else {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Argument(s) error");
+        return false;
+    }
+
+    std::string varnIn(laxb::cmdhr.getCmdtoken()[0].substr(1)); // :A
+    auto it{smr::semgr.finddmtx(varnIn)};
+    if (it == smr::semgr.getdmtxEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\"not found");
+        return false;
+    }
+    if (!(it->second.isSquare())) { // 非方阵时
+        smr::semgr.seterr(laxb::cmdhr.getName() + ": Matrix \"" + varnIn + "\" is not a square matrix");
+        return false;
+    }
+
+    decomp::BaseDecomposer decomper{it->second};
+    double output{decomper.det()};
+
+    if (type == 2) { // det :A ::val
+        smr::semgr.addreal(laxb::cmdhr.getCmdtoken()[1].substr(2), output);
+    }
+
+    if (shouldOut) {
+        smr::semgr << output;
+    }
+
+    return true;
+}

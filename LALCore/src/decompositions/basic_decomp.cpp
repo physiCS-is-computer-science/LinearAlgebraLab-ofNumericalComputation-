@@ -12,7 +12,7 @@
 
 namespace decomp {
 
-/* LU 分解 */
+/* LU 分解，顺序返回 L、U、P */
 std::vector<core::dmtx> BaseDecomposer::lu() {
     if (!origDmtx_.isSquare()) {
         throw std::invalid_argument("BaseDecomposer::lu(): origDmtx_ is not a square matrix");
@@ -73,6 +73,41 @@ core::dmtx BaseDecomposer::inv() {
     std::pair<core::dmtx, core::dmtx> E_A = util::factr.splitCol(AE, AE.getColSize() / 2); // 左为单位矩阵，右为逆
 
     return E_A.second;
+}
+
+/* 行列式
+ * - 非方阵抛出 invalid_argument() 错误 */
+double BaseDecomposer::det() {
+    if (!origDmtx_.isSquare()) {
+        throw std::invalid_argument("basic_decomp.cpp: BaseDecomposer::det(): origDmtx_ is not a square matrix");
+    }
+
+    std::vector<core::dmtx> LUP{this->lu()};
+
+    core::dvec mainDiag{LUP[1].getMainDiag()};
+    double detVal{1};
+    for (std::size_t i{0}; i < mainDiag.getSize(); ++i) { // 行列式值
+        detVal *= mainDiag(i);
+    }
+
+    std::vector<double> inversions; // 逆序数数组，用于判断行列式正负
+    for (std::size_t i{0}; i < LUP[2].getRowSize(); ++i) {
+        inversions.push_back(decomp::firstNonzero(LUP[2].getRow(i))); // P 第 i 行中 1 的列数
+    }
+
+    /* 逆序对数量是偶数：行列式正，奇数：行列式负 */
+    std::size_t inverPairCnt{0};
+    for (std::size_t slow{0}; slow < inversions.size() - 1; ++slow) {
+        for (std::size_t fast{slow + 1}; fast < inversions.size(); ++fast) {
+            if (inversions[slow] > inversions[fast]) {
+                ++inverPairCnt;
+            }
+        }
+    }
+
+    detVal = std::abs(detVal);
+
+    return (inverPairCnt % 2 == 0) ? detVal : -detVal;
 }
 
 // /* 找到行阶梯矩阵的所有主元坐标对
