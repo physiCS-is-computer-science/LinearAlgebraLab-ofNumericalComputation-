@@ -31,9 +31,6 @@ using laxb::Cmdt::SB;
 /* 关闭程序或变量空间
  * - quit -e/f */
 bool quit() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type = 0;
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{OPT}) == true) { // -opt
         type = 1;
@@ -62,10 +59,6 @@ bool quit() {
  * - show -a/l
  * - show :varn */
 bool show() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     /* sortToken() */
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) {
@@ -162,10 +155,6 @@ bool show() {
  * var ::varn {a}
  * var ::varn [a b; c b] */
 bool var() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID, laxb::Cmdt::CB}) == true) { // ::varn {a}
         type = 1;
@@ -218,9 +207,6 @@ bool var() {
  * - del :varn
  * - del -a */
 bool del() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type = 0;
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :varn
         type = 1;
@@ -270,9 +256,6 @@ bool del() {
 /* - save ::filename（重名文件则写入失败）
  * - save ::falename -f（强制写入） */
 bool save() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type = 0;
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID}) == true) { // save ::filename（重名文件则写入失败）
         type = 1;
@@ -313,9 +296,6 @@ bool save() {
  * - load :filename（载入变量至当前会话，不修改文件 filename，但修改当前文件会话）
  * - load :filename -c（改变会话文件绑定，每次操作都会修改文件 filename） */
 bool load() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type = 0;
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :filename
         type = 1;
@@ -380,9 +360,6 @@ bool cls() {
  * - help :cmdname
  * - help -l/a */
 bool help() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type = 0;
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :cmdname
         type = 1;
@@ -437,9 +414,6 @@ bool help() {
 /* - plus :varn :varn ::varn
  * - plus :varn :varn */
 bool plus() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :a :b ::c
         type = 1;
@@ -510,10 +484,6 @@ bool plus() {
  * - minus :varn :varn ::varn
  * - minus :varn :varn */
 bool minus() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
         type = 1;
@@ -584,10 +554,6 @@ bool minus() {
  * mtimes :varn :varn ::varn
  * mtimes :varn :varn */
 bool mtimes() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
@@ -651,10 +617,6 @@ bool mtimes() {
  * - times :varn :varn ::varn
  * - times :varn :varn */
 bool times() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
@@ -714,10 +676,6 @@ bool times() {
  * - divede :varn :varn ::varn
  * - divede :varn :varn */
 bool divide() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
@@ -785,10 +743,6 @@ bool divide() {
  * - power :varn :varn ::varn
  * - power :varn :varn */
 bool power() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
         type = 1;
@@ -849,10 +803,6 @@ bool power() {
 /* - eye {num}
  * - eye ::A {num} */
 bool eye() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
-
     /* 排序 args */
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB}) == true) { // eye {num}
@@ -913,9 +863,6 @@ bool eye() {
  * - lu :A -a（输出 L、U、P）
  * - lu :A ::L ::U ::P */
 bool lu() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :A
         type = 1;
@@ -980,9 +927,6 @@ bool lu() {
  * - rref :A
  * - rref :A ::R */
 bool rref() {
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     std::size_t type{0};
     if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) {
         type = 1;
@@ -1023,9 +967,6 @@ bool rref() {
  * - inv :A ::_A */
 bool inv() {
     std::size_t type{0};
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID}) == true) {
         type = 1;
     }
@@ -1070,9 +1011,6 @@ bool inv() {
  * - det :A ::val */
 bool det() {
     std::size_t type{0};
-    if (laxb::cmdhr.isempty(laxb::cmdhr.getname())) {
-        return false;
-    }
     if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID}) == true) {
         type = 1;
     }

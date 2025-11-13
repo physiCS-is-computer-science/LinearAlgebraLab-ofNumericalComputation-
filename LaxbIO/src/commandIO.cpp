@@ -4,6 +4,7 @@
 
 #include "commandIO.hpp"
 #include "function_manager.hpp"
+#include "session_manager.hpp"
 #include "utils/output.hpp"
 #include <algorithm>
 #include <iostream>
