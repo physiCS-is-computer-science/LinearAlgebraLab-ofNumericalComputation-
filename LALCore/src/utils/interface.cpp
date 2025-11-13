@@ -27,16 +27,15 @@ using laxb::Cmdt::OPT;
 using laxb::Cmdt::OUTID;
 using laxb::Cmdt::SB;
 
+using lc = laxb::CmdHandler;
+
 /* ==== 基本命令 ==== */
 /* 关闭程序或变量空间
  * - quit -e/f */
 bool quit() {
-    std::size_t type = 0;
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{OPT}) == true) { // -opt
-        type = 1;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{OPT}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -59,21 +58,14 @@ bool quit() {
  * - show -a/l
  * - show :varn */
 bool show() {
-    /* sortToken() */
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) {
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) {
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{OPT}, {INID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
     std::size_t cnt{1}; // 计数器
-    if (type == 1) {
+    if (lc::type_g == 1) {
         if (smr::semgr.dmSpace_.empty() && smr::semgr.realSpace_.empty()) {
             smr::semgr << "NaN";
             return true;
@@ -128,7 +120,7 @@ bool show() {
             return false;
         }
     }
-    else if (type == 2) { // 查看特定变量
+    else if (lc::type_g == 2) { // 查看特定变量
         std::string name(laxb::cmdhr.getcmdtk()[0].substr(1));
         auto itdmtx = smr::semgr.dmSpace_.find(name);
         auto itreal = smr::semgr.realSpace_.find(name);
@@ -138,12 +130,10 @@ bool show() {
         }
         else {
             if (itdmtx != smr::semgr.dmSpace_.end()) {
-                smr::semgr << "\n"
-                           << itdmtx->second;
+                smr::semgr << itdmtx->second;
             }
             if (itreal != smr::semgr.realSpace_.end()) {
-                smr::semgr << "\n"
-                           << itreal->second << "\n";
+                smr::semgr << itreal->second;
             }
         }
     }
@@ -155,15 +145,9 @@ bool show() {
  * var ::varn {a}
  * var ::varn [a b; c b] */
 bool var() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID, laxb::Cmdt::CB}) == true) { // ::varn {a}
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID, laxb::Cmdt::SB}) == true) { // ::varn [a b; c b]
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{OUTID, CB}, {OUTID, SB}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -177,7 +161,7 @@ bool var() {
         return false;
     }
 
-    if (type == 1) { // ::varn {a}
+    if (lc::type_g == 1) { // ::varn {a}
         std::vector<double> temp = laxb::cmdhr.curlyToken(laxb::cmdhr.getcmdtk()[1]); // {a}
         if (temp.size() != 1) { // 参数太多了
             smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[1] + "\"");
@@ -187,7 +171,7 @@ bool var() {
         smr::semgr.addreal(varn, temp[0]); // 上方检查过，矩阵与实数都没有同名变量，因而可以直接添加
         laxb::cmdhr.outDetermine(temp[0]);
     }
-    else if (type == 2) { // ::varn [a b; c d]
+    else if (lc::type_g == 2) { // ::varn [a b; c d]
         core::dmtx mtx(laxb::cmdhr.squareToken(laxb::cmdhr.getcmdtk()[1])); // 矩阵输入错误返回的是空矩阵
         if (mtx.isEmpty()) {
             smr::semgr.seterr(laxb::cmdhr.getname() + ": Error in matrix \"" + laxb::cmdhr.getcmdtk()[1] + "\"");
@@ -207,19 +191,13 @@ bool var() {
  * - del :varn
  * - del -a */
 bool del() {
-    std::size_t type = 0;
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :varn
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) { // -opt
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID}, {OPT}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
-    if (type == 1) {
+    if (lc::type_g == 1) {
         std::string varn(laxb::cmdhr.getcmdtk()[0].substr(1)); // :varn
 
         /* 查找变量是否存在 */
@@ -240,7 +218,7 @@ bool del() {
             smr::semgr.realSpace_.erase(realIt);
         }
     }
-    else if (type == 2) {
+    else if (lc::type_g == 2) {
         if (laxb::cmdhr.getcmdtk()[0] == "-a") {
             smr::semgr.clearSpace();
         }
@@ -256,20 +234,14 @@ bool del() {
 /* - save ::filename（重名文件则写入失败）
  * - save ::falename -f（强制写入） */
 bool save() {
-    std::size_t type = 0;
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID}) == true) { // save ::filename（重名文件则写入失败）
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OUTID, laxb::Cmdt::OPT}) == true) { // ::filename -f（强制写入）
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{OUTID}, {OUTID, OPT}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
     std::string filename = laxb::cmdhr.getcmdtk()[0].substr(2); // ::filename
-    if (type == 1) { // ::filename
+    if (lc::type_g == 1) { // ::filename
         std::string fullPath = smr::semgr.filePath(filename); // 获取文件路径
         std::ifstream tmpFin(fullPath); // 打开文件测试文件是否存在
         if (!tmpFin.fail()) { // 读取成功，即有重名文件时
@@ -279,7 +251,7 @@ bool save() {
 
         smr::semgr.wfile(filename); // 无重名文件时
     }
-    else if (type == 2 && laxb::cmdhr.getcmdtk()[1] == "-f") {
+    else if (lc::type_g == 2 && laxb::cmdhr.getcmdtk()[1] == "-f") {
         smr::semgr.wfile(filename);
     }
     else {
@@ -296,15 +268,9 @@ bool save() {
  * - load :filename（载入变量至当前会话，不修改文件 filename，但修改当前文件会话）
  * - load :filename -c（改变会话文件绑定，每次操作都会修改文件 filename） */
 bool load() {
-    std::size_t type = 0;
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :filename
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OPT}) == true) { // :filename -m
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID}, {INID, OPT}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -314,7 +280,7 @@ bool load() {
     auto dmSpaceCp = smr::semgr.dmSpace_;
     auto realSpaceCp = smr::semgr.realSpace_;
 
-    if (type == 1) { // :filename
+    if (lc::type_g == 1) { // :filename
         if (smr::semgr.rfile(filename) != true) { // 失败时，回档
             smr::semgr.dmSpace_ = dmSpaceCp;
             smr::semgr.realSpace_ = realSpaceCp;
@@ -322,7 +288,7 @@ bool load() {
             return false;
         }
     }
-    else if (type == 2 && laxb::cmdhr.getcmdtk()[1] == "-c") { // :filename -m
+    else if (lc::type_g == 2 && laxb::cmdhr.getcmdtk()[1] == "-c") { // :filename -m
         /* 清除当前会话 a 在内存的变量空间（没回到主函数所以不会同步更改），否则同步时会把当前会话 a 的变量同步到新文件会话 b */
         smr::semgr.clearSpace();
 
@@ -360,19 +326,13 @@ bool cls() {
  * - help :cmdname
  * - help -l/a */
 bool help() {
-    std::size_t type = 0;
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :cmdname
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::OPT}) == true) { // -l/a
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID}, {OPT}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
-    if (type == 1) { // :cmdname
+    if (lc::type_g == 1) { // :cmdname
         auto it = laxb::manual.find(laxb::cmdhr.getcmdtk()[0].substr(1));
         if (it == laxb::manual.end()) {
             smr::semgr.seterr(laxb::cmdhr.getname() + ": Command \"" + laxb::cmdhr.getcmdtk()[0].substr(1) + "\" not exist");
@@ -382,13 +342,13 @@ bool help() {
                    << it->first << '\t' << it->second.first << "\n---\n"
                    << it->second.second << '\n';
     }
-    else if (type == 2 && laxb::cmdhr.getcmdtk()[0] == "-a") { // -a
+    else if (lc::type_g == 2 && laxb::cmdhr.getcmdtk()[0] == "-a") { // -a
         smr::semgr << "\n\n";
         for (const auto& i : laxb::manual) {
             smr::semgr << i.first << '\t' << i.second.first << '\n';
         }
     }
-    else if (type == 2 && laxb::cmdhr.getcmdtk()[0] == "-l") { // -l
+    else if (lc::type_g == 2 && laxb::cmdhr.getcmdtk()[0] == "-l") { // -l
         smr::semgr << "\n\n";
         std::size_t cnt = 0;
         for (const auto& i : laxb::manual) { // 五个一行
@@ -414,15 +374,9 @@ bool help() {
 /* - plus :varn :varn ::varn
  * - plus :varn :varn */
 bool plus() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :a :b ::c
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :a :b
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -459,7 +413,7 @@ bool plus() {
 
         core::dmtx output = dmtxIts[0]->second + dmtxIts[1]->second; // 再执行一次
 
-        if (type == 1) { // plus :varn :varn ::varn
+        if (lc::type_g == 1) { // plus :varn :varn ::varn
             smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[2].substr(2), output); // ::varn
         }
         laxb::cmdhr.outDetermine(output);
@@ -467,7 +421,7 @@ bool plus() {
     else if (realIts[0] != smr::semgr.getrealEnd() && realIts[1] != smr::semgr.getrealEnd()) {
         double output = realIts[0]->second + realIts[1]->second;
 
-        if (type == 1) { // plus :varn :varn ::varn
+        if (lc::type_g == 1) { // plus :varn :varn ::varn
             smr::semgr.addreal(laxb::cmdhr.getcmdtk()[2].substr(2), output); // ::varn
         }
         laxb::cmdhr.outDetermine(output);
@@ -484,15 +438,9 @@ bool plus() {
  * - minus :varn :varn ::varn
  * - minus :varn :varn */
 bool minus() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) {
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -529,7 +477,7 @@ bool minus() {
 
         core::dmtx output = dmtxIts[0]->second - dmtxIts[1]->second; // 再执行一次
 
-        if (type == 1) { // plus :varn :varn ::varn
+        if (lc::type_g == 1) { // plus :varn :varn ::varn
             smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[2].substr(2), output); // ::varn
         }
         laxb::cmdhr.outDetermine(output);
@@ -537,7 +485,7 @@ bool minus() {
     else if (realIts[0] != smr::semgr.getrealEnd() && realIts[1] != smr::semgr.getrealEnd()) {
         double output = realIts[0]->second - realIts[1]->second;
 
-        if (type == 1) { // plus :varn :varn ::varn
+        if (lc::type_g == 1) { // plus :varn :varn ::varn
             smr::semgr.addreal(laxb::cmdhr.getcmdtk()[2].substr(2), output); // ::varn
         }
         laxb::cmdhr.outDetermine(output);
@@ -554,15 +502,9 @@ bool minus() {
  * mtimes :varn :varn ::varn
  * mtimes :varn :varn */
 bool mtimes() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -605,7 +547,7 @@ bool mtimes() {
         output = realIts[0]->second * dmtxIts[1]->second;
     }
 
-    if (type == 1) { // mtimes :varn :varn ::varn
+    if (lc::type_g == 1) { // mtimes :varn :varn ::varn
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[2].substr(2), output); // ::varn
     }
     laxb::cmdhr.outDetermine(output);
@@ -617,15 +559,9 @@ bool mtimes() {
  * - times :varn :varn ::varn
  * - times :varn :varn */
 bool times() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -664,7 +600,7 @@ bool times() {
 
     /* 计算 */
     core::dmtx output = core::times(dmtxIts[0]->second, dmtxIts[1]->second);
-    if (type == 1) {
+    if (lc::type_g == 1) {
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[2].substr(2), output); // :varn :varn ::varn
     }
     laxb::cmdhr.outDetermine(output);
@@ -676,15 +612,9 @@ bool times() {
  * - divede :varn :varn ::varn
  * - divede :varn :varn */
 bool divide() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -731,7 +661,7 @@ bool divide() {
 
     core::dmtx output = core::divide(dmtxIts[0]->second, dmtxIts[1]->second);
 
-    if (type == 1) {
+    if (lc::type_g == 1) {
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[2].substr(2), output); // :varn :varn ::varn
     }
     laxb::cmdhr.outDetermine(output);
@@ -743,15 +673,9 @@ bool divide() {
  * - power :varn :varn ::varn
  * - power :varn :varn */
 bool power() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) { // :A :B ::C
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::INID}) == true) { // :A :B
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -790,7 +714,7 @@ bool power() {
 
     /* 计算 */
     core::dmtx output = core::power(dmtxIts[0]->second, dmtxIts[1]->second);
-    if (type == 1) {
+    if (lc::type_g == 1) {
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[2].substr(2), output); // :varn :varn ::varn
     }
 
@@ -803,16 +727,9 @@ bool power() {
 /* - eye {num}
  * - eye ::A {num} */
 bool eye() {
-    /* 排序 args */
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB}) == true) { // eye {num}
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::CB, laxb::Cmdt::OUTID}) == true) { // eye ::A {num}
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{CB}, {CB, OUTID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -833,7 +750,7 @@ bool eye() {
         output(i, i) = 1;
     }
 
-    if (type == 2) {
+    if (lc::type_g == 2) {
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[1].substr(2), output); // ::A
     }
 
@@ -863,21 +780,9 @@ bool eye() {
  * - lu :A -a（输出 L、U、P）
  * - lu :A ::L ::U ::P */
 bool lu() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) { // :A
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OUTID, laxb::Cmdt::OUTID}) == true) { // :A ::L ::U
-        type = 2;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OPT}) == true) { // -a :A
-        type = 3;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OUTID, laxb::Cmdt::OUTID, laxb::Cmdt::OUTID}) == true) { // :A ::L ::U ::P
-        type = 4;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID}, {INID, OUTID, OUTID}, {INID, OPT}, {INID, OUTID, OUTID, OUTID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -895,7 +800,7 @@ bool lu() {
     decomp::BaseDecomposer decomper(it->second); // 初始化分解器
     std::vector<core::dmtx> LUP = decomper.lu(); // 分解
 
-    if (type == 3) {
+    if (lc::type_g == 3) {
         if (laxb::cmdhr.getcmdtk()[1] == "-a") { // "-a"
             true; // 待拓展
         }
@@ -905,17 +810,17 @@ bool lu() {
         }
     }
 
-    if (type == 2 || type == 4) {
+    if (lc::type_g == 2 || lc::type_g == 4) {
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[1].substr(2), LUP[0]); // L
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[2].substr(2), LUP[1]); // U
-        if (type == 4) {
+        if (lc::type_g == 4) {
             smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[3].substr(2), LUP[2]); // P
         }
     }
 
     if (laxb::cmdhr.getoutbit() == true) {
         smr::semgr << LUP[0] << LUP[1]; // L U
-        if (type == 3 || type == 4) {
+        if (lc::type_g == 3 || lc::type_g == 4) {
             smr::semgr << LUP[2]; // P
         }
     }
@@ -927,15 +832,9 @@ bool lu() {
  * - rref :A
  * - rref :A ::R */
 bool rref() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID}) == true) {
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(std::vector<laxb::Cmdt>{laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID}, {INID, OUTID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -953,7 +852,7 @@ bool rref() {
         smr::semgr.seterr(laxb::cmdhr.getname() + ": Simplification row simplest failure");
     }
 
-    if (type == 2) { // 写入矩阵变量空间
+    if (lc::type_g == 2) { // 写入矩阵变量空间
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[1].substr(2), output); // :A ::R
     }
 
@@ -966,15 +865,9 @@ bool rref() {
 /* - inv :A
  * - inv :A ::_A */
 bool inv() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID}) == true) {
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID}, {INID, OUTID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -997,7 +890,7 @@ bool inv() {
         return false;
     }
 
-    if (type == 2) { // :A ::_A
+    if (lc::type_g == 2) { // :A ::_A
         smr::semgr.adddmtx(laxb::cmdhr.getcmdtk()[1].substr(2), output);
     }
 
@@ -1010,15 +903,9 @@ bool inv() {
 /* - det :A
  * - det :A ::val */
 bool det() {
-    std::size_t type{0};
-    if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID}) == true) {
-        type = 1;
-    }
-    else if (laxb::cmdhr.sortToken(laxb::tv{laxb::Cmdt::INID, laxb::Cmdt::OUTID}) == true) {
-        type = 2;
-    }
-    else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    laxb::tvv argset{{INID}, {INID, OUTID}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
         return false;
     }
 
@@ -1036,7 +923,7 @@ bool det() {
     decomp::BaseDecomposer decomper{it->second};
     double output{decomper.det()};
 
-    if (type == 2) { // det :A ::val
+    if (lc::type_g == 2) { // det :A ::val
         smr::semgr.addreal(laxb::cmdhr.getcmdtk()[1].substr(2), output);
     }
 

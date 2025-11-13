@@ -76,7 +76,7 @@ int main() {
 
             /* 尝试调用 LALCore */
             bool state;
-            std::unordered_set<std::string> nonArgSet{"cls"}; // 无参数命令名集
+            std::unordered_set<std::string> nonArgSet{"cls"}; // 无参数命令名集（无参集）
             laxb::cmdhr.setname(laxb::cmdhr.getcmdtk()[0]);
             laxb::cmdhr.getcmdtk().erase(laxb::cmdhr.getcmdtk().begin()); // 删掉命令名
             laxb::cmdhr.semicolonDel(); // 处理末尾分号，置位 outbit_，过后由 outDetermine() 判断是否输出

@@ -14,6 +14,7 @@
 namespace laxb {
 
 CmdHandler cmdhr;
+std::size_t laxb::CmdHandler::type_g{0};
 
 /* 唯一命令输入函数，内部调用 getline()
  * - 仅简单检查命令语法正确与否，命令是否存在等
@@ -270,13 +271,13 @@ std::vector<std::string> splitBych(std::string& str, char sep) {
 }
 
 /* 按照 tplate 模板的顺序与数量检查、排序参数集，二者任意一个不一致则返回 false */
-bool CmdHandler::sortToken(std::vector<Cmdt> tplate) {
+bool CmdHandler::sortToken(const std::vector<Cmdt>& tplate) {
     if (tplate.size() != cmdToken_.size()) {
         return false;
     }
 
     std::vector<std::string> aim{}, temp(cmdToken_);
-    for (const auto i : tplate) {
+    for (const auto& i : tplate) {
         auto it = std::find_if(temp.cbegin(), temp.cend(), [i](std::string s) {if (argtype(s) == i) return true; return false; }); // 找到第一个满足当前类型 i 的迭代器
         if (it == temp.cend()) { // 没找到
             return false;
@@ -287,6 +288,17 @@ bool CmdHandler::sortToken(std::vector<Cmdt> tplate) {
     cmdToken_ = aim;
 
     return true;
+}
+
+/* 接受变量形式列表，按照传递顺序返回类型数，匹配失败返回 0 */
+std::size_t CmdHandler::argHandler(const std::vector<std::vector<laxb::Cmdt>>& arglsts) {
+    for (std::size_t i{0}; i < arglsts.size(); ++i) {
+        if (laxb::cmdhr.sortToken(arglsts[i]) == true) {
+            return i + 1;
+        }
+    }
+    smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error");
+    return 0;
 }
 
 /* 解析花括号里的数值，存储进 vector 中
@@ -450,26 +462,5 @@ void CmdHandler::semicolonDel() {
 
     outbit_ = true; // 无分号时
 }
-
-// /* ==== 一组重载函数，根据 outbit_ 判断是否写入参数至 semgr ==== */
-// void CmdHandler::outDetermine(double output) {
-
-// }
-
-// void CmdHandler::outDetermine(std::string output) {
-
-// }
-
-// void CmdHandler::outDetermine(char output) {
-
-// }
-
-// void CmdHandler::outDetermine(core::dmtx output) {
-
-// }
-
-// void CmdHandler::outDetermine(core::dvec output) {
-
-// }
 
 } // namespace laxb
