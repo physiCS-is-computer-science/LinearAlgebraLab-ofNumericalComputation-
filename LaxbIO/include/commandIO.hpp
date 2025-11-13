@@ -5,6 +5,7 @@
 // ======================================================
 
 #include "core/matrix.hpp"
+#include "session_manager.hpp"
 #include <string>
 #include <vector>
 
@@ -38,21 +39,38 @@ public:
     // }
 
     /* 一组设置读取成员的函数 */
-    std::vector<std::string>& getCmdtoken() { return cmdToken_; } // 获取命令字符串
-    std::string& getName() { return name_; } // 命令名
-    void setCmdtoken(std::vector<std::string> cmdToken) { cmdToken_ = cmdToken; } // 设置命令字符串的值
-    void setName(std::string name) { name_ = name; } // 命令名
+    std::vector<std::string>& getcmdtk() { return cmdToken_; } // 获取命令字符串
+    std::string& getname() { return name_; } // 命令名
+    bool getoutbit() { return outbit_; }
+    void setcmdtk(std::vector<std::string> cmdToken) { cmdToken_ = cmdToken; } // 设置命令字符串的值
+    void setname(std::string name) { name_ = name; } // 命令名
 
     bool sortToken(std::vector<Cmdt> tplate); // 根据 tplate 的模板排序出相同顺序、数量的 cmdToken_
     std::vector<double> curlyToken(std::string token); // 分离出花括号字符串 arg 中的数字
     core::dmtx squareToken(std::string token); // 分离出方括号字符串 arg 中存储的矩阵
 
     bool isempty(std::string outStr); // 检查 args 是否为空
-    bool semicolonDel(); // 处理末尾分号，返回是否输出标识
+    void semicolonDel(); // 处理末尾分号，置位 outbit_
+
+    // /* ==== 一组重载函数，根据 outbit_ 判断是否写入参数至 semgr ==== */
+    // void outDetermine(double output);
+    // void outDetermine(std::string output);
+    // void outDetermine(char output);
+    // void outDetermine(core::dmtx output);
+    // void outDetermine(core::dvec output);
+
+    /* 根据 outbit_ 判断是否向 semgr 写入输出并执行 */
+    template <typename T>
+    void outDetermine(const T& output) {
+        if (outbit_ == true) {
+            smr::semgr << output;
+        }
+    }
 
 private:
     std::string name_; // 命令名
     std::vector<std::string> cmdToken_; // 命令字符串，过后会删掉命令名，仅剩参数
+    bool outbit_;
 };
 extern CmdHandler cmdhr; // 不可复制，仅作为命名解析器使用
 

@@ -92,7 +92,7 @@ bool CmdHandler::in() {
         return false;
     }
 
-    laxb::cmdhr.setCmdtoken(tokens);
+    laxb::cmdhr.setcmdtk(tokens);
     return true;
 }
 
@@ -432,20 +432,43 @@ bool CmdHandler::isempty(std::string outStr) {
 }
 
 /* 有分号删除并返回 false，无分号返回 true */
-bool CmdHandler::semicolonDel() {
+void CmdHandler::semicolonDel() {
     if (cmdToken_.empty()) { // 空参数一定没分号
-        return true;
+        outbit_ = true;
+        return;
     }
 
     auto it = cmdToken_.end() - 1;
     if (*it == ";") {
-        it = cmdToken_.erase(it); // 删掉末尾分号
+        it = cmdToken_.erase(it); // 删掉末尾分号，刷新 it 为 .end()
     }
     if (it == cmdToken_.end()) { // 存在分号并且被删除时
-        return false;
+        outbit_ = false;
+        return;
     }
 
-    return true; // 无分号时
+    outbit_ = true; // 无分号时
 }
+
+// /* ==== 一组重载函数，根据 outbit_ 判断是否写入参数至 semgr ==== */
+// void CmdHandler::outDetermine(double output) {
+
+// }
+
+// void CmdHandler::outDetermine(std::string output) {
+
+// }
+
+// void CmdHandler::outDetermine(char output) {
+
+// }
+
+// void CmdHandler::outDetermine(core::dmtx output) {
+
+// }
+
+// void CmdHandler::outDetermine(core::dvec output) {
+
+// }
 
 } // namespace laxb

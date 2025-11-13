@@ -344,7 +344,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
         return os;
     }
 
-    os << '\n';
+    os << "\n\n";
     for (typename Matrix<T>::mtxSizet row = 0; row < matrix.getRowSize(); ++row) {
         Vector<T> temp(matrix.getRow(row)); // 临时行
         for (typename Vector<T>::vecSizet i = 0; i < temp.getSize(); ++i) { // 逐个输出临时行的元素

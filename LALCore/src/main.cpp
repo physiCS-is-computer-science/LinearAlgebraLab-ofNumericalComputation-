@@ -81,9 +81,10 @@ int main() {
             //           << "==== TEST ====\n";
 
             /* 尝试调用 LALCore */
-            laxb::cmdhr.setName(laxb::cmdhr.getCmdtoken()[0]);
-            laxb::cmdhr.getCmdtoken().erase(laxb::cmdhr.getCmdtoken().begin()); // 删掉命令名
-            bool state = laxb::fnmgr.call(laxb::cmdhr.getName())(); // call
+            laxb::cmdhr.setname(laxb::cmdhr.getcmdtk()[0]);
+            laxb::cmdhr.getcmdtk().erase(laxb::cmdhr.getcmdtk().begin()); // 删掉命令名
+            laxb::cmdhr.semicolonDel(); // 处理末尾分号，置位 outbit_，过后由 outDetermine() 判断是否输出
+            bool state = laxb::fnmgr.call(laxb::cmdhr.getname())(); // call
 
             /* 函数执行成功，并且为非临时会话状态时，刷新文件 */
             if (state == true && smr::semgr.getpath() != "#") {
