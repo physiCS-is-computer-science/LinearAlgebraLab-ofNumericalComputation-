@@ -37,7 +37,9 @@ public:
     std::vector<std::string>& getcmdtk() { return cmdToken_; } // 获取命令字符串
     std::string& getname() { return name_; } // 命令名
     bool getoutbit() { return outbit_; }
-    void setcmdtk(std::vector<std::string> cmdToken) { cmdToken_ = cmdToken; } // 设置命令字符串的值
+    void setcmdtk(std::vector<std::string> cmdToken) { // 设置命令字符串的值
+        cmdToken_ = cmdToken;
+    }
     void setname(std::string name) { name_ = name; } // 命令名
 
     bool sortToken(const std::vector<Cmdt>& tplate); // 根据 tplate 的模板排序出相同顺序、数量的 cmdToken_

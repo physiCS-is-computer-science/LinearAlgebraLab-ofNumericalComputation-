@@ -67,15 +67,23 @@ public:
     SessionMgr& operator<<(core::dvec vec); // 实数向量
 
     /* ==== 操作函数 ==== */
-    typename std::map<std::string, core::dmtx>::iterator finddmtx(const std::string& varn) { return dmSpace_.find(varn); }; // 如果没有该函数返回空 map
+    typename std::map<std::string, core::dmtx>::iterator finddmtx(const std::string& varn) { // 如果没有该函数返回空 map
+        return dmSpace_.find(varn);
+    };
     // typename std::map<std::string, core::dmtx>::iterator findcmtx(std::string varn) { return cmSpace_.find(varn); }; // 复数版本，同上
-    std::map<std::string, double>::iterator findreal(const std::string& varn) { return realSpace_.find(varn); };
+    std::map<std::string, double>::iterator findreal(const std::string& varn) {
+        return realSpace_.find(varn);
+    };
     void adddmtx(std::string varn, core::dmtx mtx);
     // void addcmtx(std::string varn, core::cmtx mtx); // 复数版本
     void addreal(std::string varn, double val);
-    std::map<std::string, core::dmtx>::const_iterator getdmtxEnd() { return dmSpace_.end(); } // 变量空间尾后迭代器
+    std::map<std::string, core::dmtx>::const_iterator getdmtxEnd() { // 变量空间尾后迭代器
+        return dmSpace_.end();
+    }
     // std::map<std::string, core::cmtx>::const_iterator getcmtxEnd() { return cmSpace_.end(); } // 复数版本
-    std::map<std::string, double>::const_iterator getrealEnd() { return realSpace_.end(); }
+    std::map<std::string, double>::const_iterator getrealEnd() {
+        return realSpace_.end();
+    }
     void deldmtx(decltype(dmSpace_.end()) dmtxIt) { dmSpace_.erase(dmtxIt); } // 删除该变量
     // void delcmtx(decltype())
     void delreal(decltype(realSpace_.end()) realIt) { realSpace_.erase(realIt); }

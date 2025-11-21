@@ -144,7 +144,7 @@ poly condeig balance polyeig ordeig
 2.condeig    % 特征值条件数
 3.balance    % 矩阵平衡（改善特征值计算）
 4.polyeig    % 多项式特征值问题
-5.ordeig     %拟三角矩阵特征值
+5.ordeig     % 拟三角矩阵特征值
 ```
 
 ### 矩阵分析与条件数
@@ -179,7 +179,7 @@ expm logm sqrtm funm expm1 log1p
 3.sqrtm      % 矩阵平方根
 4.funm       % 一般矩阵函数
 5.expm1      % exp(A)-I的精确计算
-6.log1p      %log(1+A)的精确计算
+6.log1p      % log(1+A)的精确计算
 ```
 
 ### 特殊矩阵
@@ -263,6 +263,5 @@ show var modify del save load cls help quit
 
 ```
 1.show
-- m 只输出矩阵（向量也存为矩阵）
 - l 变量名列表
 ```

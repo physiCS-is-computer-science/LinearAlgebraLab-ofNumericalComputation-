@@ -64,12 +64,14 @@ bool CmdHandler::in() {
                 ++endPos; // 不为最后一个字符则递增
 
                 if (cmdLine[endPos] != ' ') { // 递增之后，当前位置应该为空格（最后一个为括号例外）
-                    std::cout << util::ERS(smr::semgr.getpath()) + "CmdParser::in(): Missing spaces after brackests\n";
+                    std::cout << util::ERS(smr::semgr.getpath())
+                              << "CmdParser::in(): Missing spaces after brackests\n";
                     return false;
                 }
             }
             else if (endPos == std::string::npos) { // 未找到反括号时，处理找不到反括号的情况
-                std::cout << util::ERS(smr::semgr.getpath()) + "CmdParser::in(): Missing a backbrackets\n";
+                std::cout << util::ERS(smr::semgr.getpath())
+                          << "CmdParser::in(): Missing a backbrackets\n";
                 return false;
             }
         }
@@ -111,14 +113,16 @@ bool tksCheck(std::vector<std::string> tks) {
     std::vector<std::string> curlyBracketTks{}, squareBracketTks{}; // 括号内容单独存储
     for (auto& tk : tks) {
         if (tk.size() < 2) { // 所有命令的参数（包括命令）都至少有两位或以上（分号除外）
-            std::cout << util::ERS() + "CmdParser::in(): Argument(s) error\n";
+            std::cout << util::ERS()
+                      << "CmdParser::in(): Argument(s) error\n";
             return false;
         }
 
         /* 命令检查 */
         if (allow) {
             if (fnmgr.fnFind(tk) == false) {
-                std::cout << util::ERS() + "CmdParser::in(): Command '" + tk + "' not found\n";
+                std::cout << util::ERS()
+                          << "CmdParser::in(): Command '" + tk + "' not found\n";
                 return false;
             }
             allow = false;
@@ -129,7 +133,8 @@ bool tksCheck(std::vector<std::string> tks) {
         std::size_t inx{1}, len{std::string::npos}; // 子串写入位置
         if (tk[0] == '-') { // -p
             if (tk.size() != 2) {
-                std::cout << util::ERS() + "tksCheck(): Too many arguments in \"" + tk + "\"\n";
+                std::cout << util::ERS()
+                          << "tksCheck(): Too many arguments in \"" + tk + "\"\n";
                 return false;
             }
             inx = 1;
@@ -139,14 +144,16 @@ bool tksCheck(std::vector<std::string> tks) {
         }
         else if (tk[0] == ':' && tk[1] == ':') { // ::varn
             if (tk.size() < 3) {
-                std::cout << util::ERS() + "tksCheck(): Argument error after identifier \"::\"\n";
+                std::cout << util::ERS()
+                          << "tksCheck(): Argument error after identifier \"::\"\n";
                 return false;
             }
             inx = 2;
         }
         else if (tk[0] == '{') { // {a b ...}
             if (tk[tk.size() - 1] != '}') {
-                std::cout << util::ERS() + "tksCheck(): Missing a backbrackets '}'\n";
+                std::cout << util::ERS()
+                          << "tksCheck(): Missing a backbrackets '}'\n";
                 return false;
             }
             inx = 1;
@@ -156,7 +163,8 @@ bool tksCheck(std::vector<std::string> tks) {
         }
         else if (tk[0] == '[') { // [a b; c d; ...]
             if (tk[tk.size() - 1] != ']') {
-                std::cout << util::ERS() + "tksCheck(): Missing a backbrackets ']'\n";
+                std::cout << util::ERS()
+                          << "tksCheck(): Missing a backbrackets ']'\n";
                 return false;
             }
             inx = 1;
@@ -165,50 +173,60 @@ bool tksCheck(std::vector<std::string> tks) {
             continue; // 不存到普通 tokens
         }
         else {
-            std::cout << util::ERS() + "tksCheck(): Unknown argument(s)\n";
+            std::cout << util::ERS()
+                      << "tksCheck(): Unknown argument(s)\n";
             return false;
         }
         tksNoid.push_back(tk.substr(inx, len));
     }
 
-    const std::string legalCh{"-/1234567890abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
+    const std::string legalCh{"_-/1234567890"
+                              "abcdefghijklmnopqrstuvwxyz"
+                              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
     const std::string legalCurlyBraCh{"-/1234567890. "}; // 花括号合法字符
     const std::string legalSquareBraCh{"-/1234567890;. "}; // 方括号合法字符
     for (const auto& tkNoid : tksNoid) {
         if (tkNoid.find_first_not_of(legalCh) != std::string::npos) { // 找到非法字符时
-            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + tkNoid + "\"\n";
+            std::cout << util::ERS(smr::semgr.getpath())
+                      << "tksCheck(): Illegal argument(s) in \"" + tkNoid + "\"\n";
             return false;
         }
     }
     for (const auto& bTk : curlyBracketTks) { // 花括号内容检查
         if (bTk.empty()) {
-            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): \"{}\" is empty\n";
+            std::cout << util::ERS(smr::semgr.getpath())
+                      << "tksCheck(): \"{}\" is empty\n";
             return false;
         }
         if (bTk.find_first_not_of(legalCurlyBraCh) != std::string::npos) {
-            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + bTk + "\"\n";
+            std::cout << util::ERS(smr::semgr.getpath())
+                      << "tksCheck(): Illegal argument(s) in \"" + bTk + "\"\n";
             return false;
         }
 
         /* 到达此处说明所有字符均合法，若没有数字则括号参数有问题 */
         if (bTk.find_first_of("1234567890") == std::string::npos) {
-            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Number(s) not found in \"" + bTk + "\"\n";
+            std::cout << util::ERS(smr::semgr.getpath())
+                      << "tksCheck(): Number(s) not found in \"" + bTk + "\"\n";
             return false;
         }
     }
     for (const auto& bTk : squareBracketTks) { // 方括号内容检查
         if (bTk.empty()) {
-            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): \"[]\" is empty\n";
+            std::cout << util::ERS(smr::semgr.getpath())
+                      << "tksCheck(): \"[]\" is empty\n";
             return false;
         }
         if (bTk.find_first_not_of(legalSquareBraCh) != std::string::npos) {
-            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Illegal argument(s) in \"" + bTk + "\"\n";
+            std::cout << util::ERS(smr::semgr.getpath())
+                      << "tksCheck(): Illegal argument(s) in \"" + bTk + "\"\n";
             return false;
         }
 
         /* 到达此处说明所有字符均合法，若没有数字则括号参数有问题 */
         if (bTk.find_first_of("1234567890") == std::string::npos) {
-            std::cout << util::ERS(smr::semgr.getpath()) + "tksCheck(): Number(s) not found in \"" + bTk + "\"\n";
+            std::cout << util::ERS(smr::semgr.getpath())
+                      << "tksCheck(): Number(s) not found in \"" + bTk + "\"\n";
             return false;
         }
     }
@@ -278,7 +296,10 @@ bool CmdHandler::sortToken(const std::vector<Cmdt>& tplate) {
 
     std::vector<std::string> aim{}, temp(cmdToken_);
     for (const auto& i : tplate) {
-        auto it = std::find_if(temp.cbegin(), temp.cend(), [i](std::string s) {if (argtype(s) == i) return true; return false; }); // 找到第一个满足当前类型 i 的迭代器
+        auto it = std::find_if(temp.cbegin(), temp.cend(),
+                               [i](std::string s) { // 找到第一个满足当前类型 i 的迭代器
+                                   if (argtype(s) == i) return true; return false;
+                               });
         if (it == temp.cend()) { // 没找到
             return false;
         }
@@ -311,7 +332,9 @@ std::vector<double> CmdHandler::curlyToken(std::string token) {
     delCh(token, '}');
     delCh(token, ' '); // 去除首尾空格
 
-    if (token[0] == '/' || token[token.size() - 1] == '/' || token[token.size() - 1] == '/') { // "/a.." "..a/" "..a-"
+    if (token[0] == '/' ||
+        token[token.size() - 1] == '/' ||
+        token[token.size() - 1] == '/') { // "/a.." "..a/" "..a-"
         return {};
     }
 
@@ -399,10 +422,12 @@ core::dmtx CmdHandler::squareToken(std::string token) {
     delCh(token, ']');
 
     /* 清除开头末尾的 ' ' 和 ';' 混合干扰字符串 */
-    while (!token.empty() && (token[token.size() - 1] == ';' || token[token.size() - 1] == ' ')) { // 末尾的 ' ' 和 ';' 清除干净
+    while (!token.empty() &&
+           (token[token.size() - 1] == ';' || token[token.size() - 1] == ' ')) { // 末尾的 ' ' 和 ';' 清除干净
         token.pop_back();
     }
-    while (!token.empty() && (token[0] == ';' || token[0] == ' ')) { // 开头的 ' ' 和 ';' 清除干净
+    while (!token.empty() &&
+           (token[0] == ';' || token[0] == ' ')) { // 开头的 ' ' 和 ';' 清除干净
         token.erase(token.begin());
     }
 

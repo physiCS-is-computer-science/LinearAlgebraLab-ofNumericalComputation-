@@ -1,8 +1,6 @@
 // matrix_vector_output.hpp
 
 #include "utils/output.hpp"
-#include "core/matrix.hpp"
-#include "core/vector.hpp"
 #include <iostream>
 #include <string>
 

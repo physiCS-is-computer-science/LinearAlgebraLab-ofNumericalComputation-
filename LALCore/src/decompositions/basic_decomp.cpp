@@ -15,7 +15,8 @@ namespace decomp {
 /* LU 分解，顺序返回 L、U、P */
 std::vector<core::dmtx> BaseDecomposer::lu() {
     if (!origDmtx_.isSquare()) {
-        throw std::invalid_argument("BaseDecomposer::lu(): origDmtx_ is not a square matrix");
+        throw std::invalid_argument("BaseDecomposer::lu(): "
+                                    "origDmtx_ is not a square matrix");
     }
     return gaussianElimination();
 }
@@ -79,7 +80,8 @@ core::dmtx BaseDecomposer::inv() {
  * - 非方阵抛出 invalid_argument() 错误 */
 double BaseDecomposer::det() {
     if (!origDmtx_.isSquare()) {
-        throw std::invalid_argument("basic_decomp.cpp: BaseDecomposer::det(): origDmtx_ is not a square matrix");
+        throw std::invalid_argument("basic_decomp.cpp: BaseDecomposer::det(): "
+                                    "origDmtx_ is not a square matrix");
     }
 
     std::vector<core::dmtx> LUP{this->lu()};
@@ -155,7 +157,9 @@ core::dmtx exchangeRowToLadderMtx(core::dmtx& mtx) {
         firstNon0s[i] = firstNonzero(mtx.getRow(i));
     }
 
-    std::size_t minDim = mtx.getRowSize() < mtx.getColSize() ? mtx.getRowSize() : mtx.getColSize(); // 最小维度
+    std::size_t minDim = mtx.getRowSize() < mtx.getColSize()
+                             ? mtx.getRowSize()
+                             : mtx.getColSize(); // 最小维度
     core::dmtx P(util::factr.eye(minDim)); // 换行矩阵
 
     /* 插入排序，此处效率极其低下，因为只要遇到小于 slow 的则换行。如果找最大元素再换行会提升很多效率。我好累，以后再改这里，希望那时你看得到吧梦奇 */
@@ -196,7 +200,9 @@ std::size_t firstNonzero(const core::dvec& vec) {
 std::vector<core::dmtx> BaseDecomposer::gaussianElimination() {
     core::dmtx copy(origDmtx_); // 不改变原矩阵
 
-    const std::size_t minDim = copy.getRowSize() < copy.getColSize() ? copy.getRowSize() : copy.getColSize();
+    const std::size_t minDim = copy.getRowSize() < copy.getColSize()
+                                   ? copy.getRowSize()
+                                   : copy.getColSize();
     core::dmtx L(minDim), P(util::factr.eye(minDim)); // 最小维度
 
     /* LU 分解，每一行开始消元时，都先执行行变换，使得矩阵为行阶梯型，再进行消元算法 */

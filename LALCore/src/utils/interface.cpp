@@ -47,7 +47,8 @@ bool quit() {
         smr::semgr.clearSpace(); // 清除内存中所有变量
     }
     else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
         return false;
     }
 
@@ -58,7 +59,8 @@ bool quit() {
  * - show -a/l
  * - show :varn */
 bool show() {
-    laxb::tvv argset{{OPT}, {INID}};
+    laxb::tvv argset{{OPT},
+                     {INID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -116,7 +118,8 @@ bool show() {
             }
         }
         else {
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
             return false;
         }
     }
@@ -124,7 +127,8 @@ bool show() {
         std::string name(laxb::cmdhr.getcmdtk()[0].substr(1));
         auto itdmtx = smr::semgr.dmSpace_.find(name);
         auto itreal = smr::semgr.realSpace_.find(name);
-        if (itdmtx == smr::semgr.dmSpace_.end() && itreal == smr::semgr.realSpace_.end()) {
+        if (itdmtx == smr::semgr.dmSpace_.end() &&
+            itreal == smr::semgr.realSpace_.end()) {
             smr::semgr << "Variable \"" + name + "\" not exist";
             return true;
         }
@@ -145,7 +149,8 @@ bool show() {
  * var ::varn {a}
  * var ::varn [a b; c b] */
 bool var() {
-    laxb::tvv argset{{OUTID, CB}, {OUTID, SB}};
+    laxb::tvv argset{{OUTID, CB},
+                     {OUTID, SB}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -157,14 +162,16 @@ bool var() {
     auto dmtxIt = smr::semgr.finddmtx(varn);
     auto realIt = smr::semgr.findreal(varn);
     if (dmtxIt != smr::semgr.getdmtxEnd() || realIt != smr::semgr.getrealEnd()) { // 找到任何一个都不行
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varn + "\" exist");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varn + "\" exist");
         return false;
     }
 
     if (lc::type_g == 1) { // ::varn {a}
         std::vector<double> temp = laxb::cmdhr.curlyToken(laxb::cmdhr.getcmdtk()[1]); // {a}
         if (temp.size() != 1) { // 参数太多了
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[1] + "\"");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[1] + "\"");
             return false;
         }
 
@@ -174,7 +181,8 @@ bool var() {
     else if (lc::type_g == 2) { // ::varn [a b; c d]
         core::dmtx mtx(laxb::cmdhr.squareToken(laxb::cmdhr.getcmdtk()[1])); // 矩阵输入错误返回的是空矩阵
         if (mtx.isEmpty()) {
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Error in matrix \"" + laxb::cmdhr.getcmdtk()[1] + "\"");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Error in matrix \"" + laxb::cmdhr.getcmdtk()[1] + "\"");
             return false;
         }
 
@@ -191,7 +199,8 @@ bool var() {
  * - del :varn
  * - del -a */
 bool del() {
-    laxb::tvv argset{{INID}, {OPT}};
+    laxb::tvv argset{{INID},
+                     {OPT}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -204,7 +213,8 @@ bool del() {
         auto dmtxIt = smr::semgr.dmSpace_.find(varn);
         auto realIt = smr::semgr.realSpace_.find(varn);
         if (dmtxIt == smr::semgr.dmSpace_.end() && realIt == smr::semgr.realSpace_.end()) {
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varn + "\" not exist");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Variable \"" + varn + "\" not exist");
             return false;
         }
 
@@ -223,7 +233,8 @@ bool del() {
             smr::semgr.clearSpace();
         }
         else {
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
             return false;
         }
     }
@@ -234,7 +245,8 @@ bool del() {
 /* - save ::filename（重名文件则写入失败）
  * - save ::falename -f（强制写入） */
 bool save() {
-    laxb::tvv argset{{OUTID}, {OUTID, OPT}};
+    laxb::tvv argset{{OUTID},
+                     {OUTID, OPT}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -245,7 +257,9 @@ bool save() {
         std::string fullPath = smr::semgr.filePath(filename); // 获取文件路径
         std::ifstream tmpFin(fullPath); // 打开文件测试文件是否存在
         if (!tmpFin.fail()) { // 读取成功，即有重名文件时
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": File \"" + filename + "\" is exist, if you want to force write overwriting, add -f");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": File \"" + filename + "\" is exist, "
+                              "if you want to force write overwriting, add -f");
             return false;
         }
 
@@ -255,7 +269,8 @@ bool save() {
         smr::semgr.wfile(filename);
     }
     else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Save file \"" + filename + "\" failed");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Save file \"" + filename + "\" failed");
         return false;
     }
 
@@ -268,7 +283,8 @@ bool save() {
  * - load :filename（载入变量至当前会话，不修改文件 filename，但修改当前文件会话）
  * - load :filename -c（改变会话文件绑定，每次操作都会修改文件 filename） */
 bool load() {
-    laxb::tvv argset{{INID}, {INID, OPT}};
+    laxb::tvv argset{{INID},
+                     {INID, OPT}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -284,7 +300,8 @@ bool load() {
         if (smr::semgr.rfile(filename) != true) { // 失败时，回档
             smr::semgr.dmSpace_ = dmSpaceCp;
             smr::semgr.realSpace_ = realSpaceCp;
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Read file \"" + filename + "\" failed");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Read file \"" + filename + "\" failed");
             return false;
         }
     }
@@ -298,12 +315,14 @@ bool load() {
         else { // 失败时，不改变文件会话 a 的绑定，恢复变量空间（回档）
             smr::semgr.dmSpace_ = dmSpaceCp;
             smr::semgr.realSpace_ = realSpaceCp;
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Read file \"" + filename + "\" failed");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Read file \"" + filename + "\" failed");
             return false;
         }
     }
     else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Read file \"" + filename + "\" failed");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Read file \"" + filename + "\" failed");
         return false;
     }
 
@@ -326,7 +345,8 @@ bool cls() {
  * - help :cmdname
  * - help -l/a */
 bool help() {
-    laxb::tvv argset{{INID}, {OPT}};
+    laxb::tvv argset{{INID},
+                     {OPT}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -335,7 +355,9 @@ bool help() {
     if (lc::type_g == 1) { // :cmdname
         auto it = laxb::manual.find(laxb::cmdhr.getcmdtk()[0].substr(1));
         if (it == laxb::manual.end()) {
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Command \"" + laxb::cmdhr.getcmdtk()[0].substr(1) + "\" not exist");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Command \"" + laxb::cmdhr.getcmdtk()[0].substr(1) +
+                              "\" not exist");
             return false;
         }
         smr::semgr << "\n\n"
@@ -374,13 +396,15 @@ bool help() {
 /* - plus :varn :varn ::varn
  * - plus :varn :varn */
 bool plus() {
-    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    laxb::tvv argset{{INID, INID, OUTID},
+                     {INID, INID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
     }
 
-    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1)), varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
+    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1)); // :varn
+    std::string varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn
     std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
     std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
     std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
@@ -394,16 +418,19 @@ bool plus() {
 
     /* 变量存在性检查 */
     if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn1 + "\" is not exist");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn1 + "\" is not exist");
         return false;
     }
     if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn2 + "\" is not exist");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn2 + "\" is not exist");
         return false;
     }
 
     /* 类型一致性检查 */
-    if (dmtxIts[0] != smr::semgr.getdmtxEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd()) {
+    if (dmtxIts[0] != smr::semgr.getdmtxEnd() &&
+        dmtxIts[1] != smr::semgr.getdmtxEnd()) {
         try { // 防止矩阵维度不匹配
             dmtxIts[0]->second + dmtxIts[1]->second;
         } catch (std::invalid_argument& e) {
@@ -427,7 +454,9 @@ bool plus() {
         laxb::cmdhr.outDetermine(output);
     }
     else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variables \"" + varnIn1 + "\" and \"" + varnIn2 + "\" are of different types");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variables \"" + varnIn1 + "\" "
+                          "and \"" + varnIn2 + "\" are of different types");
         return false;
     }
 
@@ -438,13 +467,15 @@ bool plus() {
  * - minus :varn :varn ::varn
  * - minus :varn :varn */
 bool minus() {
-    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    laxb::tvv argset{{INID, INID, OUTID},
+                     {INID, INID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
     }
 
-    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1)), varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
+    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1));
+    std::string varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
     std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
     std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
     std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
@@ -458,16 +489,20 @@ bool minus() {
 
     /* 变量存在性检查 */
     if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn1 + "\" is not exist");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn1 + "\" is not exist");
         return false;
     }
-    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn2 + "\" is not exist");
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() &&
+        realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn2 + "\" is not exist");
         return false;
     }
 
     /* 类型一致性检查 */
-    if (dmtxIts[0] != smr::semgr.getdmtxEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd()) {
+    if (dmtxIts[0] != smr::semgr.getdmtxEnd() &&
+        dmtxIts[1] != smr::semgr.getdmtxEnd()) {
         try { // 防止矩阵维度不匹配
             dmtxIts[0]->second - dmtxIts[1]->second;
         } catch (std::invalid_argument& e) {
@@ -482,7 +517,8 @@ bool minus() {
         }
         laxb::cmdhr.outDetermine(output);
     }
-    else if (realIts[0] != smr::semgr.getrealEnd() && realIts[1] != smr::semgr.getrealEnd()) {
+    else if (realIts[0] != smr::semgr.getrealEnd() &&
+             realIts[1] != smr::semgr.getrealEnd()) {
         double output = realIts[0]->second - realIts[1]->second;
 
         if (lc::type_g == 1) { // plus :varn :varn ::varn
@@ -491,7 +527,9 @@ bool minus() {
         laxb::cmdhr.outDetermine(output);
     }
     else {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variables \"" + varnIn1 + "\" and \"" + varnIn2 + "\" are of different types");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variables \"" + varnIn1 + "\" "
+                          "and \"" + varnIn2 + "\" are of different types");
         return false;
     }
 
@@ -502,13 +540,15 @@ bool minus() {
  * mtimes :varn :varn ::varn
  * mtimes :varn :varn */
 bool mtimes() {
-    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    laxb::tvv argset{{INID, INID, OUTID},
+                     {INID, INID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
     }
 
-    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1)), varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
+    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1));
+    std::string varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
     std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
     std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
     std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
@@ -521,29 +561,38 @@ bool mtimes() {
     }
 
     /* 变量存在性检查 */
-    if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn1 + "\" is not exist");
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() &&
+        realIts[0] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn1 + "\" is not exist");
         return false;
     }
-    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn2 + "\" is not exist");
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() &&
+        realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn2 + "\" is not exist");
         return false;
     }
 
     core::dmtx output{};
 
     /* 计算 */
-    if (dmtxIts[0] != smr::semgr.getdmtxEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd()) { // matrix * matrix
+    if (dmtxIts[0] != smr::semgr.getdmtxEnd() &&
+        dmtxIts[1] != smr::semgr.getdmtxEnd()) { // matrix * matrix
         if (dmtxIts[0]->second.getColSize() != dmtxIts[1]->second.getRowSize()) {
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": Dimension dismatch between matrix \"" + varnIn1 + "\" and \"" + varnIn2 + "\"");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Dimension dismatch between matrix \"" + varnIn1 + "\" "
+                              "and \"" + varnIn2 + "\"");
             return false;
         }
         output = dmtxIts[0]->second * dmtxIts[1]->second;
     }
-    else if (dmtxIts[0] != smr::semgr.getdmtxEnd() && realIts[1] != smr::semgr.getrealEnd()) {
+    else if (dmtxIts[0] != smr::semgr.getdmtxEnd() &&
+             realIts[1] != smr::semgr.getrealEnd()) {
         output = dmtxIts[0]->second * realIts[1]->second;
     }
-    else if (realIts[0] != smr::semgr.getrealEnd() && dmtxIts[1] != smr::semgr.getdmtxEnd()) {
+    else if (realIts[0] != smr::semgr.getrealEnd() &&
+             dmtxIts[1] != smr::semgr.getdmtxEnd()) {
         output = realIts[0]->second * dmtxIts[1]->second;
     }
 
@@ -559,13 +608,15 @@ bool mtimes() {
  * - times :varn :varn ::varn
  * - times :varn :varn */
 bool times() {
-    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    laxb::tvv argset{{INID, INID, OUTID},
+                     {INID, INID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
     }
 
-    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1)), varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
+    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1));
+    std::string varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
     std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
     std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
     std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
@@ -578,23 +629,31 @@ bool times() {
     }
 
     /* 变量存在性检查 */
-    if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn1 + "\" is not exist");
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() &&
+        realIts[0] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn1 + "\" is not exist");
         return false;
     }
-    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn2 + "\" is not exist");
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() &&
+        realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn2 + "\" is not exist");
         return false;
     }
 
-    if (dmtxIts[0] == smr::semgr.getdmtxEnd() || dmtxIts[1] == smr::semgr.getdmtxEnd()) { // 必须为两个矩阵
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Need 2 matrix variable, but not");
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() ||
+        dmtxIts[1] == smr::semgr.getdmtxEnd()) { // 必须为两个矩阵
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Need 2 matrix variable, but not");
         return false;
     }
 
     /* 维度检查 */
     if (core::dimeq(dmtxIts[0]->second, dmtxIts[1]->second) == false) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Dimension mismatch between \"" + varnIn1 + "\" and \"" + varnIn2 + "\"");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Dimension mismatch between \"" + varnIn1 + "\" "
+                          "and \"" + varnIn2 + "\"");
         return false;
     }
 
@@ -612,13 +671,15 @@ bool times() {
  * - divede :varn :varn ::varn
  * - divede :varn :varn */
 bool divide() {
-    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    laxb::tvv argset{{INID, INID, OUTID},
+                     {INID, INID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
     }
 
-    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1)), varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
+    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1));
+    std::string varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
     std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
     std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
     std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
@@ -631,23 +692,31 @@ bool divide() {
     }
 
     /* 变量存在性检查 */
-    if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn1 + "\" is not exist");
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() &&
+        realIts[0] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn1 + "\" is not exist");
         return false;
     }
-    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn2 + "\" is not exist");
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() &&
+        realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn2 + "\" is not exist");
         return false;
     }
 
-    if (dmtxIts[0] == smr::semgr.getdmtxEnd() || dmtxIts[1] == smr::semgr.getdmtxEnd()) { // 必须为两个矩阵
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Need 2 matrix variable, but not");
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() ||
+        dmtxIts[1] == smr::semgr.getdmtxEnd()) { // 必须为两个矩阵
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Need 2 matrix variable, but not");
         return false;
     }
 
     /* 维度检查 */
     if (core::dimeq(dmtxIts[0]->second, dmtxIts[1]->second) == false) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Dimension mismatch between \"" + varnIn1 + "\" and \"" + varnIn2 + "\"");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Dimension mismatch between \"" + varnIn1 + "\" "
+                          "and \"" + varnIn2 + "\"");
         return false;
     }
 
@@ -673,13 +742,15 @@ bool divide() {
  * - power :varn :varn ::varn
  * - power :varn :varn */
 bool power() {
-    laxb::tvv argset{{INID, INID, OUTID}, {INID, INID}};
+    laxb::tvv argset{{INID, INID, OUTID},
+                     {INID, INID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
     }
 
-    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1)), varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
+    std::string varnIn1(laxb::cmdhr.getcmdtk()[0].substr(1));
+    std::string varnIn2(laxb::cmdhr.getcmdtk()[1].substr(1)); // :varn :varn
     std::vector<decltype(smr::semgr.getdmtxEnd())> dmtxIts{};
     std::vector<decltype(smr::semgr.getrealEnd())> realIts{};
     std::vector<std::string> varns{varnIn1, varnIn2}; // 这样子好算
@@ -692,23 +763,31 @@ bool power() {
     }
 
     /* 变量存在性检查 */
-    if (dmtxIts[0] == smr::semgr.getdmtxEnd() && realIts[0] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn1 + "\" is not exist");
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() &&
+        realIts[0] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn1 + "\" is not exist");
         return false;
     }
-    if (dmtxIts[1] == smr::semgr.getdmtxEnd() && realIts[1] == smr::semgr.getrealEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Variable \"" + varnIn2 + "\" is not exist");
+    if (dmtxIts[1] == smr::semgr.getdmtxEnd() &&
+        realIts[1] == smr::semgr.getrealEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Variable \"" + varnIn2 + "\" is not exist");
         return false;
     }
 
-    if (dmtxIts[0] == smr::semgr.getdmtxEnd() || dmtxIts[1] == smr::semgr.getdmtxEnd()) { // 必须为两个矩阵
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Need 2 matrix variable, but not");
+    if (dmtxIts[0] == smr::semgr.getdmtxEnd() ||
+        dmtxIts[1] == smr::semgr.getdmtxEnd()) { // 必须为两个矩阵
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Need 2 matrix variable, but not");
         return false;
     }
 
     /* 维度检查 */
     if (core::dimeq(dmtxIts[0]->second, dmtxIts[1]->second) == false) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Dimension mismatch between \"" + varnIn1 + "\" and \"" + varnIn2 + "\"");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Dimension mismatch between \"" + varnIn1 + "\" "
+                          "and \"" + varnIn2 + "\"");
         return false;
     }
 
@@ -727,7 +806,8 @@ bool power() {
 /* - eye {num}
  * - eye ::A {num} */
 bool eye() {
-    laxb::tvv argset{{CB}, {CB, OUTID}};
+    laxb::tvv argset{{CB},
+                     {CB, OUTID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -737,11 +817,13 @@ bool eye() {
     core::dmtx output{};
     std::vector<double> dimens = laxb::cmdhr.curlyToken(laxb::cmdhr.getcmdtk()[0]);
     if (dimens.size() != 1) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Argument(s) error in \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
         return false;
     }
     if (static_cast<int>(dimens[0]) == 0) { // 传递 (-1, 1) 的分数，导致此处判断为非 0，进而构造出空矩阵，在 << 处 .fail() 被置位，报错
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": 0 matrix is illegal: \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": 0 matrix is illegal: \"" + laxb::cmdhr.getcmdtk()[0] + "\"");
         return false;
     }
 
@@ -780,7 +862,10 @@ bool eye() {
  * - lu :A -a（输出 L、U、P）
  * - lu :A ::L ::U ::P */
 bool lu() {
-    laxb::tvv argset{{INID}, {INID, OUTID, OUTID}, {INID, OPT}, {INID, OUTID, OUTID, OUTID}};
+    laxb::tvv argset{{INID},
+                     {INID, OUTID, OUTID},
+                     {INID, OPT},
+                     {INID, OUTID, OUTID, OUTID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -789,11 +874,13 @@ bool lu() {
     std::string varnIn(laxb::cmdhr.getcmdtk()[0].substr(1)); // :A
     auto it = smr::semgr.finddmtx(varnIn);
     if (it == smr::semgr.getdmtxEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\"not found");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\"not found");
         return false;
     }
     if (!(it->second.isSquare())) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\"is not a square matrix");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\"is not a square matrix");
         return false;
     }
 
@@ -805,7 +892,9 @@ bool lu() {
             true; // 待拓展
         }
         else {
-            smr::semgr.seterr(laxb::cmdhr.getname() + ": There is no option \"" + laxb::cmdhr.getcmdtk()[1].substr(1) + "\"");
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": There is no option "
+                              "\"" + laxb::cmdhr.getcmdtk()[1].substr(1) + "\"");
             return false;
         }
     }
@@ -832,7 +921,8 @@ bool lu() {
  * - rref :A
  * - rref :A ::R */
 bool rref() {
-    laxb::tvv argset{{INID}, {INID, OUTID}};
+    laxb::tvv argset{{INID},
+                     {INID, OUTID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -841,7 +931,8 @@ bool rref() {
     std::string varnIn(laxb::cmdhr.getcmdtk()[0].substr(1)); // :A
     auto it{smr::semgr.finddmtx(varnIn)};
     if (it == smr::semgr.getdmtxEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\"not found");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\"not found");
         return false;
     }
 
@@ -849,7 +940,8 @@ bool rref() {
     core::dmtx output{decomper.rref()};
 
     if (output.isEmpty()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Simplification row simplest failure");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Simplification row simplest failure");
     }
 
     if (lc::type_g == 2) { // 写入矩阵变量空间
@@ -865,7 +957,8 @@ bool rref() {
 /* - inv :A
  * - inv :A ::_A */
 bool inv() {
-    laxb::tvv argset{{INID}, {INID, OUTID}};
+    laxb::tvv argset{{INID},
+                     {INID, OUTID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -874,11 +967,13 @@ bool inv() {
     std::string varnIn(laxb::cmdhr.getcmdtk()[0].substr(1)); // :A
     auto it{smr::semgr.finddmtx(varnIn)};
     if (it == smr::semgr.getdmtxEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\"not found");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\"not found");
         return false;
     }
     if (!(it->second.isSquare())) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\" is not a square matrix");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\" is not a square matrix");
         return false;
     }
 
@@ -886,7 +981,8 @@ bool inv() {
     core::dmtx output{decomper.inv()};
 
     if (output.isEmpty()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\" is singular matrix");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\" is singular matrix");
         return false;
     }
 
@@ -903,7 +999,8 @@ bool inv() {
 /* - det :A
  * - det :A ::val */
 bool det() {
-    laxb::tvv argset{{INID}, {INID, OUTID}};
+    laxb::tvv argset{{INID},
+                     {INID, OUTID}};
     lc::type_g = laxb::cmdhr.argHandler(argset);
     if (!lc::type_g) {
         return false;
@@ -912,11 +1009,13 @@ bool det() {
     std::string varnIn(laxb::cmdhr.getcmdtk()[0].substr(1)); // :A
     auto it{smr::semgr.finddmtx(varnIn)};
     if (it == smr::semgr.getdmtxEnd()) {
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\"not found");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\"not found");
         return false;
     }
     if (!(it->second.isSquare())) { // 非方阵时
-        smr::semgr.seterr(laxb::cmdhr.getname() + ": Matrix \"" + varnIn + "\" is not a square matrix");
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + varnIn + "\" is not a square matrix");
         return false;
     }
 

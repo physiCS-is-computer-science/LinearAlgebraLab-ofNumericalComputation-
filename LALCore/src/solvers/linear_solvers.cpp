@@ -6,3 +6,7 @@
 // gauss seidel solver
 // GMRES solver
 // jacobi solver
+
+class Solver {
+    
+};

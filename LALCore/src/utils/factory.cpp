@@ -76,12 +76,14 @@ core::dmtx Factory::catCol(const core::dmtx& mtx1, const core::dmtx& mtx2) {
 
 /* 从第 row 行分裂矩阵（包含第 row 行）
  * - 维度错误返回空 pair */
-std::pair<core::dmtx, core::dmtx> Factory::splitRow(const core::dmtx& mtx, std::size_t row) {
+std::pair<core::dmtx, core::dmtx> Factory::splitRow(const core::dmtx& mtx,
+                                                    std::size_t row) {
     if (mtx.getRowSize() <= 1 || row >= mtx.getRowSize() || row == 0) {
         return {};
     }
 
-    core::dmtx mtx1(row, mtx.getColSize()), mtx2(mtx.getRowSize() - row, mtx.getColSize());
+    core::dmtx mtx1(row, mtx.getColSize());
+    core::dmtx mtx2(mtx.getRowSize() - row, mtx.getColSize());
     std::size_t r{0};
     for (; r < row; ++r) {
         mtx1.replaceRow(r, mtx.getRow(r));
@@ -96,12 +98,14 @@ std::pair<core::dmtx, core::dmtx> Factory::splitRow(const core::dmtx& mtx, std::
 
 /* 从第 col 行分裂矩阵（包含第 col 列）
  * - 维度错误返回空 pair */
-std::pair<core::dmtx, core::dmtx> Factory::splitCol(const core::dmtx& mtx, std::size_t col) {
+std::pair<core::dmtx, core::dmtx> Factory::splitCol(const core::dmtx& mtx,
+                                                    std::size_t col) {
     if (mtx.getColSize() <= 1 || col >= mtx.getColSize() || col == 0) {
         return {};
     }
 
-    core::dmtx mtx1(mtx.getRowSize(), col), mtx2(mtx.getRowSize(), mtx.getColSize() - col);
+    core::dmtx mtx1(mtx.getRowSize(), col);
+    core::dmtx mtx2(mtx.getRowSize(), mtx.getColSize() - col);
     std::size_t c{0};
     for (; c < col; ++c) {
         mtx1.replaceCol(c, mtx.getCol(c));
