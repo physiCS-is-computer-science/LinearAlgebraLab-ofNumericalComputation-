@@ -89,13 +89,11 @@ public:
 
     /* ==== 构造函数们 ==== */
     Matrix(mtxSizet row, mtxSizet col)
-        : row_(row),
-          col_(col) { // r 行 c 列的矩阵，默认初始化为 0
+        : row_(row), col_(col) { // r 行 c 列的矩阵，默认初始化为 0
         initMtx(row, col);
     }
     Matrix(mtxSizet dimension)
-        : row_(dimension),
-          col_(dimension) { // dimension 维的方阵，初始化为 0
+        : row_(dimension), col_(dimension) { // dimension 维的方阵，初始化为 0
         initMtx(dimension, dimension);
     }
     Matrix(std::initializer_list<std::initializer_list<T>> il); // 初始化列表初始化，{{1, 2, 3}, {4, 5, 6}};

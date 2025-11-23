@@ -67,11 +67,11 @@ core::dmtx BaseDecomposer::inv() {
         return {};
     }
 
-    core::dmtx AE = util::factr.catCol(origDmtx_, util::factr.eye(origDmtx_.getRowSize()));
+    core::dmtx AE = util::Factory::catCol(origDmtx_, util::Factory::eye(origDmtx_.getRowSize()));
     decomp::BaseDecomposer temp{AE};
     AE = temp.rref(); // 返回的矩阵右侧为逆
 
-    std::pair<core::dmtx, core::dmtx> E_A = util::factr.splitCol(AE, AE.getColSize() / 2); // 左为单位矩阵，右为逆
+    std::pair<core::dmtx, core::dmtx> E_A = util::Factory::splitCol(AE, AE.getColSize() / 2); // 左为单位矩阵，右为逆
 
     return E_A.second;
 }
@@ -149,7 +149,7 @@ double BaseDecomposer::det() {
  * - 如果传递非方阵，换行矩阵 P 是错误的 */
 core::dmtx exchangeRowToLadderMtx(core::dmtx& mtx) {
     if (mtx.getRowSize() == 1) {
-        return util::factr.eye(1);
+        return util::Factory::eye(1);
     }
 
     std::vector<std::size_t> firstNon0s(mtx.getRowSize()); // 索引为行，存储的元素为此行第一个非 0 元素的列数
@@ -160,7 +160,7 @@ core::dmtx exchangeRowToLadderMtx(core::dmtx& mtx) {
     std::size_t minDim = mtx.getRowSize() < mtx.getColSize()
                              ? mtx.getRowSize()
                              : mtx.getColSize(); // 最小维度
-    core::dmtx P(util::factr.eye(minDim)); // 换行矩阵
+    core::dmtx P(util::Factory::eye(minDim)); // 换行矩阵
 
     /* 插入排序，此处效率极其低下，因为只要遇到小于 slow 的则换行。如果找最大元素再换行会提升很多效率。我好累，以后再改这里，希望那时你看得到吧梦奇 */
     for (std::size_t slow{0}; slow < firstNon0s.size() - 1; ++slow) { // 函数开头以保证矩阵至少有两行
@@ -203,7 +203,7 @@ std::vector<core::dmtx> BaseDecomposer::gaussianElimination() {
     const std::size_t minDim = copy.getRowSize() < copy.getColSize()
                                    ? copy.getRowSize()
                                    : copy.getColSize();
-    core::dmtx L(minDim), P(util::factr.eye(minDim)); // 最小维度
+    core::dmtx L(minDim), P(util::Factory::eye(minDim)); // 最小维度
 
     /* LU 分解，每一行开始消元时，都先执行行变换，使得矩阵为行阶梯型，再进行消元算法 */
     for (std::size_t row = 0; row < copy.getColSize() && row < copy.getRowSize() - 1; ++row) { // 逐行扫描，

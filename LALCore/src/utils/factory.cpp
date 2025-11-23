@@ -7,8 +7,6 @@
 
 namespace util {
 
-Factory factr;
-
 /* ==== 判断 ==== */
 /* 判断是否为单位矩阵 */
 bool Factory::iseye(const core::dmtx& mtx) {
