@@ -49,6 +49,7 @@ bool rref();
 
 /* ==== 线性方程组求解 ==== */
 bool inv();
+bool linsolve();
 
 /* ==== 矩阵分析与条件数 ==== */
 bool det();

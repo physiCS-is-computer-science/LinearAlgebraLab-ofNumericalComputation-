@@ -22,6 +22,7 @@
 #include "core/vector.hpp" // test
 #include "decompositions/basic_decomp.hpp" // test
 #include "function_manager.hpp"
+#include "solvers/linear_solvers.hpp" // test
 #include "utils/factory.hpp" // test
 #include "utils/output.hpp"
 #include <Windows.h>
@@ -32,23 +33,29 @@
 #include <vector>
 
 int main() {
-    bool test = 0;
+    bool test{0};
 
     /* =========================================================== */
     if (test) {
 /* ============================ TESTBEGIN ============================ */
 
         core::dmtx
-            mtx1{{1, 2, 3, 5},
-                 {0, 1, 4, 6},
-                 {0, 0, 1, 1},
-                 {0, 0, 0, 4}},
-            mtx2{{0, 0, 1, 1},
-                 {0, 0, 0, 0}};
+        mtx1{    
+    {2, 5, 1, 3},
+    {9, 1, 4, 7},
+    {6, 3, 8, 2}
+        }, 
+        mtx2{
+            {0, 0, 1, 1},
+            {0, 0, 0, 0}
+        };
 
         decomp::BaseDecomposer decomper(mtx1);
+        solve::Solver solver(mtx1);
 
-        std::cout << decomper.det();
+        std::cout << "R:"           << decomper.rref()
+                  << "---\nN(A):"   << solver.homogeneousSolve()
+                  << "---\n[xp N]:" << solver.solveAxb(util::Factory::avec({5, 8, 3})); 
 
 /* ============================= TESTEND ============================= */
     }

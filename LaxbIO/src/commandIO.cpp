@@ -296,13 +296,18 @@ bool CmdHandler::sortToken(const std::vector<Cmdt>& tplate) {
 
     std::vector<std::string> aim{}, temp(cmdToken_);
     for (const auto& i : tplate) {
-        auto it = std::find_if(temp.cbegin(), temp.cend(),
-                               [i](std::string s) { // 找到第一个满足当前类型 i 的迭代器
-                                   if (argtype(s) == i) return true; return false;
-                               });
+        auto f = [i](std::string s) { // 谓词
+            if (argtype(s) == i) {
+                return true;
+            }
+            return false;
+        };
+        auto it = std::find_if(temp.cbegin(), temp.cend(), f); // 找到第一个满足当前类型 i 的迭代器
+
         if (it == temp.cend()) { // 没找到
             return false;
         }
+
         aim.push_back(*it);
         temp.erase(it); // 找到在副本中的删掉
     }

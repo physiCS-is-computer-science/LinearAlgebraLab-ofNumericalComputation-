@@ -3,6 +3,7 @@
 // random generator
 
 #include "core/matrix.hpp"
+#include "core/vector.hpp"
 #include <utility>
 
 namespace util {
@@ -14,6 +15,12 @@ public:
 
     /* 制造 */
     static core::dmtx eye(std::size_t dim);
+    static core::dvec avec(const core::dvec& v) { return core::dvec(v); }
+    static core::dvec avec(std::size_t dim,
+                           double elem = 0.0,
+                           core::VecOrientation orien = core::VecOrientation::COLUMN);
+    static core::dmtx amtx(const core::dmtx& m) { return core::dmtx(m); }
+    static core::dmtx amtx(std::size_t row, std::size_t col, double elem = 0.0);
 
     /* 功能 */
     static core::dmtx catRow(const core::dmtx& mtx1, const core::dmtx& mtx2);

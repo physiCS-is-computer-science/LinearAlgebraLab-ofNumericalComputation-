@@ -42,6 +42,7 @@ void registerAllFunc() {
 
     /* ==== 线性方程组求解 ==== */
     fnmgr.fnReg("inv", inv);
+    fnmgr.fnReg("linsolve", linsolve);
 
     /* ==== 矩阵分析与条件数 ==== */
     fnmgr.fnReg("det", det);

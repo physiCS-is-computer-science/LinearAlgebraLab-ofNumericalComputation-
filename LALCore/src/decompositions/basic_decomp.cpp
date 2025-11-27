@@ -13,7 +13,7 @@
 namespace decomp {
 
 /* LU 分解，顺序返回 L、U、P */
-std::vector<core::dmtx> BaseDecomposer::lu() {
+std::vector<core::dmtx> BaseDecomposer::lu() const {
     if (!origDmtx_.isSquare()) {
         throw std::invalid_argument("BaseDecomposer::lu(): "
                                     "origDmtx_ is not a square matrix");
@@ -24,7 +24,7 @@ std::vector<core::dmtx> BaseDecomposer::lu() {
 /* 化为行最简型
  * - 调用 gaussianElimination() 返回的 U，返回最简型
  * - 失败返回空矩阵 */
-core::dmtx BaseDecomposer::rref() {
+core::dmtx BaseDecomposer::rref() const {
     if (origDmtx_.isEmpty()) {
         return {};
     }
@@ -56,7 +56,7 @@ core::dmtx BaseDecomposer::rref() {
 /* 方阵求逆
  * - 方阵右侧插入同维度单位矩阵，对长方阵化为行最简型，右侧矩阵即为逆
  * - 维度错误、矩阵奇异都返回空矩阵 */
-core::dmtx BaseDecomposer::inv() {
+core::dmtx BaseDecomposer::inv() const {
     if (!origDmtx_.isSquare()) {
         return {};
     }
@@ -78,7 +78,7 @@ core::dmtx BaseDecomposer::inv() {
 
 /* 行列式
  * - 非方阵抛出 invalid_argument() 错误 */
-double BaseDecomposer::det() {
+double BaseDecomposer::det()  const {
     if (!origDmtx_.isSquare()) {
         throw std::invalid_argument("basic_decomp.cpp: BaseDecomposer::det(): "
                                     "origDmtx_ is not a square matrix");
@@ -111,6 +111,21 @@ double BaseDecomposer::det() {
 
     return (inverPairCnt % 2 == 0) ? detVal : -detVal;
 }
+
+/* 返回矩阵的秩
+ * - 依靠数行秩实现 */
+std::size_t BaseDecomposer::getrank() const {
+    core::dmtx R{this->rref()};
+    std::size_t r{0};
+    while (r < R.getRowSize()) {
+        if (firstNonzero(R.getRow(r)) >= R.getRowSize()) { // 全 0 行时
+            return r;
+        }
+        ++r;
+    }
+    return r; // 行满秩
+}
+
 
 // /* 找到行阶梯矩阵的所有主元坐标对
 //  * - 非行阶梯矩阵返回空 vector */
@@ -197,7 +212,7 @@ std::size_t firstNonzero(const core::dvec& vec) {
  * - 如果 origDmtx_ 为非方阵，得到的 P 为错误的 P（详情见行变换循环）！！！
  * - 当前主元位置为 0 时，寻找下方是否存在非 0，存在则行交换，不存在则跳到下一列（即全 0 列、主元位置之下的全 0 列都不进行任何操作）
  * - 消元逻辑考虑数值稳定性，遇到 0、非最大主元都换行，以减小误差（MATLAB） */
-std::vector<core::dmtx> BaseDecomposer::gaussianElimination() {
+std::vector<core::dmtx> BaseDecomposer::gaussianElimination() const {
     core::dmtx copy(origDmtx_); // 不改变原矩阵
 
     const std::size_t minDim = copy.getRowSize() < copy.getColSize()

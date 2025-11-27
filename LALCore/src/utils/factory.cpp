@@ -23,6 +23,34 @@ core::dmtx Factory::eye(std::size_t dim) {
     return output;
 }
 
+/* 制造一个向量，默认为元素初始化为 0 的列向量 */
+core::dvec Factory::avec(std::size_t dim,
+                       double elem,
+                       core::VecOrientation orien) {
+    core::dvec oup(dim, orien);
+    if (elem != 0) {
+        for (std::size_t i{0}; i < oup.getSize(); ++i) {
+            oup(i) = elem;
+        }
+    }
+    return oup;
+}
+
+/* 制造一个矩阵，默认元素初始化为 0 */
+core::dmtx Factory::amtx(std::size_t row, std::size_t col, double elem) {
+    core::dmtx oup(row, col);
+    if (elem != 0) {
+        for (std::size_t r{0}; r < oup.getRowSize(); ++r) {
+            for (std::size_t c{0}; c < oup.getColSize(); ++c) {
+                oup(r, c) = elem;
+            }
+        }
+    }
+    return oup;
+}
+
+
+
 /* ==== 功能 ==== */
 /* 相同列数的两个矩阵的拼接（行拼接）
  * - 维度不匹配时返回空矩阵
@@ -94,7 +122,7 @@ std::pair<core::dmtx, core::dmtx> Factory::splitRow(const core::dmtx& mtx,
     return output;
 }
 
-/* 从第 col 行分裂矩阵（包含第 col 列）
+/* 从第 col 列分裂矩阵（包含第 col 列）
  * - 维度错误返回空 pair */
 std::pair<core::dmtx, core::dmtx> Factory::splitCol(const core::dmtx& mtx,
                                                     std::size_t col) {

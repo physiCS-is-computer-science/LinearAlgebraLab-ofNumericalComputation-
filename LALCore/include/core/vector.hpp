@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "utils/numerical.hpp"
 #include <algorithm>
 #include <cmath>
 #include <complex>
@@ -91,8 +92,7 @@ public:
     /* ==== 构造函数们 ==== */
     Vector(const vecSizet dimension,
            const VecOrientation orientation = VecOrientation::COLUMN)
-        : orientation_(orientation),
-          dimension_(dimension) { // 构造维度为 demension 的向量
+        : orientation_(orientation), dimension_(dimension) { // 构造维度为 demension 的向量
         initVec(dimension);
     };
     Vector(std::initializer_list<T> il); // initializer_list 初始化
@@ -110,6 +110,7 @@ public:
     T getMin() const; // 获取最小值，未定义 complex<double>
     bool isScalar() const { return dimension_ == 1; } // 是否为常量
     bool isEmpty() const { return dimension_ == 0; } // 是否为空向量
+    bool iszero() const;
     void reconstruct(vecSizet dimension = 0); // 重构向量，不改变行列特征
 
 private:
@@ -170,6 +171,18 @@ T Vector<T>::getMin() const {
     }
     return *std::min_element(vec_.begin(), vec_.end());
 }
+
+/* 判断是否为全零向量 */
+template<typename T>
+bool Vector<T>::iszero() const {
+    for (std::size_t i{0}; i < this->dimension_; ++i) {
+        if (std::abs(vec_[i] > util::EPSILON)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 
 /* 重构向量，同 matrix.hpp
  * - 默认不带维度则初始化为空向量

@@ -13,6 +13,8 @@
 #include "core/matrix.hpp"
 #include "decompositions/basic_decomp.hpp"
 #include "session_manager.hpp"
+#include "solvers/linear_solvers.hpp"
+#include "utils/factory.hpp"
 #include <Windows.h> // 为了 system("cls")
 #include <fstream>
 #include <iostream>
@@ -991,6 +993,85 @@ bool inv() {
     }
 
     laxb::cmdhr.outDetermine(output);
+
+    return true;
+}
+
+/* 求解线性方程组 Ax = b，b 可以为 0 向量
+ * - 第一参数必须为系数矩阵，第二参数必须为向量 b
+ * - 1.linsolve :A :b ::x 默认输出一个特解
+ * - 2.linsolve :A :b
+ * - 3.linsolve :A :b ::X -a 输出全解，X 为 [xp xn] 形式的矩阵
+ * - 4.linsolve :A :b -a */
+bool linsolve() {
+    laxb::tvv argset{{INID, INID,OUTID},
+                     {INID, INID},
+                     {INID, INID, OUTID, OPT},
+                     {INID, INID, OPT}};
+    lc::type_g = laxb::cmdhr.argHandler(argset);
+    if (!lc::type_g) {
+        return false;
+    }
+
+    std::string inA(laxb::cmdhr.getcmdtk()[0].substr(1)); // :A
+    std::string inb(laxb::cmdhr.getcmdtk()[1].substr(1)); // :b
+    
+    auto itA{smr::semgr.finddmtx(inA)}, itb{smr::semgr.finddmtx(inb)};
+    if (itA == smr::semgr.getdmtxEnd() || itb == smr::semgr.getdmtxEnd()) {
+        smr::semgr.seterr(laxb::cmdhr.getname() +
+                          ": Matrix \"" + inA + "\" or "
+                          "Matrix \"" + inb + "\" not found");
+        return false;
+    }
+
+    /* 维度判断 */
+    if (itb->second.getColSize() != 1 ||
+        itb->second.getRowSize() != itA->second.getColSize()) {
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                              ": Vector \"" + inb + "\" "
+                              "does not match the coefficient dimension of matrix "
+                              "\"" + inA + "\"");
+            return false;
+    }
+
+    solve::Solver solver((*itA).second); // 初始化求解器
+    core::dmtx oup(solver.solveAxb(core::tovec((*itb).second))); // 全解 [xp xn]
+
+    /* 判断输出特解还是全解 */
+    std::string opt{};
+    if (lc::type_g == 3) {
+        opt = laxb::cmdhr.getcmdtk()[3];
+        if (opt == "-a") { // :A :b ::X -a
+        // 待定
+        }
+        else {
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                                ": Unknow option \"" + opt + "\"");
+            return false;
+        }
+
+    }
+    else if (lc::type_g == 4) {
+        opt = laxb::cmdhr.getcmdtk()[2];
+        if (opt == "-a") { // :A :b -a
+        // 待定
+        }
+        else {
+            smr::semgr.seterr(laxb::cmdhr.getname() +
+                                ": Unknow option \"" + opt + "\"");
+            return false;
+        }
+    }
+    else {
+        oup = util::Factory::splitCol(oup, 1).first; // 分裂矩阵，只保留特解 xp 一列
+    }
+
+    if (lc::type_g == 1 || lc::type_g == 3) { // :A :b ::x, :A :b ::X -a
+        std::string oupName = laxb::cmdhr.getcmdtk()[2].substr(2); // ::x
+        smr::semgr.adddmtx(oupName, oup); // 添加解至变量空间
+    }
+
+    laxb::cmdhr.outDetermine(oup);
 
     return true;
 }

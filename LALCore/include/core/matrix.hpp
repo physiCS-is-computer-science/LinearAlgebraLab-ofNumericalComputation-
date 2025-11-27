@@ -9,6 +9,7 @@
 #pragma once
 
 #include "core/vector.hpp"
+#include "utils/numerical.hpp"
 #include <algorithm>
 #include <cmath>
 #include <complex>
@@ -128,6 +129,7 @@ public:
     bool isScalar() const { return row_ == col_ && row_ == 1; } // 判断是否为常量，it is a scalar if it has only 1 element
     bool isVector() const { return row_ == 1 || col_ == 1; } // 判断是否为向量
     bool isEmpty() const { return row_ == 0 && col_ == 0; } // 判断是否为空矩阵
+    bool iszero() const;
     void reconstruct(mtxSizet row = 0, mtxSizet col = 0); // 重新构建矩阵大小，默认初始化元素为0，默认重构大小为 0 * 0 的空矩阵
 
 private:
@@ -151,8 +153,7 @@ inline void Matrix<std::complex<double>>::initMtx(mtxSizet row, mtxSizet col) {
     row_ = row;
     col_ = col;
     matrix_ = std::vector<std::vector<std::complex<double>>>(
-        row,
-        std::vector<std::complex<double>>(col, std::complex<double>(0.0, 0.0)));
+        row, std::vector<std::complex<double>>(col, std::complex<double>(0.0, 0.0)));
 }
 
 /* ==== type exchange ==== */
@@ -663,6 +664,19 @@ double Matrix<T>::getMin() const {
         }
     }
     return output;
+}
+
+/* 判断是否为全零矩阵 */
+template<typename T>
+bool Matrix<T>::iszero() const {
+    for (std::size_t r{0}; r < this->row_; ++r) {
+        for (std::size_t c{0}; c < this->col_; ++c) {
+            if (std::abs(this->matrix_[r][c]) > util::EPSILON) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 /* 重构矩阵大小
