@@ -15,8 +15,10 @@ namespace decomp {
 /* LU 分解，顺序返回 L、U、P */
 std::vector<core::dmtx> BaseDecomposer::lu() const {
     if (!origDmtx_.isSquare()) {
-        throw std::invalid_argument("BaseDecomposer::lu(): "
-                                    "origDmtx_ is not a square matrix");
+        throw std::invalid_argument(
+            "BaseDecomposer::lu(): "
+            "origDmtx_ is not a square matrix"
+        );
     }
     return gaussianElimination();
 }
@@ -48,7 +50,10 @@ core::dmtx BaseDecomposer::rref() const {
             R.replaceRow(r, upRow - pivotRow * l); // 行加减
         }
     }
-    R.replaceRow(0, R.getRow(0) * (1 / R(0, firstNonzero(R.getRow(0))))); // 第 0 行主元化为 1
+    R.replaceRow( // 第 0 行主元化为 1
+        0,
+        R.getRow(0) * (1 / R(0, firstNonzero(R.getRow(0))))
+    );
 
     return R;
 }
@@ -62,16 +67,21 @@ core::dmtx BaseDecomposer::inv() const {
     }
 
     core::dmtx U{this->lu()[1]}; // 返回 U，检验是否为奇异矩阵
-    std::size_t inx{decomp::firstNonzero(U.getRow(U.getRowSize() - 1))}; // 获取矩阵最后一行
+    std::size_t inx = decomp::firstNonzero(U.getRow(U.getRowSize() - 1)); // 获取矩阵最后一行
     if (inx >= U.getColSize()) { // 返回的索引大于最大索引即为全 0 行，故矩阵奇异
         return {};
     }
 
-    core::dmtx AE = util::Factory::catCol(origDmtx_, util::Factory::eye(origDmtx_.getRowSize()));
+    core::dmtx AE = util::Factory::catCol(
+        origDmtx_, util::Factory::eye(origDmtx_.getRowSize())
+    );
     decomp::BaseDecomposer temp{AE};
     AE = temp.rref(); // 返回的矩阵右侧为逆
 
-    std::pair<core::dmtx, core::dmtx> E_A = util::Factory::splitCol(AE, AE.getColSize() / 2); // 左为单位矩阵，右为逆
+    std::pair<core::dmtx, core::dmtx> E_A = util::Factory::splitCol( // 左为单位矩阵，右为逆
+        AE,
+        AE.getColSize() / 2
+    );
 
     return E_A.second;
 }
@@ -80,8 +90,10 @@ core::dmtx BaseDecomposer::inv() const {
  * - 非方阵抛出 invalid_argument() 错误 */
 double BaseDecomposer::det()  const {
     if (!origDmtx_.isSquare()) {
-        throw std::invalid_argument("basic_decomp.cpp: BaseDecomposer::det(): "
-                                    "origDmtx_ is not a square matrix");
+        throw std::invalid_argument(
+            "basic_decomp.cpp: BaseDecomposer::det(): "
+            "origDmtx_ is not a square matrix"
+        );
     }
 
     std::vector<core::dmtx> LUP{this->lu()};
@@ -221,7 +233,10 @@ std::vector<core::dmtx> BaseDecomposer::gaussianElimination() const {
     core::dmtx L(minDim), P(util::Factory::eye(minDim)); // 最小维度
 
     /* LU 分解，每一行开始消元时，都先执行行变换，使得矩阵为行阶梯型，再进行消元算法 */
-    for (std::size_t row = 0; row < copy.getColSize() && row < copy.getRowSize() - 1; ++row) { // 逐行扫描，
+    for (std::size_t row = 0;
+        row < copy.getColSize() && row < copy.getRowSize() - 1;
+        ++row
+    ) { // 逐行扫描，
         core::dmtx correctP = exchangeRowToLadderMtx(copy); // 每次行加减时，先化为行阶梯
         L = correctP * L; // 对 L 同步对 U 的交换
 
@@ -250,7 +265,9 @@ std::vector<core::dmtx> BaseDecomposer::gaussianElimination() const {
             pivotCvec = copy.getCol(col); // 获取当前主元列
             pivotElem = pivotCvec(row); // 当前主元 (row, col)
 
-            if (row < minDim && maxPivotRow < minDim) { // 如果为非方阵，此处 P 不进行行变换，但是 U 进行了行变换！故 P 为错误矩阵
+            if (row < minDim &&
+                maxPivotRow < minDim
+            ) { // 如果为非方阵，此处 P 不进行行变换，但是 U 进行了行变换！故 P 为错误矩阵
                 P.exchangeRow(row, maxPivotRow);
                 L.exchangeRow(row, maxPivotRow); // L 同步 U 的行交换
             }

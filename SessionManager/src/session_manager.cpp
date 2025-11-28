@@ -126,7 +126,10 @@ bool SessionMgr::rfile(std::string fname) {
                 continue;
             }
 
-            smr::semgr.adddmtx(keyVal[0], input);
+            smr::semgr.adddmtx(
+                keyVal[0],
+                input
+            );
         }
         else {
             std::vector<double> input = laxb::cmdhr.curlyToken("{" + keyVal[1] + "}");
@@ -134,7 +137,10 @@ bool SessionMgr::rfile(std::string fname) {
                 continue;
             }
 
-            smr::semgr.addreal(keyVal[0], input[0]);
+            smr::semgr.addreal(
+                keyVal[0],
+                input[0]
+            );
         }
     }
 

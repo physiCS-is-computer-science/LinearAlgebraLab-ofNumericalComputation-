@@ -48,9 +48,11 @@ core::dmtx Solver::homogeneousSolve() const {
     for (std::size_t i{0}; i < R_.getColSize(); ++i) { // 构造全集
         completeSet.insert(i);
     }
-    std::set_difference(completeSet.begin(), completeSet.end(),
-                        pivotVarCols.begin(), pivotVarCols.end(),
-                        std::inserter(freeVarCols, freeVarCols.end())); // 集合求差
+    std::set_difference( // 集合求差
+        completeSet.begin(), completeSet.end(),
+        pivotVarCols.begin(), pivotVarCols.end(),
+        std::inserter(freeVarCols, freeVarCols.end())
+    );
 
     /* 构造 N */
     auto pivotIt{pivotVarCols.rbegin()}, freeIt{freeVarCols.rbegin()};
@@ -89,12 +91,14 @@ core::dmtx Solver::homogeneousSolve() const {
  * - 无穷解时返回 [xp xn] */
 core::dmtx Solver::solveAxb(const core::dvec &b) const {
     if (R_.getRowSize() != b.getSize() ||
-        b.getOrientation() != core::VecOrientation::COLUMN) { // 维度、方向错误
+        b.getOrientation() != core::VecOrientation::COLUMN
+    ) { // 维度、方向错误
         return {};
     }
     
-    decomp::BaseDecomposer decomperAb(util::Factory::catCol(decomper_.getorigMtx(),
-                                                            core::tomtx(b))); // 增广矩阵
+    decomp::BaseDecomposer decomperAb( // 增广矩阵
+        util::Factory::catCol(decomper_.getorigMtx(), core::tomtx(b))
+    );
     core::dmtx Rd{decomperAb.rref()}; // 化 [A b] 为行最简型 [R d]
     core::dmtx N{homogeneousSolve()}; // A 的零空间解（使用 R_，非增广矩阵）
     core::dmtx xp(R_.getColSize(), 1); // 初始化特解向量

@@ -84,7 +84,8 @@ int main() {
             laxb::cmdhr.getcmdtk().erase(laxb::cmdhr.getcmdtk().begin()); // 删掉命令名
             laxb::cmdhr.semicolonDel(); // 处理末尾分号，置位 outbit_，过后由 outDetermine() 判断是否输出
             if (nonArgSet.find(laxb::cmdhr.getname()) == nonArgSet.end() &&
-                laxb::cmdhr.isempty(laxb::cmdhr.getname())) { // 命令名不属于无参集，并且命令参数为空时
+                laxb::cmdhr.isempty(laxb::cmdhr.getname())
+            ) { // 命令名不属于无参集，并且命令参数为空时
                 state = false;
             }
             else { // 命令名属于无参集或者命令有参数时，都通过函数自行判断 state
@@ -93,7 +94,8 @@ int main() {
 
             /* 函数执行成功，并且为非临时会话状态时，刷新文件 */
             if (state == true &&
-                smr::semgr.getpath() != "#") {
+                smr::semgr.getpath() != "#"
+            ) {
                 smr::semgr.wfile(smr::semgr.getpath());
             }
 
@@ -104,7 +106,8 @@ int main() {
 
             /* LaxbIO */
             if (state == true &&
-                !smr::semgr.getoup().empty()) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
+                !smr::semgr.getoup().empty()
+            ) { // 执行成功并且存在输出时（不存在时 cptoup_ 为空串）
                 std::cout << util::SOS(smr::semgr.getpath()) + smr::semgr.getoup() + "\n";
             }
             else if (state == false) {

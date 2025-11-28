@@ -153,7 +153,9 @@ inline void Matrix<std::complex<double>>::initMtx(mtxSizet row, mtxSizet col) {
     row_ = row;
     col_ = col;
     matrix_ = std::vector<std::vector<std::complex<double>>>(
-        row, std::vector<std::complex<double>>(col, std::complex<double>(0.0, 0.0)));
+        row,
+        std::vector<std::complex<double>>(col, std::complex<double>(0.0, 0.0))
+    );
 }
 
 /* ==== type exchange ==== */
@@ -206,8 +208,10 @@ Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> il) {
 template <typename T>
 Matrix<T> operator+(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
-        throw std::invalid_argument("matrix.hpp: operator+(): "
-                                    "Dimensional mismatch between the two matrices");
+        throw std::invalid_argument(
+            "matrix.hpp: operator+(): "
+            "Dimensional mismatch between the two matrices"
+        );
     }
 
     Matrix<T> output(matrix1);
@@ -224,8 +228,10 @@ Matrix<T> operator+(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 template <typename T>
 Matrix<T> operator-(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
-        throw std::invalid_argument("matrix.hpp: operator-(): "
-                                    "Dimensional mismatch between the two matrices");
+        throw std::invalid_argument(
+            "matrix.hpp: operator-(): "
+            "Dimensional mismatch between the two matrices"
+        );
     }
 
     Matrix output(matrix1);
@@ -254,8 +260,10 @@ Matrix<T> operator-(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 template <typename T>
 Matrix<T> operator*(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     if (matrix1.col_ != matrix2.row_) {
-        throw std::invalid_argument("matrix.hpp: operator*(): "
-                                    "Dimensional mismatch between the two matrices");
+        throw std::invalid_argument(
+            "matrix.hpp: operator*(): "
+            "Dimensional mismatch between the two matrices"
+        );
     }
     Matrix<T> output(matrix1.row_, matrix2.col_);
     std::vector<Vector<T>> a(matrix1.row_); // row_ 个行向量
@@ -338,8 +346,10 @@ bool operator!=(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 template <typename T>
 Matrix<T> operator~(const Matrix<T>& matrix) {
     if (matrix.isEmpty()) {
-        throw std::invalid_argument("matrix.hpp: operator~(): "
-                                    "the incomming matrix is empty");
+        throw std::invalid_argument(
+            "matrix.hpp: operator~(): "
+            "the incomming matrix is empty"
+        );
     }
 
     Matrix<T> output(matrix.col_, matrix.row_);
@@ -355,8 +365,10 @@ Matrix<T> operator~(const Matrix<T>& matrix) {
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
     if (os.fail()) {
-        throw std::ios::failure("matrix.hpp: operator<<(): "
-                                "std::cout.fail() == true");
+        throw std::ios::failure(
+            "matrix.hpp: operator<<(): "
+            "std::cout.fail() == true"
+        );
         return os;
     }
     if (matrix.getColSize() == 0 || matrix.getRowSize() == 0) {
@@ -381,8 +393,10 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
 template <typename T>
 Matrix<T> times(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
-        throw std::invalid_argument("matrix.hpp: times(): "
-                                    "Dimensional mismatch between the two matrices");
+        throw std::invalid_argument(
+            "matrix.hpp: times(): "
+            "Dimensional mismatch between the two matrices"
+        );
     }
     Matrix<T> output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
@@ -397,8 +411,10 @@ Matrix<T> times(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 template <typename T>
 Matrix<T> power(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
-        throw std::invalid_argument("matrix.hpp: power(): "
-                                    "Dimensional mismatch between the two matrices");
+        throw std::invalid_argument(
+            "matrix.hpp: power(): "
+            "Dimensional mismatch between the two matrices"
+        );
     }
     Matrix<T> output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
@@ -415,15 +431,19 @@ Matrix<T> power(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 template <typename T>
 Matrix<T> divide(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
     if (matrix1.row_ != matrix2.row_ || matrix1.col_ != matrix2.col_) {
-        throw std::invalid_argument("matrix.hpp: divide(): "
-                                    "Dimensional mismatch between the two matrices");
+        throw std::invalid_argument(
+            "matrix.hpp: divide(): "
+            "Dimensional mismatch between the two matrices"
+        );
     }
     Matrix<T> output(matrix1);
     for (typename Matrix<T>::mtxSizet i = 0; i < output.row_; ++i) {
         for (typename Matrix<T>::mtxSizet j = 0; j < output.col_; ++j) {
             if (matrix2.matrix_[i][j] == 0) {
-                throw std::invalid_argument("matrix.hpp: divide(): "
-                                            "Divide by zero error");
+                throw std::invalid_argument(
+                    "matrix.hpp: divide(): "
+                    "Divide by zero error"
+                );
             }
             output.matrix_[i][j] /= matrix2.matrix_[i][j];
         }
@@ -435,8 +455,10 @@ Matrix<T> divide(const Matrix<T>& matrix1, const Matrix<T>& matrix2) {
 template <typename T>
 Vector<T> tovec(const Matrix<T>& matrix) {
     if (matrix.row_ != 1 && matrix.col_ != 1) {
-        throw std::invalid_argument("matrix.hpp: tovec(): "
-                                    "expected a 1*n or n*1 matrix, but passed that is not");
+        throw std::invalid_argument(
+            "matrix.hpp: tovec(): "
+            "expected a 1*n or n*1 matrix, but passed that is not"
+        );
     }
 
     Vector<T> output{};
@@ -469,9 +491,11 @@ bool dimeq(const Matrix<T>& mtx1, const Matrix<T>& mtx2) {
 template <typename T>
 Vector<T> Matrix<T>::getRow(mtxSizet row) const {
     if (row >= row_ || row < 0) {
-        throw std::out_of_range("matrix.hpp: getRow(): "
-                                "colume index " + std::to_string(row) + " out of range " + 
-                                "[0, " + std::to_string(row_ - 1) + "]");
+        throw std::out_of_range(
+            "matrix.hpp: getRow(): "
+            "colume index " + std::to_string(row) + " out of range " + 
+            "[0, " + std::to_string(row_ - 1) + "]"
+        );
     }
 
     Vector<T> output(col_);
@@ -487,9 +511,11 @@ Vector<T> Matrix<T>::getRow(mtxSizet row) const {
 template <typename T>
 Vector<T> Matrix<T>::getCol(mtxSizet col) const {
     if (col >= col_ || col < 0) {
-        throw std::out_of_range("matrix.hpp: getCol(): "
-                                "colume index " + std::to_string(col) + " out of range " +
-                                "[0, " + std::to_string(col_ - 1) + "]");
+        throw std::out_of_range(
+            "matrix.hpp: getCol(): "
+            "colume index " + std::to_string(col) + " out of range " +
+            "[0, " + std::to_string(col_ - 1) + "]"
+        );
     }
 
     Vector<T> output(row_);
@@ -503,8 +529,10 @@ Vector<T> Matrix<T>::getCol(mtxSizet col) const {
 template <typename T>
 void Matrix<T>::exchangeRow(mtxSizet r1, mtxSizet r2) {
     if (r1 >= row_ || r2 >= row_) {
-        throw std::invalid_argument("matrix.hpp: exchangeRow(): "
-                                    "Dimension not match");
+        throw std::invalid_argument(
+            "matrix.hpp: exchangeRow(): "
+            "Dimension not match"
+        );
     }
 
     T temp;
@@ -519,8 +547,10 @@ void Matrix<T>::exchangeRow(mtxSizet r1, mtxSizet r2) {
 template <typename T>
 void Matrix<T>::exchangeCol(mtxSizet c1, mtxSizet c2) {
     if (c1 >= col_ || c2 >= col_) {
-        throw std::invalid_argument("matrix.hpp: exchangeCol(): "
-                                    "Dimension not match");
+        throw std::invalid_argument(
+            "matrix.hpp: exchangeCol(): "
+            "Dimension not match"
+        );
     }
 
     T temp;
@@ -537,13 +567,17 @@ template <typename T>
 void Matrix<T>::replaceRow(mtxSizet pos, Vector<T> vec) {
     /* 运算匹配性检查 */
     if (pos >= row_) {
-        throw std::invalid_argument("matrix.hpp: replaceRow(): "
-                                    "Max dimension is:" + std::to_string(row_) + 
-                                    " but pass: " + std::to_string(pos));
+        throw std::invalid_argument(
+            "matrix.hpp: replaceRow(): "
+            "Max dimension is:" + std::to_string(row_) + 
+            " but pass: " + std::to_string(pos)
+        );
     }
     if (vec.getOrientation() != VecOrientation::ROW || vec.getSize() != col_) {
-        throw std::invalid_argument("matrix.hpp: replaceRow(): "
-                                    "Orientation or dimension error");
+        throw std::invalid_argument(
+            "matrix.hpp: replaceRow(): "
+            "Orientation or dimension error"
+        );
     }
 
     /* 逐项覆盖 */
@@ -558,13 +592,17 @@ template <typename T>
 void Matrix<T>::replaceCol(mtxSizet pos, Vector<T> vec) {
     /* 运算匹配性检查 */
     if (pos >= col_) {
-        throw std::invalid_argument("matrix.hpp: replaceRow(): "
-                                    "Max dimension is:" + std::to_string(col_) +
-                                    " but pass: " + std::to_string(pos));
+        throw std::invalid_argument(
+            "matrix.hpp: replaceRow(): "
+            "Max dimension is:" + std::to_string(col_) +
+            " but pass: " + std::to_string(pos)
+        );
     }
     if (vec.getOrientation() != VecOrientation::COLUMN || vec.getSize() != row_) {
-        throw std::invalid_argument("matrix.hpp: replaceRow(): "
-                                    "Orientation or dimension error");
+        throw std::invalid_argument(
+            "matrix.hpp: replaceRow(): "
+            "Orientation or dimension error"
+        );
     }
 
     /* 逐项覆盖 */
@@ -579,8 +617,10 @@ void Matrix<T>::replaceCol(mtxSizet pos, Vector<T> vec) {
 template <typename T>
 Vector<T> Matrix<T>::getMainDiag() const {
     if (!isSquare()) {
-        throw std::domain_error("matrix.hpp: getMainDiag(): "
-                                "expect a square matrix, but it is a non-square matrix"); // 域错误
+        throw std::domain_error(
+            "matrix.hpp: getMainDiag(): "
+            "expect a square matrix, but it is a non-square matrix"
+        ); // 域错误
     }
 
     Vector<T> output(row_);
@@ -594,8 +634,10 @@ Vector<T> Matrix<T>::getMainDiag() const {
 template <typename T>
 Vector<T> Matrix<T>::getAntiDiag() const {
     if (!isSquare()) {
-        throw std::domain_error("matrix.hpp: getAntiDiag(): "
-                                "expect a square matrix, but it is a non-square matrix"); // 域错误
+        throw std::domain_error( // 域错误
+            "matrix.hpp: getAntiDiag(): "
+            "expect a square matrix, but it is a non-square matrix"
+        );
     }
 
     Vector output(row_);
@@ -609,8 +651,10 @@ Vector<T> Matrix<T>::getAntiDiag() const {
 template <typename T>
 double Matrix<T>::getTrace() const {
     if (!(this->isSquare())) {
-        throw std::domain_error("matrix.hpp: getTrace(): "
-                                "expect a square matrix, but it is a non-square matrix"); // 域错误
+        throw std::domain_error( // 域错误
+            "matrix.hpp: getTrace(): "
+            "expect a square matrix, but it is a non-square matrix"
+        );
     }
 
     double output = 0.0;
@@ -635,7 +679,10 @@ double Matrix<T>::getElementSum() const {
 /* 矩阵平均值 */
 template <typename T>
 double Matrix<T>::getMean() const {
-    return (this->getElementSum() / (this->getRowSize() * this->getColSize()));
+    return (
+        this->getElementSum() /
+        (this->getRowSize() * this->getColSize())
+    );
 }
 
 /* 矩阵最大值 */

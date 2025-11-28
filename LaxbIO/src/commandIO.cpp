@@ -44,12 +44,16 @@ bool CmdHandler::in() {
     std::size_t cmdlSize = cmdLine.size();
     while (true) {
         /* 普通字符起点 */
-        if (cmdLine[begPos] != '{' && cmdLine[begPos] != '[') {
+        if (cmdLine[begPos] != '{' &&
+            cmdLine[begPos] != '['
+        ) {
             endPos = cmdLine.find(" ", begPos);
         }
 
         /* 括号起点 */
-        if (cmdLine[begPos] == '{' || cmdLine[begPos] == '[') {
+        if (cmdLine[begPos] == '{' ||
+            cmdLine[begPos] == '['
+        ) {
             if (cmdLine[begPos] == '{') {
                 endPos = cmdLine.find("}", begPos);
             }
@@ -81,7 +85,9 @@ bool CmdHandler::in() {
         }
 
         /* 此时为多个空格（begPos开始查找第一个空格，而第一个空格是自身） */
-        if (begPos == endPos && endPos != cmdlSize - 1) {
+        if (begPos == endPos &&
+            endPos != cmdlSize - 1
+        ) {
             ++begPos;
             continue;
         }
@@ -139,10 +145,14 @@ bool tksCheck(std::vector<std::string> tks) {
             }
             inx = 1;
         }
-        else if (tk[0] == ':' && tk[1] != ':') { // :varn
+        else if (tk[0] == ':' &&
+                 tk[1] != ':'
+        ) { // :varn
             inx = 1;
         }
-        else if (tk[0] == ':' && tk[1] == ':') { // ::varn
+        else if (tk[0] == ':' &&
+                 tk[1] == ':'
+        ) { // ::varn
             if (tk.size() < 3) {
                 std::cout << util::ERS()
                           << "tksCheck(): Argument error after identifier \"::\"\n";
@@ -180,9 +190,11 @@ bool tksCheck(std::vector<std::string> tks) {
         tksNoid.push_back(tk.substr(inx, len));
     }
 
-    const std::string legalCh{"_-/1234567890"
-                              "abcdefghijklmnopqrstuvwxyz"
-                              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"}; // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
+    const std::string legalCh{ // 这些字符之外的字符都为非法，禁止出现在除去标识符的参数中
+        "_-/1234567890"
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    };
     const std::string legalCurlyBraCh{"-/1234567890. "}; // 花括号合法字符
     const std::string legalSquareBraCh{"-/1234567890;. "}; // 方括号合法字符
     for (const auto& tkNoid : tksNoid) {
@@ -258,10 +270,14 @@ Cmdt argtype(std::string str) {
 
 /* 去除首尾 tobedel 字符，无此字符则不操作 */
 void delCh(std::string& str, char tobedel) {
-    while (!str.empty() && *(str.end() - 1) == tobedel) { // 删掉末尾所有空格
+    while (!str.empty() &&
+           *(str.end() - 1) == tobedel
+    ) { // 删掉末尾所有空格
         str.pop_back();
     }
-    while (!str.empty() && *str.begin() == tobedel) { // 删掉开头所有空格
+    while (!str.empty() &&
+           *str.begin() == tobedel
+    ) { // 删掉开头所有空格
         str.erase(str.begin());
     }
 }
@@ -275,7 +291,10 @@ std::vector<std::string> splitBych(std::string& str, char sep) {
     delCh(str, sep); // 删除首尾 sep 字符，防止以下循环出现 substr() 访问越界的未定义行为
 
     std::vector<std::string> tokens{};
-    for (std::size_t posbeg = 0, posend = 0; posend < str.size(); ++posbeg) { // str 为空串时不执行循环直接返回空 vector
+    for (std::size_t posbeg = 0, posend = 0;
+        posend < str.size();
+        ++posbeg
+    ) { // str 为空串时不执行循环直接返回空 vector
         posend = str.find(sep, posbeg);
         if (posbeg == posend) { // posbeg 自身为 sep
             continue;
@@ -302,7 +321,11 @@ bool CmdHandler::sortToken(const std::vector<Cmdt>& tplate) {
             }
             return false;
         };
-        auto it = std::find_if(temp.cbegin(), temp.cend(), f); // 找到第一个满足当前类型 i 的迭代器
+        auto it = std::find_if( // 找到第一个满足当前类型 i 的迭代器
+            temp.cbegin(),
+            temp.cend(),
+            f
+        );
 
         if (it == temp.cend()) { // 没找到
             return false;
@@ -339,7 +362,8 @@ std::vector<double> CmdHandler::curlyToken(std::string token) {
 
     if (token[0] == '/' ||
         token[token.size() - 1] == '/' ||
-        token[token.size() - 1] == '/') { // "/a.." "..a/" "..a-"
+        token[token.size() - 1] == '/'
+    ) { // "/a.." "..a/" "..a-"
         return {};
     }
 
@@ -354,7 +378,9 @@ std::vector<double> CmdHandler::curlyToken(std::string token) {
     for (const auto& i : originTks) {
         std::size_t div = i.find("/");
 
-        if (div != std::string::npos && state == State::NORM) { // "/" "a/" "/a" "a/b"
+        if (div != std::string::npos &&
+            state == State::NORM
+        ) { // "/" "a/" "/a" "a/b"
             if (std::count(i.begin(), i.end(), '/') != 1) { // 一个分式不可能两个 '/'
                 return {};
             }
@@ -372,7 +398,10 @@ std::vector<double> CmdHandler::curlyToken(std::string token) {
                 tks.push_back("/");
                 tks.push_back(i.substr(1));
             }
-            else if (i.size() > 2 && i[0] != '/' && i[i.size() - 1] != '/') { // "a/b"
+            else if (i.size() > 2 &&
+                     i[0] != '/' &&
+                     i[i.size() - 1] != '/'
+            ) { // "a/b"
                 tks.push_back(i.substr(0, div));
                 tks.push_back("/");
                 tks.push_back(i.substr(div + 1));
@@ -381,7 +410,9 @@ std::vector<double> CmdHandler::curlyToken(std::string token) {
                 return {};
             }
         }
-        else if (div != std::string::npos && state == State::DIV) { // 分式状态下又找到 '/' 一定为错误
+        else if (div != std::string::npos &&
+                 state == State::DIV
+        ) { // 分式状态下又找到 '/' 一定为错误
             return {};
         }
         else {
@@ -395,10 +426,14 @@ std::vector<double> CmdHandler::curlyToken(std::string token) {
     /* 正确分数格式匹配 */
     std::vector<double> nums{};
     for (std::size_t i = 0; i < tks.size(); ++i) {
-        if (i < tks.size() - 1 && tks[i + 1] != "/") { // "a" "b"...
+        if (i < tks.size() - 1 &&
+            tks[i + 1] != "/"
+        ) { // "a" "b"...
             nums.push_back(std::stod(tks[i]));
         }
-        else if (i < tks.size() - 1 && tks[i + 1] == "/") { // "a" "/"...
+        else if (i < tks.size() - 1 &&
+                 tks[i + 1] == "/"
+        ) { // "a" "/"...
             double a = std::stod(tks[i]), b = std::stod(tks[i + 2]);
             if (b == 0) { // "a" "/" "0"
                 return {};
@@ -428,11 +463,13 @@ core::dmtx CmdHandler::squareToken(std::string token) {
 
     /* 清除开头末尾的 ' ' 和 ';' 混合干扰字符串 */
     while (!token.empty() &&
-           (token[token.size() - 1] == ';' || token[token.size() - 1] == ' ')) { // 末尾的 ' ' 和 ';' 清除干净
+           (token[token.size() - 1] == ';' || token[token.size() - 1] == ' ')
+    ) { // 末尾的 ' ' 和 ';' 清除干净
         token.pop_back();
     }
     while (!token.empty() &&
-           (token[0] == ';' || token[0] == ' ')) { // 开头的 ' ' 和 ';' 清除干净
+           (token[0] == ';' || token[0] == ' ')
+    ) { // 开头的 ' ' 和 ';' 清除干净
         token.erase(token.begin());
     }
 
