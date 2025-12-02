@@ -156,4 +156,22 @@ std::pair<core::dmtx, core::dmtx> Factory::splitCol(
     return output;
 }
 
+/* 返回第 r 行，第 c 列元素（包括自己）之下所有元素构成的子向量（列向量） */
+core::dvec Factory::subvec(const core::dmtx& m, std::size_t r, std::size_t c) {
+    if (r >= m.getRowSize() ||
+        r < 0 ||
+        c >= m.getColSize() ||
+        c < 0
+    ) {
+        throw std::invalid_argument("Factory::subvec(): row or column out of range");
+    }
+
+    core::dvec oup = avec(m.getRowSize() - r);
+    for (std::size_t row{0}; r < m.getRowSize(); ++r, ++row) {
+        oup(row) = m(r, c);
+    }
+
+    return oup;
+}
+
 } // namespace util

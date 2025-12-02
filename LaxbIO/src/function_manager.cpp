@@ -12,21 +12,21 @@ void registerAllFunc() {
     /* ==== 基本命令 ==== */
     fnmgr.fnReg("quit", quit);
     fnmgr.fnReg("show", show);
-    fnmgr.fnReg("var", var);
-    fnmgr.fnReg("del", del);
+    fnmgr.fnReg("var",  var);
+    fnmgr.fnReg("del",  del);
     fnmgr.fnReg("save", save);
     fnmgr.fnReg("load", load);
-    fnmgr.fnReg("cls", cls);
+    fnmgr.fnReg("cls",  cls);
     fnmgr.fnReg("help", help);
 
     /* ==== 运算 ==== */
-    fnmgr.fnReg("plus", plus);
-    fnmgr.fnReg("minus", minus);
+    fnmgr.fnReg("plus",   plus);
+    fnmgr.fnReg("minus",  minus);
     fnmgr.fnReg("mtimes", mtimes);
-    fnmgr.fnReg("times", times);
+    fnmgr.fnReg("times",  times);
     fnmgr.fnReg("divide", divide);
     // fnmgr.fnReg("mpower", mpower);
-    fnmgr.fnReg("power", power);
+    fnmgr.fnReg("power",  power);
 
     /* ==== 矩阵创建与操作 ==== */
     fnmgr.fnReg("eye", eye);
@@ -37,11 +37,11 @@ void registerAllFunc() {
     // fnmgr.fnReg("diag", diag);
 
     /* ==== 矩阵分解 ==== */
-    fnmgr.fnReg("lu", lu);
+    fnmgr.fnReg("lu",   lu);
     fnmgr.fnReg("rref", rref);
 
     /* ==== 线性方程组求解 ==== */
-    fnmgr.fnReg("inv", inv);
+    fnmgr.fnReg("inv",      inv);
     fnmgr.fnReg("linsolve", linsolve);
 
     /* ==== 矩阵分析与条件数 ==== */

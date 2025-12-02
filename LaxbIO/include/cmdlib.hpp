@@ -12,85 +12,85 @@ namespace laxb {
 
 /* ==== 基本命令 ==== */
 const std::string quitMan{
-    "-f:\tExit the currently loaded file\n"
-    "-e:\tExit the LAL program"
+    "-f:    Exit the currently loaded file\n"
+    "-e:    Exit the LAL program"
 };
 const std::string showMan{
-    "-a:\tDisplay all variables\n"
-    "-l:\tDisplay a list of all variable names\n"
-    ":varn:\tDisplay specific variables"
+    "-a:       Display all variables\n"
+    "-l:       Display a list of all variable names\n"
+    ":varn:    Display specific variables"
 };
 const std::string varMan{
-    "::varn:\tSave the output to this variable\n"
-    "{}:\tparameter list\n"
-    "[]:\tMatrix elements list"
+    "::varn:    Save the output to this variable\n"
+    "{}:        parameter list\n"
+    "[]:        Matrix elements list"
 };
 const std::string delMan{
-    "-a:\tDelete all variables\n"
-    ":varn:\tDeleting specific variables"
+    "-a:       Delete all variables\n"
+    ":varn:    Deleting specific variables"
 };
 const std::string saveMan{
-    "-f:\t\tForcibly write a file\n"
-    "::filename:\tSave the current session to the file"
+    "-f:            Forcibly write a file\n"
+    "::filename:    Save the current session to the file"
 };
 const std::string loadMan{
-    "-c:\t\tBinding file\n"
-    ":filename:\tVariables that load this file session"
+    "-c:           Binding file\n"
+    ":filename:    Variables that load this file session"
 };
 const std::string clsMan{
-    "\tClear screen"
+    "    Clear screen"
 };
 const std::string helpMan{
-    "-a:\tDisplay all commands\n"
-    "-l:\tDisplay a list of all command names\n"
-    ":cmdname:\tDisplay specific command details"
+    "-a:          Display all commands\n"
+    "-l:          Display a list of all command names\n"
+    ":cmdname:    Display specific command details"
 };
 
 /* ==== 运算 ==== */
 const std::string plusMan{
-    ":varn:\tAccept a variable\n"
-    "\t:varn :varn\n"
-    "::varn:\tThe result is output to this variable"
+    ":varn:     Accept a variable\n"
+    "           :varn :varn\n"
+    "::varn:    The result is output to this variable"
 };
 const std::string minusMan{
-    ":varn:\tAccept a variable\n"
-    "\t:varn :varn\n"
-    "::varn:\tThe result is output to this variable"
+    ":varn:     Accept a variable\n"
+    "           :varn :varn\n"
+    "::varn:    The result is output to this variable"
 };
 const std::string mtimesMan{
-    ":varn:\tAccept a variable\n"
-    "\t:varn :varn\n"
-    "::varn:\tThe result is output to this variable"
+    ":varn:     Accept a variable\n"
+    "           :varn :varn\n"
+    "::varn:    The result is output to this variable"
 };
 const std::string timesMan{
-    ":varn:\tAccept a variable\n"
-    "\t:varn :varn\n"
-    "::varn:\tThe result is output to this variable"
+    ":varn:     Accept a variable\n"
+    "           :varn :varn\n"
+    "::varn:    The result is output to this variable"
 };
 const std::string divideMan{
-    ":varn:\tAccept a variable\n"
-    "\t:varn :varn\n"
-    "::varn:\tThe result is output to this variable"
+    ":varn:     Accept a variable\n"
+    "           :varn :varn\n"
+    "::varn:    The result is output to this variable"
 };
 const std::string powerMan{
-    ":varn:\tAccept a variable\n"
-    "\t:varn :varn\n"
-    "::varn:\tThe result is output to this variable"
+    ":varn:     Accept a variable\n"
+    "           :varn :varn\n"
+    "::varn:    The result is output to this variable"
 };
 
 /* ==== 矩阵创建与操作 ==== */
 
 /* ==== 矩阵分解 ==== */
 const std::string luMan{
-    "-a:\tThe output includes all the results of L, U, P\n"
-    ":varn:\tInput matrix\n"
-    "::varn:\tSave the output to this variable\n"
-    "\t::L ::U\n"
-    "t::L ::U ::P"
+    "-a:        The output includes all the results of L, U, P\n"
+    ":varn:     Input matrix\n"
+    "::varn:    Save the output to this variable\n"
+    "           ::L ::U\n"
+    "           ::L ::U ::P"
 };
 const std::string rrefMan{
-    ":varn:\tInput matrix\n"
-    "::varn:\tSave the output to this variable"
+    ":varn:     Input matrix\n"
+    "::varn:    Save the output to this variable"
 };
 
 const std::map<std::string, std::pair<std::string, std::string>> manual{

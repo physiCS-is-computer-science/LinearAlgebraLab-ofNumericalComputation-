@@ -376,6 +376,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
         return os;
     }
 
+    std::cout << std::fixed << std::setprecision(5);
     os << "\n\n";
     for (typename Matrix<T>::mtxSizet row = 0; row < matrix.getRowSize(); ++row) {
         Vector<T> temp(matrix.getRow(row)); // 临时行

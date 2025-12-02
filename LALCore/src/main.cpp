@@ -20,6 +20,7 @@
 #include "commandIO.hpp"
 #include "core/matrix.hpp" // test
 #include "core/vector.hpp" // test
+#include "decompositions/advanced_decomp.hpp" // test
 #include "decompositions/basic_decomp.hpp" // test
 #include "function_manager.hpp"
 #include "solvers/linear_solvers.hpp" // test
@@ -41,21 +42,21 @@ int main() {
 
         core::dmtx
         mtx1{    
-    {2, 5, 1, 3},
-    {9, 1, 4, 7},
-    {6, 3, 8, 2}
+            {2, 5, 1, 3},
+            {9, 1, 4, 7},
+            {6, 3, 8, 2}
         }, 
         mtx2{
-            {0, 0, 1, 1},
-            {0, 0, 0, 0}
+            {0}
         };
 
-        decomp::BaseDecomposer decomper(mtx1);
-        solve::Solver solver(mtx1);
+        decomp::AdvancedDecomposer decomper(mtx1);
+        std::pair<core::dmtx, core::dmtx> QR = decomper.householderQR();
 
-        std::cout << "R:"           << decomper.rref()
-                  << "---\nN(A):"   << solver.homogeneousSolve()
-                  << "---\n[xp N]:" << solver.solveAxb(util::Factory::avec({5, 8, 3})); 
+        std::cout << "Original matrix:" << decomper.origmtx()
+                  << "Q:" << QR.first
+                  << "R:" << QR.second
+                  << "Q*R:" << QR.first * QR.second;
 
 /* ============================= TESTEND ============================= */
     }

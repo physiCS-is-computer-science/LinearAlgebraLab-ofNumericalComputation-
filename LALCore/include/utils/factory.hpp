@@ -29,6 +29,7 @@ public:
     static core::dmtx catCol(const core::dmtx& mtx1, const core::dmtx& mtx2);
     static std::pair<core::dmtx, core::dmtx> splitRow(const core::dmtx& mtx, std::size_t row);
     static std::pair<core::dmtx, core::dmtx> splitCol(const core::dmtx& mtx, std::size_t col);
+    static core::dvec subvec(const core::dmtx& m, std::size_t r, std::size_t c);
 };
 
 } // namespace util

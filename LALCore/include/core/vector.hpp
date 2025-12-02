@@ -109,6 +109,7 @@ public:
     T getMean() const { return (this->getElemSum() / this->getSize()); } // 获取实数向量所有元素平均值，未定义 complex<double>
     T getMax() const; // 获取最大值，未定义 complex<double>
     T getMin() const; // 获取最小值，未定义 complex<double>
+    T norm() const; // 获取 2-范数，即为模长
     bool isScalar() const { return dimension_ == 1; } // 是否为常量
     bool isEmpty() const { return dimension_ == 0; } // 是否为空向量
     bool iszero() const;
@@ -174,6 +175,15 @@ T Vector<T>::getMin() const {
         return vec_[0];
     }
     return *std::min_element(vec_.begin(), vec_.end());
+}
+
+template <typename T>
+T Vector<T>::norm() const {
+    T oup{};
+    for (auto i : vec_) {
+        oup += std::pow(i, 2);
+    }
+    return std::sqrt(oup);
 }
 
 /* 判断是否为全零向量 */
