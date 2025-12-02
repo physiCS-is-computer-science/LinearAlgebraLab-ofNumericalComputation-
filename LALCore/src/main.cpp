@@ -24,6 +24,7 @@
 #include "decompositions/basic_decomp.hpp" // test
 #include "function_manager.hpp"
 #include "solvers/linear_solvers.hpp" // test
+#include "spaces/projections.hpp"
 #include "spaces/subspaces.hpp" // test
 #include "utils/factory.hpp" // test
 #include "utils/output.hpp"
@@ -51,12 +52,10 @@ int main() {
             {0}
         };
 
-        subsp::SubSpace spcer(mtx1);
+        subsp::Projection projer(mtx1);
 
-        std::cout << "Original matrix:" << spcer.orig()
-                  << "Column Space:" << spcer.colBase()
-                  << "Null Space:" << spcer.nullBase()
-                  << "C * ~C:" << spcer.colBase() * ~spcer.colBase();
+        std::cout << "Original matrix:" << projer.orig()
+                  << "Projection Matrix: " << projer.projmtx();
 
 /* ============================= TESTEND ============================= */
     }

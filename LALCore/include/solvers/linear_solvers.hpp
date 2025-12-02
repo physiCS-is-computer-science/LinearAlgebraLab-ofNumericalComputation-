@@ -11,6 +11,8 @@
 // 基础求解器，调用基础分解部分求解
 // =================================
 
+#pragma once
+
 #include "core/matrix.hpp"
 #include "core/vector.hpp"
 namespace solve {
