@@ -136,10 +136,13 @@ std::pair<core::dmtx, core::dmtx> Factory::splitCol(
     std::size_t col
 ) {
     if (mtx.getColSize() <= 1 ||
-        col >= mtx.getColSize() ||
         col == 0
     ) {
         return {};
+    }
+
+    if (col >= mtx.getColSize()) { // 获得原矩阵，置于左边
+        return {mtx, {}};
     }
 
     core::dmtx mtx1(mtx.getRowSize(), col);

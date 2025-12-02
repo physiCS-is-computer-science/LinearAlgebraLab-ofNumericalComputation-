@@ -11,7 +11,7 @@
 
 namespace decomp {
 
-class AdvancedDecomposer : protected BaseDecomposer {
+class AdvancedDecomposer : public BaseDecomposer {
 public:
     AdvancedDecomposer() = default;
     ~AdvancedDecomposer() override = default;
@@ -22,7 +22,7 @@ public:
 
     AdvancedDecomposer(const BaseDecomposer& other) : BaseDecomposer(other) {}
 
-    core::dmtx origmtx() { return getorigMtx(); }
+    core::dmtx orig() { return getorigMtx(); }
     
     std::pair<core::dmtx, core::dmtx> householderQR(); // 返回 Q R
 };

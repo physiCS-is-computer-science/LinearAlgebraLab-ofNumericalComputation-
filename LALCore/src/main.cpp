@@ -24,6 +24,7 @@
 #include "decompositions/basic_decomp.hpp" // test
 #include "function_manager.hpp"
 #include "solvers/linear_solvers.hpp" // test
+#include "spaces/subspaces.hpp" // test
 #include "utils/factory.hpp" // test
 #include "utils/output.hpp"
 #include <Windows.h>
@@ -34,7 +35,7 @@
 #include <vector>
 
 int main() {
-    bool test{0};
+    bool test{1};
 
     /* =========================================================== */
     if (test) {
@@ -50,13 +51,12 @@ int main() {
             {0}
         };
 
-        decomp::AdvancedDecomposer decomper(mtx1);
-        std::pair<core::dmtx, core::dmtx> QR = decomper.householderQR();
+        subsp::SubSpace spcer(mtx1);
 
-        std::cout << "Original matrix:" << decomper.origmtx()
-                  << "Q:" << QR.first
-                  << "R:" << QR.second
-                  << "Q*R:" << QR.first * QR.second;
+        std::cout << "Original matrix:" << spcer.orig()
+                  << "Column Space:" << spcer.colBase()
+                  << "Null Space:" << spcer.nullBase()
+                  << "C * ~C:" << spcer.colBase() * ~spcer.colBase();
 
 /* ============================= TESTEND ============================= */
     }
