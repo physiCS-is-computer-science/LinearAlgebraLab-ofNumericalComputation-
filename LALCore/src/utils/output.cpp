@@ -17,7 +17,7 @@ void startupBanner() {
     std::cout << "+---------- " << name << " ----------+\n";
     std::cout << " > Matrix Calculation\n";
     std::cout << " > Real number version               \n";
-    std::cout << "+-------------------------------------+\n\n";
+    std::cout << "+------------------------------+\n\n";
 }
 
 } // namespace util
