@@ -135,7 +135,7 @@ constr qrMan{
     "# QR decomposition of the matrix\n"
     ":varn:     Accept a variable\n"
     "::varn:    Output to this variable\n"
-    "           ::Q ::E"
+    "           ::Q ::R"
 };
 
 /* ==== 线性方程组求解 ==== */
@@ -148,7 +148,7 @@ constr linsolveMan{
     "# Solving linear equations Ax = b\n"
     "-a:       The total solution of the output [xp xn] form of the matrix\n"
     ":varn:    Accept a variable\n"
-    "          :A :b"
+    "          :A :b\n"
     "::varn:   Output to this variable\n"
     "          -a ::X\n"
     "          ::x"

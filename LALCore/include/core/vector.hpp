@@ -16,6 +16,7 @@
 #include <cmath>
 #include <complex>
 #include <initializer_list>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <stdexcept>
@@ -225,6 +226,7 @@ std::ostream& operator<<(std::ostream& os, const Vector<T>& vec) {
         return os;
     }
 
+    os << std::fixed << std::setprecision(4);
     os << "\n\n";
     if (vec.getOrientation() == VecOrientation::ROW) { // 行向量
         for (typename Vector<T>::vecSizet i = 0; i < vec.getSize(); ++i) {

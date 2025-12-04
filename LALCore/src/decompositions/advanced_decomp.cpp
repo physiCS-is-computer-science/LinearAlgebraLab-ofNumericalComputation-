@@ -29,7 +29,7 @@ std::pair<core::dmtx, core::dmtx> AdvancedDecomposer::householderQR() {
     core::dmtx Q = util::Factory::eye(row);
     
     /* (r, c) 锁定当前子向量首元素，其下（包括自身）为当前抽出以构造 u 的向量 */
-    for (std::size_t r{0}, c{0}; c < col - 1 && r != row - 1; ++c) { // 最后一列、行无需执行
+    for (std::size_t r{0}, c{0}; c < col && r != row - 1; ++c) { // 最后一行无需执行
         if (std::abs(R(r, c)) <= util::EPSILON) { // 0 时跳过此列，行不变
             continue;
         }

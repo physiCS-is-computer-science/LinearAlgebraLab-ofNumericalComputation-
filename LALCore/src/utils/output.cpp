@@ -12,7 +12,7 @@ OutPathID SOS = OutPathID(">: ");
 OutPathID SIS = OutPathID("<< ");
 
 void startupBanner() {
-    std::string name{"LAL v0.6 (Beta)"};
+    std::string name{"LAL v0.7 (Beta)"};
 
     std::cout << "+---------- " << name << " ----------+\n";
     std::cout << " > Support: Matrix/Vector Calculation\n";
