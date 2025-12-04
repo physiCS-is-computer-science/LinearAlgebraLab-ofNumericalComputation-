@@ -11,20 +11,20 @@ reshape cat horzcat vertcat blkdiag tril triu flip rot90 compan
 ```
 
 ```
-1.eye ::varn {}              --> eye ::A {3}         % 单位矩阵 **
-2.zeros ::varn {}            ==> zeros ::A {3}       % 零矩阵 **
-3.ones ::varn {}             ==> ones ::A {3}        % 全1矩阵 **
+1.eye ::varn {}              > eye ::A {3}         % 单位矩阵 **
+2.zeros ::varn {}            > zeros ::A {3}       % 零矩阵 **
+3.ones ::varn {}             > ones ::A {3}        % 全1矩阵 **
 4.random ::varn {}           ==> random ::A {3}      % 均匀分布随机矩阵 *
 5.randn ::varn {}            ==> randn ::A {3}       % 正态分布随机矩阵
-6.diag -opt :varn ::varn     ==> diag -m :A ::B      % 对角矩阵或获取对角线元素 **
+6.diag -opt :varn ::varn     > diag -m :A ::B      % 获取对角线元素 **
 7.linspace   % 线性间隔向量 **
 8.logspace   % 对数间隔向量
 9.meshgrid   % 生成网格坐标
 10.repmat :varn ::varn       ==> repmat :A ::B       % 复制和平铺矩阵 *
 11.reshape   % 改变矩阵形状 *
-12.cat       % 连接数组 *
-13.horzcat   % 水平连接 *
-14.vertcat   % 垂直连接 *
+12.cat       % 连接数组 *     ==>
+13.horzcat                   >                       % 水平连接 *
+14.vertcat                   >                       % 垂直连接 *
 15.blkdiag   % 块对角矩阵
 16.tril -opt :varn ::varn    ==> tril :A ::B         % 下三角部分 *
 17.triu -opt :varn ::varn    ==> tilu :A ::B         % 上三角部分 *
@@ -42,24 +42,24 @@ isnan isinf isfinite find nnz nonzeros issymmetric ishermitian isdefinite
 ```
 
 ```
-1.size :varn ::varn      ==> size :A ::s         % 矩阵维度 **
+1.size :varn ::varn      > size :A             % 矩阵维度 **
 2.length :varn ::varn    ==> length :A ::len     % 最大维度长度 **
 3.ndims :varn ::varn     ==> ndims :A ::num      % 维度数量
 4.numel :varn ::varn     ==> numel :A ::num      % 元素个数 **
 5.isscalar :varn         ==> isscalar :A         % 是否为标量 **
 6.isvector :varn         ==> isvector :A         % 是否为向量 **
 7.ismatrix :varn         ==> ismatrix :A         % 是否为矩阵 **
-8.isempty :varn          ==> isempty :A          % 是否为空矩阵 **
-9.isequal :varn :varn    ==> isequal :A :B       % 判断矩阵是否相等
-10.isnan :varn           ==> isnan :A            % 检查NaN值
-11.isinf :varn           ==> isinf :A            % 检查无穷大
+8.isempty :varn % 是否为空矩阵 **
+9.isequal :varn :varn    > isequal :A :B       % 判断矩阵是否相等
+10.isnan :varn % 检查NaN值
+11.isinf :varn % 检查无穷大
 12.isfinite  % 检查有限值
 13.find      % 查找非零元素索引
 14.nnz :varn ::varn      ==> nnz :A ::cnt        % 非零元素个数 **
 15.nonzeros  % 非零元素值
 16.issymmetric :varn     ==> issymmetric :A      % 是否为对称矩阵 *
-18.ishermitian :varn     ==> ishermitian :A      % 是否为Hermitian矩阵 *
-19.isdefinite :varn      ==> isdefinite :A       % 是否为正定矩阵
+18.ishermitian :varn % 是否为Hermitian矩阵 *
+19.isdefinite :varn % 是否为正定矩阵
 ```
 
 ### 矩阵运算
@@ -71,23 +71,24 @@ mrdivide divide cross dot sum mean max min sort kron diff gradient
 ```
 
 ```
-1.transpose -opt :varn ::varn       ==> transpose -s :A       % 转置 **
-2.ctranspose -opt :varn ::varn      ==> ctranspose -s :A      % 共轭转置 ('运算符) **
-3.plus :varn :varn :varn ::varn     ==> plus :A :B :C ::D     % 加法 (+) **
-4.minus -opt :varn :varn ::varn     ==> minus :A :B ::C       % 减法 (-) **
-5.mtimes :varn :varn :varn ::varn   ==> mtines :A :B :C ::D   % 矩阵乘法 (*) **
-6.times :varn :varn :varn ::varn    ==> times :A :B :C ::D    % 逐元素乘法 (.*) **
+1.transpose -opt :varn ::varn       > transpose -s :A       % 转置 **
+2.ctranspose -opt :varn ::varn % 共轭转置 ('运算符) **
+3.plus :varn :varn :varn ::varn     > plus :A :B :C ::D     % 加法 (+) **
+4.minus -opt :varn :varn ::varn     > minus :A :B ::C       % 减法 (-) **
+5.mtimes :varn :varn :varn ::varn   > mtines :A :B :C ::D   % 矩阵乘法 (*) **
+6.times :varn :varn :varn ::varn    > times :A :B :C ::D    % 逐元素乘法 (.*) **
 7.mpower :varn {}                   ==> mpower :A {3}         % 矩阵幂 (^) **
-8.power :varn :varn ::varn          ==> power :A :B ::C       % 逐元素幂 (.^) **
+8.power :varn :varn ::varn          > power :A :B ::C       % 逐元素幂 (.^) **
 9.mldivide   % 左除 (\) **
 10.mrdivide  % 右除 (/) **
-11.divide :varn :varn ::varn        ==> divide :A :B ::C      % 逐元素除 **
-13.cross :varn :varn ::varn         ==> cross :A :B ::C       % 向量叉积 **
+11.divide :varn :varn ::varn        > divide :A :B ::C      % 逐元素除 **
+13.cross :varn :varn ::varn % 向量叉积 **
+   outer % 向量外积
 14.dot :varn :varn ::varn           ==> dot :A :B ::C         % 向量点积 **
-15.sum -opt :varn ::varn            ==> sum -a :A ::total     % 元素求和 **
-16.mean -opt :varn ::varn           ==> mean -a :A ::m        % 平均值 **
-17.max -opt :varn ::varn            ==> max -a :A ::maxNum    % 最大值 **
-18.min -opt :varn ::varn            ==> min -a :A ::minNum    % 最小值 **
+15.sum -opt :varn ::varn            > sum -a :A ::total     % 元素求和 **
+16.mean -opt :varn ::varn           > mean -a :A ::m        % 平均值 **
+17.max -opt :varn ::varn            > max -a :A ::maxNum    % 最大值 **
+18.min -opt :varn ::varn            > min -a :A ::minNum    % 最小值 **
 19.sort -opt :varn ::varn           ==> sort -s :A ::B        % 排序
 20.kron      % Kronecker 张量积
 21.diff      % 数值差分运算
@@ -102,8 +103,8 @@ lu qr chol svd eig schur hess qz ldl
 ```
 
 ```
-1.lu :varn ::varn ::varn    ==> lu :A ::L ::U     % LU 分解 **
-2.qr :varn ::varn ::varn    ==> qu :A ::Q ::R     % QR 分解 **
+1.lu :varn ::varn ::varn    > lu :A ::L ::U     % LU 分解 **
+2.qr :varn ::varn ::varn    > qr :A ::Q ::R     % QR 分解 **
 3.chol        % Cholesky 分解 **
 4.svd         % 奇异值分解 **
 5.eig         % 特征值分解 **
@@ -117,19 +118,20 @@ lu qr chol svd eig schur hess qz ldl
 
 - 关键词预览：
 ```
-linsolve inv pinv lscov rref null orth lsqnonneg lsqminnorm 
+linsolve inv pinv lscov rref null orth lsqnonneg lsqminnorm lsq
 ```
 
 ```
-1.linsolve :varn :varn ::varn    ==> linsolve :A ::x :b  % 线性方程组求解 **
-2.inv -opt :varn ::varn          ==> inv -s :A ::B       % 矩阵求逆 **
+1.linsolve :varn :varn ::varn    > linsolve :A ::x :b  % 线性方程组求解 **
+2.inv -opt :varn ::varn          > inv -s :A ::B       % 矩阵求逆 **
 3.pinv       % 伪逆（Moore-Penrose） **
 4.lscov      % 最小二乘解（已知协方差）
-5.rref -opt :varn ::varn         ==> rref -s :A ::B      % 简化行阶梯形式 **
-6.null       % 零空间基 *
-7.orth       % 正交化 *
+5.rref -opt :varn ::varn         > rref -s :A ::B      % 简化行阶梯形式 **
+6.null                           > % 零空间基 *
+7.orth                           > % 正交化 *
 8.lsqnonneg   % 非负最小二乘 ** 
-9.lsqminnorm % 最小范数最小二乘
+9.lsqminnorm                     ==> % 最小范数最小二乘
+10.lsq                           > % 最小二乘全解
 ```
 
 ### 特征值与奇异值
@@ -155,10 +157,10 @@ det rank trace norm cond condest rcond condeig balance
 ```
 
 ```
-1.det -opt :varn ::varn     ==> det -a :A ::d       % 行列式 **
-2.rank -opt :varn ::varn    ==> rank -a :A ::r      % 矩阵的秩 **
-3.trace -opt :varn ::varn   ==> trace -a :A ::t     % 矩阵的迹 **
-4.norm       % 矩阵或向量范数 **
+1.det -opt :varn ::varn     > det -a :A ::d       % 行列式 **
+2.rank -opt :varn ::varn    > rank -a :A ::r      % 矩阵的秩 **
+3.trace -opt :varn ::varn   > trace -a :A ::t     % 矩阵的迹 **
+4.norm                      ==> % 矩阵或向量范数 **
 5.cond       % 矩阵条件数 **
 6.condest    % 1-范数条件数估计
 7.rcond      % 条件数倒数估计
@@ -239,15 +241,14 @@ show var modify del save load cls help quit
 ```
 
 ```
-1.show -opt :varn                -->   show -a              % 展示某一变量或所有变量
-2.var ::varn [a b; c d] {varn}   ==>   var ::A [1 2; 3 4;]  % 创建变量（矩阵或常量）
-3.modify :varn {a} [a; b]        ==>   modify :A [1; 3]     % 修改变量值
-4.del -opt :varn                 ==>   del :A               % 删除该变量
-5.save ::varn                    ==>   save ::new.lal       % 保存当前工作空间到文件 path
-6.load :varn                     ==>   load :test.lal       % 从 path 读取工作空间
-7.cls                            -->   cls                  % 清屏
-8.help :varn                     ==>   help :eye            % 查找该命令的信息
-9.quit                           -->   quit                 % 退出
+1.show -opt :varn                >   show -a              % 展示某一变量或所有变量
+2.var ::varn [a b; c d] {varn}   >   var ::A [1 2; 3 4;]  % 创建变量（矩阵或常量）
+4.del -opt :varn                 >   del :A               % 删除该变量
+5.save ::varn                    >   save ::new.lal       % 保存当前工作空间到文件 path
+6.load :varn                     >   load :test.lal       % 从 path 读取工作空间
+7.cls                            >   cls                  % 清屏
+8.help :varn                     >   help :eye            % 查找该命令的信息
+9.quit                           >   quit                 % 退出
 ```
 
 

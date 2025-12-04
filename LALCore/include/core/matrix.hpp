@@ -641,7 +641,7 @@ Vector<T> Matrix<T>::getAntiDiag() const {
         );
     }
 
-    Vector output(row_);
+    Vector<T> output(row_);
     for (typename Vector<T>::vecSizet i = 0; i < row_; ++i) {
         output(i) = matrix_[i][row_ - 1 - i];
     }

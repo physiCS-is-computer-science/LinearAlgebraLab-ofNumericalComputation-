@@ -16,6 +16,55 @@
 // public:
 // };
 
+/* ==== 矩阵创建与操作 ==== */
+bool eye();
+bool zeros();
+bool ones();
+// bool random();
+// bool randn();
+bool diag();
+bool horzcat();
+bool vertcat();
+
+/* ==== 矩阵基本信息 ==== */
+bool size();
+bool isequal();
+
+/* ==== 矩阵运算 ==== */
+bool transpose();
+bool plus();
+bool minus();
+bool mtimes();
+bool times();
+bool divide();
+// bool mpower(); // 设计负数次方（矩阵求逆），因此暂时不实现
+bool power();
+bool sum();
+bool mean();
+bool max();
+bool min();
+
+/* ==== 矩阵分解 ==== */
+bool lu();
+bool qr();
+
+/* ==== 线性方程组求解 ==== */
+bool inv();
+bool linsolve();
+bool rref();
+bool null();
+bool orth();
+bool lsq();
+
+/* ==== 特征值与奇异值 ==== */
+
+/* ==== 矩阵分析与条件数 ==== */
+bool det();
+bool rank();
+bool trace();
+
+/* ==== 特殊矩阵 ==== */
+
 /* ==== 基本命令 ==== */
 bool quit();
 bool show();
@@ -25,31 +74,3 @@ bool save();
 bool load();
 bool cls();
 bool help();
-
-/* ==== 运算 ==== */
-bool plus();
-bool minus();
-bool mtimes();
-bool times();
-bool divide();
-// bool mpower(); // 设计负数次方（矩阵求逆），因此暂时不实现
-bool power();
-
-/* ==== 矩阵创建与操作 ==== */
-bool eye();
-// bool zeros();
-// bool ones();
-// bool random();
-// bool randn();
-// bool diag();
-
-/* ==== 矩阵分解 ==== */
-bool lu();
-bool rref();
-
-/* ==== 线性方程组求解 ==== */
-bool inv();
-bool linsolve();
-
-/* ==== 矩阵分析与条件数 ==== */
-bool det();

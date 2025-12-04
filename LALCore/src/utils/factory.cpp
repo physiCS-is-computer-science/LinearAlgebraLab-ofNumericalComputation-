@@ -109,10 +109,13 @@ std::pair<core::dmtx, core::dmtx> Factory::splitRow(
     std::size_t row
 ) {
     if (mtx.getRowSize() <= 1 ||
-        row >= mtx.getRowSize() ||
         row == 0
     ) {
         return {};
+    }
+
+    if (row >= mtx.getRowSize()) { // 获得原矩阵，置于上边
+        return {mtx, {}};
     }
 
     core::dmtx mtx1(row, mtx.getColSize());

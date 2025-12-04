@@ -15,6 +15,8 @@
 
 #include "core/matrix.hpp"
 #include "core/vector.hpp"
+#include "decompositions/basic_decomp.hpp"
+
 namespace solve {
 
 class Solver {
@@ -27,7 +29,7 @@ public:
     Solver& operator=(Solver&&) = default;
     Solver(const core::dmtx &m) : decomper_(m), R_(decomper_.rref()) {}
 
-    core::dmtx getorigMtx() { return decomper_.getorigMtx(); } // 获取原始矩阵
+    core::dmtx orig() { return decomper_.getorigMtx(); } // 获取原始矩阵
 
     core::dmtx homogeneousSolve() const; // 求解 Ax = 0（A 的零空间），返回零空间基拼接而成的矩阵 N
     core::dmtx solveAxb(const core::dvec &b) const; // 求解 Ax

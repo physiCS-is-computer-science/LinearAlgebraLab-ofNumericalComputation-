@@ -36,7 +36,7 @@
 #include <vector>
 
 int main() {
-    bool test{1};
+    bool test{0};
 
     /* =========================================================== */
     if (test) {
